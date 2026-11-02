@@ -18,7 +18,7 @@ export default function Home() {
 
   // Achtergrond van de trainingskaart: uitgelichte foto, anders de eerste clubfoto
   const featured = photos?.find((p) => p.featured);
-  const heroImg = featured?.url || CLUB_PHOTOS[0]?.src || null;
+  const heroImg = featured?.url || null; // zonder uitgelichte foto: het Backyard-filmpje
   const strip = [...(photos || []).slice(0, 8), ...CLUB_PHOTOS.slice(1).map((p, i) => ({ id: 'club-' + i, url: p.src, name: 'BenneKOM', caption: p.caption }))].slice(0, 8);
 
   return (
@@ -88,7 +88,11 @@ function NextTraining({ e, img }) {
   const going = Boolean(data.mine[e.id]);
   const n = data.counts[e.id] || 0;
   return (
-    <section className={'hero' + (img ? ' photo' : '')} style={img ? { backgroundImage: `url("${img}")` } : undefined}>
+    <section className={'hero photo' + (img ? '' : ' has-video')} style={img ? { backgroundImage: `url("${img}")` } : undefined}>
+      {!img && (
+        <video className="hero-video" src="/media/backyard-shirt.mp4" poster="/media/backyard-shirt.jpg"
+          autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
+      )}
       <span className="eyebrow">Volgende clubtraining · {rel(e.date)}</span>
       <h1>{p.W} {p.d} {p.m}</h1>
       <div className="meta"><span className="num">{e.time}</span><span>{e.place}</span></div>

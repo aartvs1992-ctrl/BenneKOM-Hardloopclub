@@ -212,3 +212,8 @@ body{margin:0;min-height:100%}
 .photo-header h1{font-size:34px}
 .photo-header>*{position:relative}
 .photo-header p{font-size:15px;opacity:.9;max-width:34ch}
+.hero.has-video>.hero-video{position:absolute;top:0;left:0;width:100%;height:min(62vw,290px);object-fit:cover;object-position:30% 88%;z-index:0}
+.hero.has-video{padding-top:calc(min(62vw,290px) + 6px)}
+.hero.has-video::before{z-index:1;background:linear-gradient(180deg,rgba(7,30,62,0) 0,rgba(7,30,62,0) calc(min(62vw,290px) * .78),var(--navy) min(62vw,290px))}
+.hero.has-video>*:not(.hero-video){z-index:2}
+@media (prefers-reduced-motion: reduce){.hero-video{display:none}.hero.has-video{background-image:url("/media/backyard-shirt.jpg");background-size:100% auto;background-position:30% 88%}}
