@@ -304,3 +304,6 @@ a.media-item:hover{border-color:var(--gold)}
 .code-box .eyebrow{color:var(--gold)}
 .code-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .code-box .code{font-size:24px;font-weight:700;letter-spacing:.12em;user-select:all}
+.signoff{white-space:pre-line;font-family:var(--f-display);font-style:italic;font-weight:800;font-size:22px;color:var(--gold-ink)}
+.story-block{display:flex;flex-direction:column;gap:10px}
+.story-block h3{font-size:22px;margin-top:6px}

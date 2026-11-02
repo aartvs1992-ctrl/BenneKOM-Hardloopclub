@@ -20,8 +20,9 @@ export default function Verhaal() {
             {b.caption && <p className="small muted">{b.caption}</p>}
           </section>
         )) : (
-          <p className="note">Het volledige verhaal van Aart over hoe BenneKOM begon volgt binnenkort, met foto&apos;s van de eerste trainingen.</p>
+          <p className="note">Het volledige verhaal volgt binnenkort.</p>
         )}
+        {v.signoff && <p className="signoff">{v.signoff}</p>}
       </article>
       <section className="section">
         <h2>Tijdlijn</h2>

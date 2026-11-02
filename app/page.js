@@ -64,14 +64,12 @@ export default function Home() {
       )}
 
       <section className="section">
-        <h2>Handig</h2>
+        <h2>Meer BenneKOM</h2>
         <div className="tiles">
-          <Link className="tile" href="/tools"><span className="k">Calculator</span><span className="v">Tempo, voorspeller, zones, splits</span></Link>
-          <Link className="tile" href="/voeding"><span className="k">Voeding</span><span className="v">Je persoonlijke raceplan</span></Link>
-          <Link className="tile" href="/leren"><span className="k">Leren</span><span className="v">{local.done.length}/15 modules gelezen</span></Link>
-          <Link className="tile" href="/nieuws"><span className="k">Nieuws</span><span className="v">Berichten van de club</span></Link>
-          <Link className="tile" href="/partners"><span className="k">Partners</span><span className="v">Ledenkorting bij onze partners</span></Link>
           <Link className="tile" href="/verhaal"><span className="k">Ons verhaal</span><span className="v">Hoe BenneKOM begon</span></Link>
+          <Link className="tile" href="/partners"><span className="k">Partners</span><span className="v">Ledenkorting bij onze partners</span></Link>
+          <Link className="tile" href="/nieuws"><span className="k">Nieuws</span><span className="v">Berichten van de club</span></Link>
+          <Link className="tile" href="/tools"><span className="k">Calculator</span><span className="v">Tempo, voorspeller, zones, splits</span></Link>
         </div>
       </section>
     </>

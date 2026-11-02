@@ -20,7 +20,6 @@ export default function Tools() {
         {tab === 'zones' && <Zones />}
         {tab === 'splits' && <Splits />}
       </div>
-      <Link className="tile" href="/voeding"><span className="k">Voeding voor je race →</span><span className="v">Koolhydraten, gels en water op maat</span></Link>
     </>
   );
 }
