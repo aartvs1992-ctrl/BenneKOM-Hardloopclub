@@ -13,8 +13,7 @@ export default function Home() {
   if (!useReady()) return <Loading />;
 
   const next = data.events.find((e) => e.type === 'training' || e.replaces_training);
-  const specials = data.events.filter((e) => e.type === 'special' && e.id !== next?.id).slice(0, 2);
-  const chal = data.events.find((e) => e.type === 'challenge');
+  const specials = data.events.filter((e) => e.type === 'special' && e.id !== next?.id).slice(0, 3);
   const race = data.events.find((e) => e.type === 'wedstrijd');
 
   // Achtergrond van de trainingskaart: uitgelichte foto, anders de eerste clubfoto
@@ -32,7 +31,6 @@ export default function Home() {
         <div className="section-head"><h2>Doe mee</h2><Link className="link" href="/agenda">Hele agenda ›</Link></div>
         <div className="list">
           {specials.map((e) => <EventRow key={e.id} e={e} />)}
-          {chal && <EventRow e={chal} />}
         </div>
       </section>
 
