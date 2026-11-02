@@ -193,8 +193,8 @@ body{margin:0;min-height:100%}
 .btn-danger{background:#C0392B;color:#fff}
 
 /* ---------- vernieuwde home ---------- */
-.hero.photo{background-size:cover;background-position:center 35%;min-height:340px;justify-content:flex-end}
-.hero.photo::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,30,62,.15) 0%,rgba(7,30,62,.55) 40%,rgba(7,30,62,.94) 78%);pointer-events:none}
+.hero.photo{background-color:var(--navy);background-size:100% auto;background-position:center top;background-repeat:no-repeat;padding-top:min(52vw,250px)}
+.hero.photo::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,30,62,0) 0,rgba(7,30,62,0) min(30vw,150px),rgba(7,30,62,.85) min(50vw,240px),var(--navy) min(62vw,290px));pointer-events:none}
 .hero.photo>*{position:relative;z-index:1}
 .hero.photo::after{display:none}
 .strip{display:grid;grid-auto-flow:column;grid-auto-columns:42%;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px))}
