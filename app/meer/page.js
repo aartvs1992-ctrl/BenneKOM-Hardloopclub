@@ -24,7 +24,7 @@ export default function Meer() {
         {ask && <button className="btn btn-gold" type="submit">Opslaan en terug</button>}
       </form>
       <div className="list">
-        {[['/voeding', 'Voeding', 'Raceplan op maat'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/nieuws', 'Nieuws', 'Van de club en Strava'], ['/shirt', 'Clubshirt', 'Singlets, shirts en shorts'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
+        {[['/tools', 'Calculator', 'Tempo, voorspeller, zones en splits'], ['/voeding', 'Voeding', 'Raceplan op maat'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/nieuws', 'Nieuws', 'Berichten van de club'], ['/shirt', 'Clubshirt', 'Singlets, shirts en shorts'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
           <Link key={h} className="row" style={{ gridTemplateColumns: '1fr auto' }} href={h}><span><span className="t">{t}</span><br /><span className="s">{s}</span></span><span className="chev">›</span></Link>
         ))}
         {[['https://hardloopclubbennekom.nl/verhaal', 'Het verhaal', 'Hoe Bennekom een loopclub kreeg'], [CLUB.strava, 'Strava-club', ''], [CLUB.instagram, 'Instagram', 'Foto\'s en impressies']].map(([h, t, s]) => (

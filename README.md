@@ -9,7 +9,8 @@ De app van Hardloopclub BenneKOM. Leden zetten hem op hun beginscherm en krijgen
 - **5km Challenge**: eigen tijden, PR en ranglijst
 - **Calculator** (tempo, voorspeller, hartslagzones, splits) en **voedingsplan**
 - **Leren**: 15 modules met voortgang
-- **Nieuws** en de **Strava-feed** van de club
+- **Nieuws** van de club
+- **Fotowall**: leden plaatsen foto's, geven duimpjes; beheer kan uitlichten en verwijderen
 - **Pushmeldingen**: dinsdagherinnering, nieuwe events, Challenge, carpool
 - **Beheer** (`/beheer`): events, nieuws, voorstellen, tijden en meldingen versturen
 
@@ -22,7 +23,7 @@ Gebouwd met Next.js, Supabase (database) en Vercel (hosting). Alles past binnen 
 ### 1. Database (Supabase)
 1. Ga naar [supabase.com](https://supabase.com) en log in met GitHub.
 2. Klik **New project**. Naam: `bennekom`. Kies regio **West EU**. Bewaar het databasewachtwoord.
-3. Ga naar **SQL Editor → New query**, plak de inhoud van [`supabase/schema.sql`](supabase/schema.sql) en klik **Run**.
+3. Ga naar **SQL Editor → New query**, plak de inhoud van [`supabase/schema.sql`](supabase/schema.sql) en klik **Run**. Doe daarna hetzelfde met [`supabase/002_fotowall.sql`](supabase/002_fotowall.sql).
 4. Ga naar **Project Settings → API** en noteer de **Project URL** en de **service_role**-sleutel (geheim houden).
 
 ### 2. Pushmeldingen (sleutels)
@@ -47,16 +48,12 @@ Laat Claude dit doen, of draai `npx web-push generate-vapid-keys`. Je krijgt een
 
 Elke dag om 16:00 (winter) of 17:00 (zomer) kijkt de app of er die dag een training is of morgen een Challenge, en stuurt dan een melding (`vercel.json`).
 
-### 4. Strava (optioneel)
-1. Ga naar [strava.com/settings/api](https://www.strava.com/settings/api) en maak een app aan (website: je Vercel-adres).
-2. Haal een refresh token op met de scope `read` (Claude kan je hierbij helpen).
-3. Vul `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET` en `STRAVA_REFRESH_TOKEN` in bij Vercel en deploy opnieuw.
-
 ---
 
 ## Aanpassen
 - **Dinsdagtraining** (dag, tijd, plek): `lib/club.js`
 - **Leermodules, clubshirts, meldingtypes**: `lib/content.js`
+- **Vaste clubfoto's**: bestanden in `public/club/`, lijst in `lib/club.js` (`CLUB_PHOTOS`)
 - **Kleuren en stijl**: `app/globals.css`
 - **Events en nieuws**: gewoon via `/beheer` in de app
 

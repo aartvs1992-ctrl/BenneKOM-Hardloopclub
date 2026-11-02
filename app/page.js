@@ -3,11 +3,13 @@ import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { EventRow, Loading, ErrorNote, useReady, AttendButton } from '@/components/ui';
 import { dparts, rel } from '@/lib/content';
-import { CLUB } from '@/lib/club';
+import { CLUB, CLUB_PHOTOS } from '@/lib/club';
+import { usePhotos } from '@/lib/usePhotos';
 import InstallBanner from '@/components/InstallBanner';
 
 export default function Home() {
-  const { data, local, act } = useApp();
+  const { data, local } = useApp();
+  const { photos } = usePhotos();
   if (!useReady()) return <Loading />;
 
   const next = data.events.find((e) => e.type === 'training' || e.replaces_training);
@@ -15,17 +17,36 @@ export default function Home() {
   const chal = data.events.find((e) => e.type === 'challenge');
   const race = data.events.find((e) => e.type === 'wedstrijd');
 
+  // Achtergrond van de trainingskaart: uitgelichte foto, anders de eerste clubfoto
+  const featured = photos?.find((p) => p.featured);
+  const heroImg = featured?.url || CLUB_PHOTOS[0]?.src || null;
+  const strip = [...(photos || []).slice(0, 8), ...CLUB_PHOTOS.slice(1).map((p, i) => ({ id: 'club-' + i, url: p.src, name: 'BenneKOM', caption: p.caption }))].slice(0, 8);
+
   return (
     <>
       <ErrorNote />
       <InstallBanner />
-      {next && <NextTraining e={next} />}
+      {next && <NextTraining e={next} img={heroImg} />}
 
       <section className="section">
         <div className="section-head"><h2>Doe mee</h2><Link className="link" href="/agenda">Hele agenda ›</Link></div>
         <div className="list">
           {specials.map((e) => <EventRow key={e.id} e={e} />)}
           {chal && <EventRow e={chal} />}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-head"><h2>Dit zijn wij</h2><Link className="link" href="/fotos">Alle foto&apos;s ›</Link></div>
+        <div className="strip">
+          <Link className="add" href="/fotos"><b>+</b>Deel je foto</Link>
+          {strip.map((p) => (
+            <Link key={p.id} href="/fotos" aria-label={p.caption || 'Foto van ' + p.name}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.url} alt="" loading="lazy" />
+              <span className="by">{p.name}</span>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -41,7 +62,9 @@ export default function Home() {
             <div className="btn-row">
               <Link className="btn btn-gold btn-sm" href={'/event/' + race.id}>Carpool regelen</Link>
               <span className="small muted" style={{ alignSelf: 'center' }}>
-                {(data.rides[race.id] || []).reduce((a, r) => a + r.left, 0)} plekken vrij
+                {(data.rides[race.id] || []).length
+                  ? `${(data.rides[race.id] || []).reduce((a, r) => a + r.left, 0)} plekken vrij`
+                  : 'Nog geen ritten'}
               </span>
             </div>
           </div>
@@ -54,30 +77,29 @@ export default function Home() {
           <Link className="tile" href="/tools"><span className="k">Calculator</span><span className="v">Tempo, voorspeller, zones, splits</span></Link>
           <Link className="tile" href="/voeding"><span className="k">Voeding</span><span className="v">Je persoonlijke raceplan</span></Link>
           <Link className="tile" href="/leren"><span className="k">Leren</span><span className="v">{local.done.length}/15 modules gelezen</span></Link>
-          <Link className="tile" href="/nieuws"><span className="k">Nieuws</span><span className="v">Van de club en Strava</span></Link>
+          <Link className="tile" href="/nieuws"><span className="k">Nieuws</span><span className="v">Berichten van de club</span></Link>
         </div>
       </section>
     </>
   );
-
 }
 
-function NextTraining({ e }) {
-    const { data, local, act } = useApp();
-    const p = dparts(e.date);
-    const going = Boolean(data.mine[e.id]);
-    const n = data.counts[e.id] || 0;
-    return (
-      <section className="hero">
-        <span className="eyebrow">Volgende clubtraining · {rel(e.date)}</span>
-        <h1>{p.W} {p.d} {p.m}</h1>
-        <div className="meta"><span className="num">{e.time}</span><span>{e.place}</span></div>
-        <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></div>
-        <div className="btn-row">
-          <AttendButton e={e} going={going} act={act} local={local} />
-          <a className="btn btn-line" href={CLUB.strava} target="_blank" rel="noopener noreferrer">Strava</a>
-        </div>
-        <span className="slogan">Samen=LEUKER</span>
-      </section>
-    );
-  }
+function NextTraining({ e, img }) {
+  const { data, local, act } = useApp();
+  const p = dparts(e.date);
+  const going = Boolean(data.mine[e.id]);
+  const n = data.counts[e.id] || 0;
+  return (
+    <section className={'hero' + (img ? ' photo' : '')} style={img ? { backgroundImage: `url("${img}")` } : undefined}>
+      <span className="eyebrow">Volgende clubtraining · {rel(e.date)}</span>
+      <h1>{p.W} {p.d} {p.m}</h1>
+      <div className="meta"><span className="num">{e.time}</span><span>{e.place}</span></div>
+      <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></div>
+      <div className="btn-row">
+        <AttendButton e={e} going={going} act={act} local={local} />
+        <a className="btn btn-line" href={CLUB.strava} target="_blank" rel="noopener noreferrer">Strava</a>
+      </div>
+      <span className="slogan">Samen=LEUKER</span>
+    </section>
+  );
+}

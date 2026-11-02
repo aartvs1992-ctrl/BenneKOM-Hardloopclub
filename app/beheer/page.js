@@ -47,7 +47,7 @@ export default function Beheer() {
         <b>Status</b>
         <span>Database: {d.status.database ? '✓ Supabase gekoppeld' : '⚠ tijdelijke opslag (stel Supabase in)'}</span>
         <span>Pushmeldingen: {d.status.push ? `✓ aan · ${d.subscribers} abonnees` : '⚠ VAPID-sleutels ontbreken'}</span>
-        <span>Strava: {d.status.strava ? '✓ gekoppeld' : 'niet gekoppeld'}</span>
+        <span>Foto&apos;s: {d.photos?.length ?? 0} op de wall</span>
       </div>
 
       <section className="section">
@@ -103,6 +103,22 @@ export default function Beheer() {
             <option value="events">Iedereen met &apos;specials en wedstrijden&apos; aan</option><option value="training">Trainingsherinnering aan</option><option value="challenge">5km Challenge aan</option><option value="shirt">Bestelronde clubshirt aan</option></select></div>
           <button className="btn btn-gold" type="submit">Versturen</button>
         </form>
+      </section>
+
+      <section className="section">
+        <h2>Fotowall</h2>
+        <p className="small muted">Ster = groot op de homepagina achter de trainingskaart.</p>
+        {d.photos?.length ? <div className="admin-photos">{d.photos.map((p) => (
+          <div key={p.id} className="admin-photo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={p.url} alt={p.caption || ''} loading="lazy" />
+            <span className="small">{p.name}{p.caption ? ' · ' + p.caption : ''}</span>
+            <span className="btn-row" style={{ gap: 8 }}>
+              <button className="link" onClick={() => call('featurePhoto', { id: p.id }, p.featured ? 'Niet meer uitgelicht' : 'Uitgelicht op de homepagina')}>{p.featured ? '★ Uitgelicht' : '☆ Uitlichten'}</button>
+              <DeleteButton onConfirm={() => call('deletePhoto', { id: p.id }, 'Foto verwijderd')} />
+            </span>
+          </div>
+        ))}</div> : <p className="muted">Nog geen foto&apos;s geplaatst.</p>}
       </section>
 
       <section className="section">

@@ -1,5 +1,6 @@
 // Beheer: events, nieuws, voorstellen en handmatige pushmeldingen. Beveiligd met ADMIN_PASSWORD.
-import { all, insert, upsert, remove, usingSupabase } from '@/lib/db';
+import { all, insert, upsert, remove, usingSupabase, deleteFile } from '@/lib/db';
+import { listPhotos } from '@/lib/photos';
 import { sendPush, pushReady } from '@/lib/push';
 
 export const dynamic = 'force-dynamic';
@@ -51,6 +52,16 @@ export async function POST(req) {
       case 'deleteResult':
         await remove('challenge_results', { id: b.id });
         break;
+      case 'deletePhoto': {
+        const p = (await all('photos')).find((x) => x.id === b.id);
+        if (p) { await remove('photo_likes', { photo_id: p.id }); await remove('photos', { id: p.id }); await deleteFile(p.path); }
+        break;
+      }
+      case 'featurePhoto': {
+        const p = (await all('photos')).find((x) => x.id === b.id);
+        if (p) await upsert('photos', { ...p, featured: !p.featured }, ['id']);
+        break;
+      }
       case 'push': {
         if (!clean(b.title)) return Response.json({ error: 'Geef de melding een titel.' }, { status: 400 });
         const r = await sendPush(b.pref || 'events', { title: clean(b.title, 80), body: clean(b.body, 200), url: b.url || '/' });
@@ -59,15 +70,15 @@ export async function POST(req) {
       default:
         return Response.json({ error: 'Onbekende actie.' }, { status: 400 });
     }
-    const [events, news, suggestions, participants, results, subs] = await Promise.all([
-      all('events'), all('news'), all('suggestions'), all('participants'), all('challenge_results'), all('push_subscriptions'),
+    const [events, news, suggestions, participants, results, subs, photos] = await Promise.all([
+      all('events'), all('news'), all('suggestions'), all('participants'), all('challenge_results'), all('push_subscriptions'), listPhotos(''),
     ]);
     return Response.json({
       events: events.sort((a, b) => a.date.localeCompare(b.date)),
       news: news.sort((a, b) => String(b.published_at).localeCompare(String(a.published_at))),
-      suggestions, participants, results,
+      suggestions, participants, results, photos,
       subscribers: subs.length,
-      status: { database: usingSupabase, push: pushReady, strava: Boolean(process.env.STRAVA_REFRESH_TOKEN) },
+      status: { database: usingSupabase, push: pushReady },
     });
   } catch (e) {
     return Response.json({ error: 'Er ging iets mis: ' + e.message }, { status: 500 });
