@@ -17,7 +17,7 @@ export default function Meer() {
         <span className="chev">›</span>
       </Link>
       <div className="list">
-        {[['/tools', 'Calculator', 'Tempo, voorspeller, zones en splits'], ['/voeding', 'Voeding', 'Raceplan op maat'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/nieuws', 'Nieuws', 'Berichten van de club'], ['/verhaal', 'Het ontstaan van BenneKOM', 'Hoe Bennekom een loopclub kreeg'], ['/media', 'BenneKOM in de media', 'Krant, lokale media en partners'], ['/shirt', 'Clubshirt', 'Singlets, shirts en shorts'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
+        {[['/partners', 'Partners', 'Korting bij Runners World Ede en Fitsynergy'], ['/tools', 'Calculator', 'Tempo, voorspeller, zones en splits'], ['/voeding', 'Voeding', 'Raceplan op maat'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/nieuws', 'Nieuws', 'Berichten van de club'], ['/verhaal', 'Het ontstaan van BenneKOM', 'Hoe Bennekom een loopclub kreeg'], ['/media', 'BenneKOM in de media', 'Krant, lokale media en partners'], ['/shirt', 'Clubshirt', 'Singlets, shirts en shorts'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
           <Link key={h} className="row" style={{ gridTemplateColumns: '1fr auto' }} href={h}><span><span className="t">{t}</span><br /><span className="s">{s}</span></span><span className="chev">›</span></Link>
         ))}
         {[[CLUB.strava, 'Strava-club', ''], [CLUB.instagram, 'Instagram', 'Foto\'s en impressies']].map(([h, t, s]) => (

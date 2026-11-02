@@ -298,3 +298,9 @@ a.media-item:hover{border-color:var(--gold)}
 .timeline li{position:relative;display:flex;flex-direction:column;gap:2px}
 .timeline li::before{content:"";position:absolute;left:-26px;top:4px;width:13px;height:13px;border-radius:50%;background:var(--navy);border:3px solid var(--gold)}
 .timeline b{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink)}
+.partner h2{font-size:24px}
+.partner .benefit{font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--gold-ink);text-transform:uppercase;letter-spacing:.01em}
+.code-box{background:var(--navy);color:var(--on-navy);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.code-box .eyebrow{color:var(--gold)}
+.code-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.code-box .code{font-size:24px;font-weight:700;letter-spacing:.12em;user-select:all}

@@ -77,6 +77,16 @@ export async function POST(req) {
         await insert('media', { outlet: clean(m.outlet, 60), title: clean(m.title, 160), published: /^\d{4}-\d{2}$/.test(m.published || '') ? m.published : '', url: /^https?:\/\//.test(m.url || '') ? clean(m.url, 400) : '', summary: clean(m.summary, 400) });
         break;
       }
+      case 'savePartner': {
+        const m = b.partner || {};
+        if (!clean(m.name)) return Response.json({ error: 'Vul de naam van de partner in.' }, { status: 400 });
+        const row = { name: clean(m.name, 80), about: clean(m.about, 400), benefit: clean(m.benefit, 160), code: clean(m.code, 40), how: clean(m.how, 200), url: /^https?:\/\//.test(m.url || '') ? clean(m.url, 300) : '', sort: parseInt(m.sort, 10) || 0 };
+        if (m.id) await upsert('partners', { id: m.id, ...row }, ['id']); else await insert('partners', row);
+        break;
+      }
+      case 'deletePartner':
+        await remove('partners', { id: b.id });
+        break;
       case 'deleteMedia':
         await remove('media', { id: b.id });
         break;
@@ -110,6 +120,7 @@ export async function POST(req) {
       suggestions, participants, results, photos,
       subscribers: subs.length,
       media: await all('media').catch(() => []),
+      partners: (await all('partners').catch(() => [])).sort((a, b) => (a.sort || 0) - (b.sort || 0)),
       upcoming: withTrainings(events).map((e) => ({ id: e.id, title: e.title, date: e.date, type: e.type })),
       added: b.added,
       status: { database: usingSupabase, push: pushReady },

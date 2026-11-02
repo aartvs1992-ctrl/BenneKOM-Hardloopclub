@@ -13,6 +13,8 @@ export default function Beheer() {
   const [notify, setNotify] = useState(true);
   const [news, setNews] = useState({ author: 'Bestuur', title: '', body: '', event_id: '' });
   const [imp, setImp] = useState({ eventId: '', names: '' });
+  const P0 = { id: '', name: '', about: '', benefit: '', code: '', how: '', url: '', sort: '' };
+  const [par, setPar] = useState(P0);
   const [med, setMed] = useState({ outlet: '', title: '', published: '', url: '', summary: '' });
   const [push, setPush] = useState({ title: '', body: '', pref: 'events' });
 
@@ -103,6 +105,23 @@ export default function Beheer() {
             </div>
           )}
         </form>
+      </section>
+
+      <section className="section">
+        <h2>Partners</h2>
+        <form className="panel" onSubmit={async (e) => { e.preventDefault(); if (await call('savePartner', { partner: par }, 'Opgeslagen')) setPar(P0); }}>
+          <div className="field"><label htmlFor="pa-name">Naam</label><input className="input" id="pa-name" value={par.name} onChange={(e) => setPar({ ...par, name: e.target.value })} required /></div>
+          <div className="field"><label htmlFor="pa-about">Korte uitleg</label><textarea className="input" id="pa-about" value={par.about} onChange={(e) => setPar({ ...par, about: e.target.value })} /></div>
+          <div className="field"><label htmlFor="pa-benefit">Voordeel voor leden</label><input className="input" id="pa-benefit" value={par.benefit} onChange={(e) => setPar({ ...par, benefit: e.target.value })} placeholder="10% korting op schoenen en kleding" /></div>
+          <div className="grid2"><div className="field"><label htmlFor="pa-code">Kortingscode (optioneel)</label><input className="input" id="pa-code" value={par.code} onChange={(e) => setPar({ ...par, code: e.target.value })} /></div><div className="field"><label htmlFor="pa-sort">Volgorde</label><input className="input" id="pa-sort" value={par.sort} onChange={(e) => setPar({ ...par, sort: e.target.value })} type="number" /></div></div>
+          <div className="field"><label htmlFor="pa-how">Hoe krijg je de korting?</label><input className="input" id="pa-how" value={par.how} onChange={(e) => setPar({ ...par, how: e.target.value })} placeholder="Vul de code in bij het afrekenen" /></div>
+          <div className="field"><label htmlFor="pa-url">Website (optioneel)</label><input className="input" id="pa-url" value={par.url} onChange={(e) => setPar({ ...par, url: e.target.value })} type="url" placeholder="https://" /></div>
+          <div className="btn-row"><button className="btn btn-gold" type="submit">{par.id ? 'Opslaan' : 'Partner toevoegen'}</button>{par.id && <button type="button" className="btn btn-line" onClick={() => setPar(P0)}>Annuleren</button>}</div>
+        </form>
+        <div className="list">{(d.partners || []).map((p) => (
+          <div key={p.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}><span><span className="t">{p.name}</span><br /><span className="s">{p.benefit}{p.code ? ' · code ' + p.code : ''}</span></span>
+            <span className="btn-row" style={{ gap: 6 }}><button className="link" onClick={() => { setPar({ ...P0, ...p, sort: p.sort ?? '' }); window.scrollTo(0, 0); }}>Bewerk</button><DeleteButton onConfirm={() => call('deletePartner', { id: p.id }, 'Verwijderd')} /></span></div>
+        ))}</div>
       </section>
 
       <section className="section">
