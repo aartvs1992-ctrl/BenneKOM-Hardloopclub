@@ -1,13 +1,16 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/components/AppProvider';
-import { Loading, Avatar } from '@/components/ui';
-import { squareAvatar } from '@/lib/usePhotos';
+import { Loading, Avatar, MemberSheet } from '@/components/ui';
+import AvatarCropper from '@/components/AvatarCropper';
 
 export default function Profiel() {
   const { local, updateLocal, refresh, toast } = useApp();
   const [prof, setProf] = useState(undefined); // undefined = laden, null = nog geen profiel
-  const [f, setF] = useState({ first_name: '', last_name: '', about: '' });
+  const EMPTY = { first_name: '', last_name: '', song: '', member_since: '', fun_fact: '', work: '' };
+  const [f, setF] = useState(EMPTY);
+  const [cropFile, setCropFile] = useState(null);
+  const [preview, setPreview] = useState(false);
   const [photo, setPhoto] = useState(null);   // nieuwe foto (data-URL)
   const [removePhoto, setRemovePhoto] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -24,8 +27,8 @@ export default function Profiel() {
       .then((r) => r.json())
       .then((j) => {
         setProf(j.profile);
-        if (j.profile) setF({ first_name: j.profile.first_name, last_name: j.profile.last_name, about: j.profile.about });
-        else if (local.name) { const [a, ...b] = local.name.split(' '); setF({ first_name: a, last_name: b.join(' '), about: '' }); }
+        if (j.profile) setF({ ...EMPTY, ...Object.fromEntries(Object.keys(EMPTY).map((k) => [k, j.profile[k] || ''])) });
+        else if (local.name) { const [a, ...b] = local.name.split(' '); setF({ ...EMPTY, first_name: a, last_name: b.join(' ') }); }
       })
       .catch(() => setProf(null));
   }, [local?.device, local?.name]);
@@ -43,8 +46,7 @@ export default function Profiel() {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    try { setPhoto(await squareAvatar(file)); setRemovePhoto(false); }
-    catch { toast('Deze foto kan niet worden gelezen. Probeer een andere.'); }
+    setCropFile(file);
   }
 
   async function save(e) {
@@ -74,11 +76,12 @@ export default function Profiel() {
 
   async function del() {
     setBusy(true);
-    try { await post({ action: 'delete' }); setProf(null); setF({ first_name: '', last_name: '', about: '' }); updateLocal({ name: '' }); await refresh(); toast('Profiel verwijderd'); }
+    try { await post({ action: 'delete' }); setProf(null); setF(EMPTY); updateLocal({ name: '' }); await refresh(); toast('Profiel verwijderd'); }
     catch (err) { toast(err.message); }
     finally { setBusy(false); setSure(false); }
   }
 
+  const card = prof && { name: prof.name, avatar: prof.avatar, since: prof.member_since, song: prof.song, work: prof.work, fact: prof.fun_fact, me: true };
   const shown = removePhoto ? null : photo || prof?.avatar;
   const fullName = [f.first_name, f.last_name].filter(Boolean).join(' ');
 
@@ -88,7 +91,13 @@ export default function Profiel() {
       {!prof && <p className="muted">Maak je profiel aan met je naam en een foto. Dan zien andere lopers wie er komt, en jij herkent ze bij de training.</p>}
       {back && !prof && <p className="note">Maak eerst je profiel aan, dan zetten we je meteen op de lijst.</p>}
 
-      <form className="panel profile-form" onSubmit={save}>
+      {cropFile && (
+        <section className="panel">
+          <AvatarCropper file={cropFile} onCancel={() => setCropFile(null)} onDone={(d) => { setPhoto(d); setRemovePhoto(false); setCropFile(null); }} />
+        </section>
+      )}
+
+      <form className="panel profile-form" onSubmit={save} hidden={!!cropFile}>
         <div className="avatar-pick">
           <button type="button" className="avatar-btn" onClick={() => input.current.click()} aria-label="Kies een profielfoto">
             <Avatar name={fullName} src={shown} size={112} />
@@ -106,10 +115,18 @@ export default function Profiel() {
           <div className="field"><label htmlFor="pf-first">Voornaam</label><input className="input" id="pf-first" value={f.first_name} onChange={(e) => setF({ ...f, first_name: e.target.value })} autoComplete="given-name" required maxLength={40} /></div>
           <div className="field"><label htmlFor="pf-last">Achternaam</label><input className="input" id="pf-last" value={f.last_name} onChange={(e) => setF({ ...f, last_name: e.target.value })} autoComplete="family-name" maxLength={60} /></div>
         </div>
-        <div className="field"><label htmlFor="pf-about">Over jou <span className="muted">(optioneel)</span></label>
-          <input className="input" id="pf-about" value={f.about} onChange={(e) => setF({ ...f, about: e.target.value })} placeholder="Bijv. Loop sinds 2025 mee, op weg naar mijn eerste halve" maxLength={140} /></div>
+        <h3 style={{ marginTop: 4 }}>Leer elkaar kennen <span className="muted small">(allemaal optioneel)</span></h3>
+        <div className="field"><label htmlFor="pf-since">Lid sinds</label>
+          <input className="input" id="pf-since" type="month" min="2025-01" max={new Date().toISOString().slice(0, 7)} value={f.member_since} onChange={(e) => setF({ ...f, member_since: e.target.value })} /></div>
+        <div className="field"><label htmlFor="pf-song">Favoriete nummer tijdens het sporten</label>
+          <input className="input" id="pf-song" value={f.song} onChange={(e) => setF({ ...f, song: e.target.value })} placeholder="Artiest – titel" maxLength={80} /></div>
+        <div className="field"><label htmlFor="pf-work">Wat doe je voor werk?</label>
+          <input className="input" id="pf-work" value={f.work} onChange={(e) => setF({ ...f, work: e.target.value })} placeholder="Bijv. docent, monteur, student" maxLength={80} /></div>
+        <div className="field"><label htmlFor="pf-fact">Wat weten mensen bij de club nog niet over je?</label>
+          <textarea className="input" id="pf-fact" rows={2} value={f.fun_fact} onChange={(e) => setF({ ...f, fun_fact: e.target.value })} placeholder="Iets leuks of verrassends" maxLength={200} /></div>
         <button className="btn btn-gold" type="submit" disabled={busy}>{busy ? 'Bezig met opslaan…' : prof ? 'Opslaan' : 'Profiel aanmaken'}</button>
-        <p className="note">Je naam en foto zijn zichtbaar voor iedereen die de app gebruikt, bijvoorbeeld bij wie er komt trainen.</p>
+        <p className="note">Je naam, foto en antwoorden zijn zichtbaar voor iedereen die de app gebruikt. Anderen zien ze als ze op je gezicht tikken.</p>
+        {prof && <button type="button" className="link" style={{ alignSelf: 'flex-start' }} onClick={() => setPreview(true)}>Bekijk hoe anderen je kaart zien ›</button>}
       </form>
 
       {prof ? (
@@ -137,6 +154,7 @@ export default function Profiel() {
           )}
         </section>
       )}
+      {preview && card && <MemberSheet p={card} onClose={() => setPreview(false)} />}
     </>
   );
 }

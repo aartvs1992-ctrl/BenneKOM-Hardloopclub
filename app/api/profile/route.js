@@ -18,7 +18,8 @@ function own(p) {
   if (!p) return { profile: null };
   return {
     profile: {
-      first_name: p.first_name, last_name: p.last_name, about: p.about,
+      first_name: p.first_name, last_name: p.last_name,
+      song: p.song || '', member_since: p.member_since || '', fun_fact: p.fun_fact || '', work: p.work || '',
       name: displayName(p), avatar: p.photo_path ? fileUrl(p.photo_path) : null,
       restore_code: p.restore_code,
     },
@@ -61,7 +62,10 @@ export async function POST(req) {
       device_id: device,
       first_name: first,
       last_name: clean(b.last_name, 60),
-      about: clean(b.about, 140),
+      song: clean(b.song, 80),
+      member_since: /^\d{4}-\d{2}$/.test(b.member_since || '') ? b.member_since : '',
+      fun_fact: clean(b.fun_fact, 200),
+      work: clean(b.work, 80),
       photo_path: current?.photo_path || null,
       restore_code: current?.restore_code || newCode(),
       updated_at: new Date().toISOString(),
@@ -85,7 +89,9 @@ export async function POST(req) {
     await upsert('profiles', row, ['device_id']);
     return Response.json(own(row));
   } catch (e) {
-    const missing = /relation .*profiles|does not exist|schema cache/i.test(String(e.message));
-    return bad(missing ? 'Profielen zijn nog niet ingesteld: draai 004_profielen.sql in Supabase.' : 'Opslaan lukte niet. Probeer het nog eens.', 500);
+    const msg = String(e.message);
+    if (/(song|member_since|fun_fact|work)'? column|column .*(song|member_since|fun_fact|work)/i.test(msg)) return bad('De profielvragen zijn nog niet ingesteld: draai 005_profielvragen.sql in Supabase.', 500);
+    if (/table .*profiles|relation .*profiles|does not exist/i.test(msg)) return bad('Profielen zijn nog niet ingesteld: draai 004_profielen.sql in Supabase.', 500);
+    return bad('Opslaan lukte niet. Probeer het nog eens.', 500);
   }
 }

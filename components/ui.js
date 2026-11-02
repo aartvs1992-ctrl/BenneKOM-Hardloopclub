@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useApp } from './AppProvider';
 import { dparts, TYPE_LABEL } from '@/lib/content';
@@ -78,17 +79,57 @@ export function Avatar({ name = '', src, size = 36, className = '' }) {
     : <span className={'avatar initials ' + className} style={{ width: size, height: size, fontSize: size * 0.38 }} aria-hidden="true">{initials}</span>;
 }
 
-// Rij gezichten met naam (aanmeldingen, inschrijvingen)
+// Rij gezichten met naam; tik op een gezicht voor de ledenkaart
 export function People({ list }) {
+  const [open, setOpen] = useState(null);
   if (!list?.length) return null;
   return (
-    <ul className="faces">
-      {list.map((p, i) => (
-        <li key={i} className={p.me ? 'me' : ''}>
-          <Avatar name={p.name} src={p.avatar} size={52} />
-          <span>{(p.name || '').split(' ')[0]}</span>
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="faces">
+        {list.map((p, i) => (
+          <li key={i} className={p.me ? 'me' : ''}>
+            <button type="button" onClick={() => setOpen(p)} aria-label={'Bekijk ' + p.name}>
+              <Avatar name={p.name} src={p.avatar} size={52} />
+              <span>{(p.name || '').split(' ')[0]}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {open && <MemberSheet p={open} onClose={() => setOpen(null)} />}
+    </>
+  );
+}
+
+const MONTHS = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+export const sinceLabel = (v) => (/^\d{4}-\d{2}$/.test(v || '') ? `${MONTHS[+v.slice(5) - 1]} ${v.slice(0, 4)}` : '');
+
+export const QUESTIONS = [
+  ['since', 'Lid sinds'],
+  ['song', 'Favoriete nummer tijdens het sporten'],
+  ['work', 'Wat ik doe voor werk'],
+  ['fact', 'Wat mensen bij de club niet over me weten'],
+];
+
+// Ledenkaart: grote foto en antwoorden op de vragen
+export function MemberSheet({ p, onClose }) {
+  useEffect(() => {
+    const k = (e) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [onClose]);
+  const answers = QUESTIONS.map(([k, q]) => [q, k === 'since' ? sinceLabel(p.since) : p[k]]).filter(([, a]) => a);
+  return (
+    <div className="sheet-bg" onClick={onClose}>
+      <div className="sheet" role="dialog" aria-modal="true" aria-label={p.name} onClick={(e) => e.stopPropagation()}>
+        <div className="who">
+          <Avatar name={p.name} src={p.avatar} size={220} />
+          <h2>{p.name}</h2>
+        </div>
+        {answers.length
+          ? <dl className="qa">{answers.map(([q, a]) => <div key={q}><dt>{q}</dt><dd>{a}</dd></div>)}</dl>
+          : <p className="muted" style={{ textAlign: 'center' }}>{p.me ? 'Vul de vragen in bij je profiel, dan leren anderen je kennen.' : 'Nog geen antwoorden ingevuld.'}</p>}
+        <button className="btn btn-line" onClick={onClose}>Sluiten</button>
+      </div>
+    </div>
   );
 }

@@ -259,3 +259,21 @@ body{margin:0;min-height:100%}
 .count .stack .avatar.initials{background:var(--gold);color:#071E3E}
 .count{flex-wrap:wrap;align-items:center}
 .panel.join-card{flex-direction:row;align-items:center}
+
+/* ---------- foto bijsnijden + ledenkaart ---------- */
+.cropper-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.cropper{position:relative;overflow:hidden;border-radius:16px;background:#000;touch-action:none;cursor:grab;max-width:100%;user-select:none}
+.cropper img{position:absolute;left:0;top:0;max-width:none;pointer-events:none}
+.cropper-ring{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 999px rgba(3,10,22,.55);border:2px solid rgba(255,255,255,.8)}
+.zoom-row{display:flex;align-items:center;gap:10px;width:min(280px,100%);font-weight:700;font-size:20px}
+.zoom-row input{flex:1;accent-color:var(--gold)}
+.faces button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;max-width:100%}
+.faces button:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:12px}
+.sheet-bg{position:fixed;inset:0;z-index:30;background:rgba(3,10,22,.6);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);color:var(--ink);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px;max-height:88vh;overflow:auto}
+.sheet .who{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.sheet .who .avatar{width:min(220px,60vw)!important;height:min(220px,60vw)!important;font-size:64px!important;border:4px solid var(--gold)}
+.qa{display:flex;flex-direction:column;gap:10px;margin:0}
+.qa div{background:var(--soft);border-radius:12px;padding:10px 12px}
+.qa dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.qa dd{margin:2px 0 0;font-weight:600}
