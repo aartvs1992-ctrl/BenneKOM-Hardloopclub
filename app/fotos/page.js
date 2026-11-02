@@ -34,7 +34,7 @@ export default function Fotos() {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    if (!local.name) { location.href = '/meer?naam=1'; return; }
+    if (!local.name) { location.href = '/profiel?terug=1'; return; }
     try {
       setDraft({ ...(await shrink(file)), caption: '' });
     } catch {

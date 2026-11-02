@@ -52,6 +52,10 @@ export default function AppProvider({ children }) {
   }, [local?.device]);
 
   useEffect(() => { refresh(); }, [refresh]);
+  // heeft dit toestel een profiel, dan is dat de naam overal in de app
+  useEffect(() => {
+    if (data?.me?.name && local && data.me.name !== local.name) updateLocal({ name: data.me.name });
+  }, [data?.me?.name, local, updateLocal]);
   useEffect(() => {
     const onFocus = () => refresh();
     window.addEventListener('focus', onFocus);

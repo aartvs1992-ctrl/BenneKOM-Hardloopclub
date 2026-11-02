@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useApp } from '@/components/AppProvider';
-import { Loading, ErrorNote, useReady, AttendButton } from '@/components/ui';
+import { Loading, ErrorNote, useReady, AttendButton, People, Avatar } from '@/components/ui';
 import { dparts, rel, TYPE_LABEL } from '@/lib/content';
 
 export default function EventPage() {
@@ -45,7 +45,7 @@ function Attend({ e }) {
     <div className="panel">
       <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></div>
       <AttendButton e={e} going={Boolean(data.mine[e.id])} act={act} local={local} long />
-      {data.names[e.id]?.length ? <div className="people">{data.names[e.id].map((nm, i) => <span key={i} className={'person' + (nm === data.mine[e.id] ? ' me' : '')}>{nm}</span>)}</div> : null}
+      <People list={data.names[e.id]} />
       <p className="note">Zo weet de trainer vooraf hoeveel mensen er komen en kan hij de groepen indelen.</p>
     </div>
   );
@@ -60,10 +60,14 @@ function Register({ e }) {
   return (
     <div className="panel">
       <div className="section-head"><h3>Inschrijven</h3><span className="num small muted">{n}{e.capacity ? ' / ' + e.capacity : ''} ingeschreven</span></div>
-      {data.names[e.id]?.length ? <div className="people">{data.names[e.id].map((nm, i) => <span key={i} className={'person' + (nm === mine ? ' me' : '')}>{nm}</span>)}</div> : null}
+      <People list={data.names[e.id]} />
       {mine ? (
         <button className="btn btn-line" onClick={() => act('participate', { eventId: e.id, on: false }, 'Uitgeschreven')}>Uitschrijven</button>
-      ) : full ? <p>Dit evenement zit vol.</p> : (
+      ) : full ? <p>Dit evenement zit vol.</p> : data.me ? (
+        <button className="btn btn-gold" onClick={() => act('participate', { eventId: e.id, on: true }, 'Ingeschreven!')}>
+          <Avatar name={data.me.name} src={data.me.avatar} size={26} /> Inschrijven als {data.me.first}
+        </button>
+      ) : (
         <form className="section" onSubmit={async (ev) => {
           ev.preventDefault();
           const nm = name.trim();
@@ -75,7 +79,7 @@ function Register({ e }) {
           <button className="btn btn-gold" type="submit">Inschrijven</button>
         </form>
       )}
-      <p className="note">Geen account nodig. Je naam is zichtbaar voor andere leden.</p>
+      <p className="note">{data.me ? 'Je naam en profielfoto zijn zichtbaar voor andere leden.' : <>Geen profiel nodig. Met een <Link href="/profiel">profiel</Link> zien anderen ook je foto.</>}</p>
     </div>
   );
 }
@@ -85,7 +89,7 @@ function Carpool({ e }) {
   const [f, setF] = useState({ from: 'Dunantlaan 18, Bennekom', time: '08:30', seats: 3, open: false });
   const rides = data.rides[e.id] || [];
   const joinedAny = rides.some((r) => r.joined);
-  const needName = () => { if (!local.name) { location.href = '/meer?naam=1'; return true; } return false; };
+  const needName = () => { if (!local.name) { location.href = '/profiel?terug=1'; return true; } return false; };
 
   return (
     <div className="panel">
@@ -93,10 +97,14 @@ function Carpool({ e }) {
       <div>
         {rides.length ? rides.map((r) => (
           <div className="ride" key={r.id}>
-            <div>
-              <b>{r.driver}</b><br />
+            <div className="ride-who">
+              <Avatar name={r.driver.name} src={r.driver.avatar} size={40} />
+              <div>
+              <b>{r.driver.name}</b><br />
               <span className="small muted">Vertrek {r.time} · {r.from}</span><br />
-              <span className="seats">{r.left} {r.left === 1 ? 'plek' : 'plekken'} vrij{r.passengers.length ? ' · met ' + r.passengers.join(', ') : ''}</span>
+              <span className="seats">{r.left} {r.left === 1 ? 'plek' : 'plekken'} vrij</span>
+              {r.passengers.length > 0 && <span className="pax">{r.passengers.map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={24} />)} <span className="small muted">rijden mee</span></span>}
+              </div>
             </div>
             {r.mine ? <button className="btn btn-line btn-sm" onClick={() => act('cancelRide', { rideId: r.id }, 'Rit verwijderd')}>Verwijderen</button>
               : r.joined ? <button className="btn btn-done btn-sm" onClick={() => act('joinRide', { rideId: r.id, on: false }, 'Je rijdt niet meer mee')}>✓ Je rijdt mee</button>

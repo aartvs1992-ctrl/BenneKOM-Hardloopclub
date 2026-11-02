@@ -52,7 +52,7 @@ export function AttendButton({ e, going, act, local, long }) {
     <button
       className={'btn ' + (going ? 'btn-done' : 'btn-gold')}
       onClick={() => {
-        if (!going && !local.name) { location.href = '/meer?naam=1'; return; }
+        if (!going && !local.name) { location.href = '/profiel?terug=1'; return; }
         act('participate', { eventId: e.id, on: !going }, going ? 'Afgemeld' : 'Je staat op de lijst. Tot dan!');
       }}
     >{label}</button>
@@ -66,5 +66,29 @@ export function PhotoHeader({ src, title, sub, pos = 'center 40%' }) {
       <h1>{title}</h1>
       {sub && <p>{sub}</p>}
     </header>
+  );
+}
+
+// Ronde profielfoto, of de beginletters als er geen foto is
+export function Avatar({ name = '', src, size = 36, className = '' }) {
+  const initials = name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
+  return src
+    // eslint-disable-next-line @next/next/no-img-element
+    ? <img className={'avatar ' + className} src={src} alt="" width={size} height={size} style={{ width: size, height: size }} loading="lazy" />
+    : <span className={'avatar initials ' + className} style={{ width: size, height: size, fontSize: size * 0.38 }} aria-hidden="true">{initials}</span>;
+}
+
+// Rij gezichten met naam (aanmeldingen, inschrijvingen)
+export function People({ list }) {
+  if (!list?.length) return null;
+  return (
+    <ul className="faces">
+      {list.map((p, i) => (
+        <li key={i} className={p.me ? 'me' : ''}>
+          <Avatar name={p.name} src={p.avatar} size={52} />
+          <span>{(p.name || '').split(' ')[0]}</span>
+        </li>
+      ))}
+    </ul>
   );
 }

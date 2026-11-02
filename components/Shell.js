@@ -1,6 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useApp } from './AppProvider';
+import { Avatar } from './ui';
 
 const TABS = [
   ['/', 'Home', <path key="h" d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />],
@@ -24,6 +26,8 @@ export default function Shell({ children }) {
   const router = useRouter();
   const tab = activeTab(path);
   const isRoot = TABS.some(([href]) => href === path);
+  const { data } = useApp();
+  const me = data?.me;
 
   return (
     <>
@@ -33,7 +37,9 @@ export default function Shell({ children }) {
             <button className="back" aria-label="Terug" onClick={() => (history.length > 1 ? router.back() : router.push('/'))}>‹</button>
           )}
           <Link className="brand" href="/">Benne<b>KOM</b></Link>
-          <span className="sub">Samen=leuker</span>
+          <Link className="me-link" href="/profiel" aria-label={me ? 'Mijn profiel' : 'Profiel aanmaken'}>
+            {me ? <><span>{me.first}</span><Avatar name={me.name} src={me.avatar} size={32} /></> : <span className="sub" style={{ marginLeft: 0 }}>Profiel aanmaken ›</span>}
+          </Link>
         </div>
       </header>
       <main className="wrap"><div className="view">{children}</div></main>

@@ -1,28 +1,21 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
-import { Loading, PhotoHeader } from '@/components/ui';
+import { Loading, PhotoHeader, Avatar } from '@/components/ui';
 import { CLUB } from '@/lib/club';
 
 export default function Meer() {
-  const { local, updateLocal, toast } = useApp();
-  const [ask, setAsk] = useState(false);
-  const ref = useRef(null);
-  useEffect(() => {
-    if (new URLSearchParams(location.search).get('naam')) { setAsk(true); setTimeout(() => ref.current?.focus(), 50); }
-  }, []);
+  const { local, data } = useApp();
   if (!local) return <Loading />;
 
   return (
     <>
       <PhotoHeader src="/club/karikaturenwand.jpg" title="Meer" sub="Hardloopclub BenneKOM · sinds 2025 · iedereen welkom" pos="center 30%" />
-      <form className="panel" onSubmit={(e) => { e.preventDefault(); toast('Naam opgeslagen'); if (ask) history.back(); }}>
-        {ask && <p className="note">Vul eerst je naam in, dan zien andere leden wie er komt.</p>}
-        <div className="field"><label htmlFor="me-name">Jouw naam</label>
-          <input ref={ref} className="input" id="me-name" value={local.name} onChange={(e) => updateLocal({ name: e.target.value.slice(0, 80) })} placeholder="Zo zien andere leden je" autoComplete="name" /></div>
-        {ask && <button className="btn btn-gold" type="submit">Opslaan en terug</button>}
-      </form>
+      <Link className="panel join-card" href="/profiel">
+        <Avatar name={data?.me?.name || local.name || '?'} src={data?.me?.avatar} size={56} />
+        <span style={{ minWidth: 0 }}><b>{data?.me ? data.me.name : 'Maak je profiel'}</b><br /><span className="small muted">{data?.me ? 'Mijn profiel: naam, foto en code voor een ander toestel' : 'Naam en foto, dan zien anderen wie er komt'}</span></span>
+        <span className="chev">›</span>
+      </Link>
       <div className="list">
         {[['/tools', 'Calculator', 'Tempo, voorspeller, zones en splits'], ['/voeding', 'Voeding', 'Raceplan op maat'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/nieuws', 'Nieuws', 'Berichten van de club'], ['/shirt', 'Clubshirt', 'Singlets, shirts en shorts'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
           <Link key={h} className="row" style={{ gridTemplateColumns: '1fr auto' }} href={h}><span><span className="t">{t}</span><br /><span className="s">{s}</span></span><span className="chev">›</span></Link>

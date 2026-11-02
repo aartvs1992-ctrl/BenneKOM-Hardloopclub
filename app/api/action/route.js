@@ -3,6 +3,7 @@ import { all, insert, upsert, remove } from '@/lib/db';
 import { buildState } from '@/lib/state';
 import { withTrainings } from '@/lib/club';
 import { sendPush } from '@/lib/push';
+import { profileMap } from '@/lib/profiles';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +14,10 @@ export async function POST(req) {
   let b;
   try { b = await req.json(); } catch { return bad('Ongeldig verzoek.'); }
   const device = clean(b.device, 64);
-  const name = clean(b.name);
+  if (!clean(b.device, 64)) return bad('Apparaat onbekend. Herlaad de app.');
+  // heeft dit toestel een profiel, dan altijd die naam gebruiken
+  const prof = (await profileMap())[clean(b.device, 64)];
+  const name = prof?.name || clean(b.name);
   if (!device) return bad('Apparaat onbekend. Herlaad de app.');
 
   try {

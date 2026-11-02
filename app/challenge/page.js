@@ -34,6 +34,7 @@ export default function Challenge() {
   const [t, setT] = useState('');
   const [day, setDay] = useState(lastChallengeDate);
   const [manualOpen, setManualOpen] = useState(false);
+  const [stravaMsg, setStravaMsg] = useState('');
 
   const load = useCallback(async () => {
     if (!local?.device) return;
@@ -45,8 +46,9 @@ export default function Challenge() {
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
-    const s = new URLSearchParams(location.search).get('strava');
-    if (s && STATUS[s]) { toast(STATUS[s]); history.replaceState(null, '', '/challenge'); }
+    const q = new URLSearchParams(location.search);
+    const s = q.get('strava');
+    if (s && STATUS[s]) { toast(STATUS[s]); setStravaMsg(s === 'ok' ? '' : (q.get('why') || STATUS[s])); history.replaceState(null, '', '/challenge'); }
   }, [toast]);
 
   const ready = useReady();
@@ -75,7 +77,7 @@ export default function Challenge() {
 
   async function addManual(ev) {
     ev.preventDefault();
-    if (!local.name) { location.href = '/meer?naam=1'; return; }
+    if (!local.name) { location.href = '/profiel?terug=1'; return; }
     const s = parseT(t);
     if (Number.isNaN(s)) return;
     if (await act('addResult', { seconds: s, edition: day }, best && s < best ? `Nieuw PR: ${fmt(s)}!` : 'Tijd opgeslagen')) { setT(''); setManualOpen(false); }
@@ -120,6 +122,7 @@ export default function Challenge() {
 
       <section className="panel">
         <div className="section-head"><h3>Strava</h3><a className="link" href={sv.segment?.url} target="_blank" rel="noopener noreferrer">Bekijk het segment ↗</a></div>
+        {stravaMsg && <p className="err">Koppelen lukte niet. {stravaMsg}</p>}
         {!sv.configured ? (
           <p className="muted small">De koppeling met Strava wordt binnenkort ingesteld. Tot die tijd vul je je tijd zelf in.</p>
         ) : sv.connected ? (

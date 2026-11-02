@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
-import { EventRow, Loading, ErrorNote, useReady, AttendButton } from '@/components/ui';
+import { EventRow, Loading, ErrorNote, useReady, AttendButton, Avatar, People } from '@/components/ui';
 import { dparts, rel } from '@/lib/content';
 import { CLUB, CLUB_PHOTOS } from '@/lib/club';
 import { usePhotos } from '@/lib/usePhotos';
@@ -26,6 +26,14 @@ export default function Home() {
       <ErrorNote />
       <InstallBanner />
       {next && <NextTraining e={next} img={heroImg} />}
+
+      {!data.me && (
+        <Link className="panel join-card" href="/profiel">
+          <Avatar name="?" size={56} />
+          <span style={{ minWidth: 0 }}><b>Maak je profiel</b><br /><span className="small muted">Naam en foto, dan zien anderen wie er komt. Duurt een minuut.</span></span>
+          <span className="chev">›</span>
+        </Link>
+      )}
 
       <section className="section">
         <div className="section-head"><h2>Doe mee</h2><Link className="link" href="/agenda">Hele agenda ›</Link></div>
@@ -96,7 +104,9 @@ function NextTraining({ e, img }) {
       <span className="eyebrow">Volgende clubtraining · {rel(e.date)}</span>
       <h1>{p.W} {p.d} {p.m}</h1>
       <div className="meta"><span className="num">{e.time}</span><span>{e.place}</span></div>
-      <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></div>
+      <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span>
+        {n > 0 && <span className="stack">{(data.names[e.id] || []).slice(0, 7).map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={30} />)}</span>}
+      </div>
       <div className="btn-row">
         <AttendButton e={e} going={going} act={act} local={local} />
         <a className="btn btn-line" href={CLUB.strava} target="_blank" rel="noopener noreferrer">Strava</a>
