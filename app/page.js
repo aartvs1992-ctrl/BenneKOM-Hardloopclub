@@ -90,7 +90,7 @@ function NextTraining({ e, img }) {
   return (
     <section className={'hero photo' + (img ? '' : ' has-video')} style={img ? { backgroundImage: `url("${img}")` } : undefined}>
       {!img && (
-        <video className="hero-video" src="/media/backyard-shirt.mp4" poster="/media/backyard-shirt.jpg"
+        <video className="hero-video" src="/media/backyard-montage.mp4" poster="/media/backyard-montage.jpg"
           autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
       )}
       <span className="eyebrow">Volgende clubtraining · {rel(e.date)}</span>
