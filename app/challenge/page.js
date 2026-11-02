@@ -60,7 +60,12 @@ export default function Challenge() {
   }));
   const attempts = [...(sv.efforts || []), ...manual].sort((a, b) => String(a.date).localeCompare(String(b.date)));
   attempts.forEach((a, i) => { a.delta = i ? a.seconds - attempts[i - 1].seconds : null; });
-  const best = attempts.length ? Math.min(...attempts.map((a) => a.seconds)) : null;
+  // PR: het officiële all-time PR van Strava gaat voor; anders de snelste tijd die we kennen
+  const official = sv.pr?.seconds || null;
+  const known = attempts.length ? Math.min(...attempts.map((a) => a.seconds)) : null;
+  const best = official ? Math.min(official, known ?? Infinity) : known;
+  const prDate = official && official === best ? sv.pr.date : attempts.find((a) => a.seconds === best)?.date;
+  const recent = attempts.slice(-10);
   const last = attempts[attempts.length - 1];
   const next = data.events.find((e) => e.type === 'challenge');
 
@@ -95,14 +100,16 @@ export default function Challenge() {
         </Link>
       )}
 
-      {attempts.length ? (
+      {attempts.length || official ? (
         <section className="panel">
-          <div className="section-head"><h3>Jouw stand</h3><span className="small muted">{attempts.length} {attempts.length === 1 ? 'poging' : 'pogingen'}</span></div>
+          <div className="section-head"><h3>Jouw stand</h3><span className="small muted">{sv.pr?.count || attempts.length} {(sv.pr?.count || attempts.length) === 1 ? 'poging' : 'pogingen'}</span></div>
           <div className="pr-big">
-            <span className="lbl">Persoonlijk record</span>
+            <span className="lbl">Persoonlijk record{official ? ' · all-time volgens Strava' : ''}</span>
             <span className="num">{fmt(best)}</span>
-            <span className="small muted">{fmt(best / 5)} per km</span>
+            <span className="small muted">{fmt(best / 5)} per km{prDate ? ' · ' + dateLabel(prDate) : ''}
+              {official && sv.pr.activity && <> · <a href={`https://www.strava.com/activities/${sv.pr.activity}`} target="_blank" rel="noopener noreferrer">bekijk op Strava</a></>}</span>
           </div>
+          {last && <>
           <div className="readout">
             <div><span className="lbl">Laatste keer</span><span className="big">{fmt(last.seconds)}</span><span className="lbl">{dateLabel(last.date)}</span></div>
             <div><span className="lbl">T.o.v. vorige</span>
@@ -110,8 +117,12 @@ export default function Challenge() {
               <span className="lbl">{last.delta == null ? 'eerste poging' : last.delta < 0 ? 'sneller' : last.delta > 0 ? 'trager' : 'gelijk'}</span></div>
             <div><span className="lbl">Tot je PR</span><span className="big">{last.seconds === best ? '★' : signed(last.seconds - best)}</span><span className="lbl">{last.seconds === best ? 'dit is je PR!' : 'nog te winnen'}</span></div>
           </div>
-          {attempts.length > 1 && <Chart attempts={attempts} best={best} />}
+          {recent.length > 1 && <>
+            <div className="section-head"><b>Laatste {recent.length} pogingen</b><span className="small muted legend"><i className="lg-pr" /> PR</span></div>
+            <Chart attempts={recent} best={best} />
+          </>}
           <p className="note">{message(attempts, best)}</p>
+          </>}
         </section>
       ) : (
         <section className="panel">
@@ -193,33 +204,33 @@ function message(attempts, best) {
   return 'Elke poging telt. Volgende keer pak je hem!';
 }
 
-// Lijngrafiek van je tijden; sneller = hoger
+// Lijngrafiek van je laatste pogingen; sneller = hoger, gestippelde lijn = je PR
 function Chart({ attempts, best }) {
-  const W = 320, H = 130, L = 44, R = 10, T = 12, B = 22;
+  const W = 340, H = 170, L = 46, R = 12, T = 18, B = 26;
   const secs = attempts.map((a) => a.seconds);
-  const mn = Math.min(...secs), mx = Math.max(...secs);
-  const pad = Math.max(10, (mx - mn) * 0.15);
+  const mn = Math.min(best, ...secs), mx = Math.max(...secs);
+  const pad = Math.max(8, (mx - mn) * 0.12);
   const lo = mn - pad, hi = mx + pad;
   const x = (i) => L + (i * (W - L - R)) / (attempts.length - 1);
-  const y = (s) => T + ((s - lo) / (hi - lo)) * (H - T - B); // korter (sneller) = hoger
+  const y = (sec) => T + ((sec - lo) / (hi - lo)) * (H - T - B);
   const pts = attempts.map((a, i) => `${x(i)},${y(a.seconds)}`).join(' ');
-  const ticks = mn === mx ? [mn] : [mn, mx];
+  const short = (iso) => { const d = new Date(iso); return `${d.getDate()} ${MON[d.getMonth()]}`; };
   return (
-    <div className="chart" role="img" aria-label={`Grafiek van ${attempts.length} tijden, snelste ${fmt(best)}`}>
+    <div className="chart" role="img" aria-label={`Grafiek van je laatste ${attempts.length} tijden; PR ${fmt(best)}`}>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" preserveAspectRatio="xMidYMid meet">
-        {ticks.map((s) => (
-          <g key={s}>
-            <line x1={L} x2={W - R} y1={y(s)} y2={y(s)} className="grid" />
-            <text x={L - 6} y={y(s) + 4} textAnchor="end" className="axis">{fmt(s)}</text>
-          </g>
+        {[mx].filter((v) => v !== best).map((v) => (
+          <g key={v}><line x1={L} x2={W - R} y1={y(v)} y2={y(v)} className="grid" /><text x={L - 6} y={y(v) + 4} textAnchor="end" className="axis">{fmt(v)}</text></g>
         ))}
+        <line x1={L} x2={W - R} y1={y(best)} y2={y(best)} className="prline" />
+        <text x={L - 6} y={y(best) + 4} textAnchor="end" className="axis pr-label">{fmt(best)}</text>
         <polygon points={`${x(0)},${H - B} ${pts} ${x(attempts.length - 1)},${H - B}`} className="area" />
         <polyline points={pts} className="line" />
         {attempts.map((a, i) => (
-          <circle key={i} cx={x(i)} cy={y(a.seconds)} r={a.seconds === best ? 5.5 : 3.5} className={a.seconds === best ? 'pr' : 'dot'} />
+          <circle key={i} cx={x(i)} cy={y(a.seconds)} r={a.seconds === best ? 6 : 4} className={a.seconds === best ? 'pr' : 'dot'}><title>{`${short(a.date)}: ${fmt(a.seconds)}`}</title></circle>
         ))}
-        <text x={L} y={H - 6} className="axis">{dateLabel(attempts[0].date)}</text>
-        <text x={W - R} y={H - 6} textAnchor="end" className="axis">{dateLabel(attempts[attempts.length - 1].date)}</text>
+        <text x={x(attempts.length - 1)} y={y(attempts[attempts.length - 1].seconds) - 10} textAnchor="end" className="axis last-label">{fmt(attempts[attempts.length - 1].seconds)}</text>
+        <text x={L} y={H - 7} className="axis">{short(attempts[0].date)}</text>
+        <text x={W - R} y={H - 7} textAnchor="end" className="axis">{short(attempts[attempts.length - 1].date)}</text>
       </svg>
     </div>
   );

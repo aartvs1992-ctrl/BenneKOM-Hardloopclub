@@ -1,11 +1,14 @@
 // Persoonlijke segmenttijden: alleen voor het eigen apparaat
-import { linkFor, effortsFor, sync, disconnect, stravaReady, SEGMENT_ID } from '@/lib/strava';
+import { linkFor, effortsFor, sync, disconnect, athleteStats, stravaReady, SEGMENT_ID } from '@/lib/strava';
 
 export const dynamic = 'force-dynamic';
 
 async function payload(device, extra = {}) {
   const link = await linkFor(device);
+  let pr = null;
+  if (link) { try { pr = await athleteStats(link); } catch { /* dan berekenen we de PR zelf */ } }
   return {
+    pr,
     configured: stravaReady,
     segment: { id: SEGMENT_ID, url: `https://www.strava.com/segments/${SEGMENT_ID}` },
     connected: Boolean(link),

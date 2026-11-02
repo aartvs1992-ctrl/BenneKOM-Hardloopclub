@@ -277,3 +277,9 @@ body{margin:0;min-height:100%}
 .qa div{background:var(--soft);border-radius:12px;padding:10px 12px}
 .qa dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .qa dd{margin:2px 0 0;font-weight:600}
+
+.chart .prline{stroke:var(--gold);stroke-width:1.5;stroke-dasharray:5 4}
+.chart .pr-label{fill:var(--gold-ink);font-weight:700}
+.chart .last-label{fill:var(--ink);font-weight:700}
+.legend{display:inline-flex;align-items:center;gap:6px}
+.lg-pr{display:inline-block;width:18px;border-top:2px dashed var(--gold)}
