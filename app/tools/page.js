@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { PhotoHeader } from '@/components/ui';
 import { DISTS, fmt, parseT, riegel, ZONES, splits } from '@/lib/content';
 
 const TABS = [['tempo', 'Tempo'], ['voorspeller', 'Voorspeller'], ['zones', 'Zones'], ['splits', 'Splits']];
@@ -9,7 +10,7 @@ export default function Tools() {
   const [tab, setTab] = useState('tempo');
   return (
     <>
-      <h1>Calculator</h1>
+      <PhotoHeader src="/club/beukenlaan.jpg" title="Calculator" sub="Tempo, voorspeller, hartslagzones en splits." pos="center 45%" />
       <div className="seg" role="group" aria-label="Calculator">
         {TABS.map(([k, l]) => <button key={k} aria-pressed={tab === k} onClick={() => setTab(k)}>{l}</button>)}
       </div>
