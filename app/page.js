@@ -14,7 +14,7 @@ export default function Home() {
 
   const next = data.events.find((e) => e.type === 'training' || e.replaces_training);
   const specials = data.events.filter((e) => e.type === 'special' && e.id !== next?.id).slice(0, 3);
-  const race = data.events.find((e) => e.type === 'wedstrijd');
+  const races = data.events.filter((e) => e.type === 'wedstrijd' && (e.km == null || e.km <= 50)).slice(0, 3);
 
   // Achtergrond van de trainingskaart: uitgelichte foto, anders de eerste clubfoto
   const featured = photos?.find((p) => p.featured);
@@ -36,7 +36,7 @@ export default function Home() {
       )}
 
       <section className="section">
-        <div className="section-head"><h2>Doe mee</h2><Link className="link" href="/agenda">Hele agenda ›</Link></div>
+        <div className="section-head"><h2>Doe mee</h2><Link className="link" href="/agenda#special">Alle specials ›</Link></div>
         <div className="list">
           {specials.map((e) => <EventRow key={e.id} e={e} />)}
         </div>
@@ -56,24 +56,10 @@ export default function Home() {
         </div>
       </section>
 
-      {race && (
+      {races.length > 0 && (
         <section className="section">
-          <h2>Race in de regio</h2>
-          <div className="panel">
-            <div>
-              <span className="eyebrow">{dparts(race.date).d} {dparts(race.date).m} · {rel(race.date)}</span>
-              <h3>{race.title}</h3>
-              {race.distances && <p className="muted small">{race.distances}</p>}
-            </div>
-            <div className="btn-row">
-              <Link className="btn btn-gold btn-sm" href={'/event/' + race.id}>Carpool regelen</Link>
-              <span className="small muted" style={{ alignSelf: 'center' }}>
-                {(data.rides[race.id] || []).length
-                  ? `${(data.rides[race.id] || []).reduce((a, r) => a + r.left, 0)} plekken vrij`
-                  : 'Nog geen ritten'}
-              </span>
-            </div>
-          </div>
+          <div className="section-head"><h2>Races in de regio</h2><Link className="link" href="/agenda#wedstrijd">Alle wedstrijden ›</Link></div>
+          <div className="list">{races.map((e) => <EventRow key={e.id} e={e} noTag />)}</div>
         </section>
       )}
 

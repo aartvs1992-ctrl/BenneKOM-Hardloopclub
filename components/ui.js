@@ -19,18 +19,23 @@ export function useReady() {
   return Boolean(data && local);
 }
 
-export function EventRow({ e }) {
+export function EventRow({ e, noTag }) {
   const { data } = useApp();
   const p = dparts(e.date);
   const going = Boolean(data?.mine?.[e.id]);
+  const n = data?.counts?.[e.id] || 0;
+  const rides = (data?.rides?.[e.id] || []).length;
   return (
     <Link className="row" href={'/event/' + e.id}>
       <span className="date"><span className="d">{p.d}</span><span className="m">{p.w} {p.m}</span></span>
       <span style={{ minWidth: 0 }}>
-        <span className="t"><span className={'tag ' + e.type}>{TYPE_LABEL[e.type]}</span>{e.title}</span><br />
+        <span className="t">{!noTag && <span className={'tag ' + e.type}>{TYPE_LABEL[e.type]}</span>}{e.title}</span><br />
         <span className="s">
-          {e.time ? e.time + ' · ' : ''}{e.place}
-          {going ? <b style={{ color: 'var(--ok)' }}> · je bent erbij</b> : null}
+          {e.type === 'wedstrijd'
+            ? <>📍 {e.place}{e.km != null ? ` (${e.km} km)` : ''}{e.distances ? <><br />🏃 {e.distances}</> : ''}</>
+            : <>{e.time ? e.time + ' · ' : ''}{(e.place || '').split(',')[0]}</>}
+          {going ? <b style={{ color: 'var(--ok)' }}> · je bent erbij</b> : n > 0 ? ` · ${n} ${e.type === 'training' ? 'komen' : 'aangemeld'}` : null}
+          {rides > 0 ? ` · ${rides} ${rides === 1 ? 'rit' : 'ritten'}` : null}
         </span>
       </span>
       <span className="chev">›</span>

@@ -29,6 +29,7 @@ export async function POST(req) {
           description: clean(e.description, 1000), distances: clean(e.distances, 120),
           capacity: e.capacity ? parseInt(e.capacity, 10) : null,
           registration: !!e.registration, carpool: !!e.carpool, replaces_training: !!e.replaces_training,
+          url: /^https?:\/\//.test(e.url || '') ? clean(e.url, 300) : '',
         };
         await upsert('events', row, ['id']);
         if (b.notify) await sendPush('events', { title: 'Nieuw in de agenda', body: `${row.title} · ${row.date.split('-').reverse().join('-')}`, url: '/event/' + row.id });
@@ -70,6 +71,15 @@ export async function POST(req) {
       case 'removeParticipant':
         await remove('participants', { event_id: clean(b.eventId, 80), device_id: clean(b.device, 80) });
         break;
+      case 'saveMedia': {
+        const m = b.media || {};
+        if (!clean(m.outlet) || !clean(m.title)) return Response.json({ error: 'Vul het medium en de titel in.' }, { status: 400 });
+        await insert('media', { outlet: clean(m.outlet, 60), title: clean(m.title, 160), published: /^\d{4}-\d{2}$/.test(m.published || '') ? m.published : '', url: /^https?:\/\//.test(m.url || '') ? clean(m.url, 400) : '', summary: clean(m.summary, 400) });
+        break;
+      }
+      case 'deleteMedia':
+        await remove('media', { id: b.id });
+        break;
       case 'deleteResult':
         await remove('challenge_results', { id: b.id });
         break;
@@ -99,6 +109,7 @@ export async function POST(req) {
       news: news.sort((a, b) => String(b.published_at).localeCompare(String(a.published_at))),
       suggestions, participants, results, photos,
       subscribers: subs.length,
+      media: await all('media').catch(() => []),
       upcoming: withTrainings(events).map((e) => ({ id: e.id, title: e.title, date: e.date, type: e.type })),
       added: b.added,
       status: { database: usingSupabase, push: pushReady },

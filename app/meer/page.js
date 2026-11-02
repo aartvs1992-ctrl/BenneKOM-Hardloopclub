@@ -17,10 +17,10 @@ export default function Meer() {
         <span className="chev">›</span>
       </Link>
       <div className="list">
-        {[['/tools', 'Calculator', 'Tempo, voorspeller, zones en splits'], ['/voeding', 'Voeding', 'Raceplan op maat'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/nieuws', 'Nieuws', 'Berichten van de club'], ['/shirt', 'Clubshirt', 'Singlets, shirts en shorts'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
+        {[['/tools', 'Calculator', 'Tempo, voorspeller, zones en splits'], ['/voeding', 'Voeding', 'Raceplan op maat'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/nieuws', 'Nieuws', 'Berichten van de club'], ['/verhaal', 'Het ontstaan van BenneKOM', 'Hoe Bennekom een loopclub kreeg'], ['/media', 'BenneKOM in de media', 'Krant, lokale media en partners'], ['/shirt', 'Clubshirt', 'Singlets, shirts en shorts'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
           <Link key={h} className="row" style={{ gridTemplateColumns: '1fr auto' }} href={h}><span><span className="t">{t}</span><br /><span className="s">{s}</span></span><span className="chev">›</span></Link>
         ))}
-        {[['https://hardloopclubbennekom.nl/verhaal', 'Het verhaal', 'Hoe Bennekom een loopclub kreeg'], [CLUB.strava, 'Strava-club', ''], [CLUB.instagram, 'Instagram', 'Foto\'s en impressies']].map(([h, t, s]) => (
+        {[[CLUB.strava, 'Strava-club', ''], [CLUB.instagram, 'Instagram', 'Foto\'s en impressies']].map(([h, t, s]) => (
           <a key={h} className="row" style={{ gridTemplateColumns: '1fr auto' }} href={h} target="_blank" rel="noopener noreferrer"><span><span className="t">{t}</span>{s && <><br /><span className="s">{s}</span></>}</span><span className="chev">↗</span></a>
         ))}
       </div>

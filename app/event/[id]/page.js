@@ -27,6 +27,9 @@ export default function EventPage() {
           <div><span className="lbl">Plaats</span><span style={{ fontWeight: 600, fontSize: 14 }}>{(e.place || '').split(',')[0]}</span></div>
         </div>
         {e.distances && <p><b>Afstanden:</b> {e.distances}</p>}
+        {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km} km van Bennekom (hemelsbreed)</p>}
+        {e.url && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={e.url} target="_blank" rel="noopener noreferrer">Info en inschrijven bij de organisatie ↗</a>}
+        {e.type === 'wedstrijd' && !e.url && <a className="link" href={'https://www.google.com/search?q=' + encodeURIComponent(e.title + ' ' + e.place + ' ' + e.date.slice(0, 4))} target="_blank" rel="noopener noreferrer">Zoek info en inschrijving ›</a>}
         {e.description && <p style={{ whiteSpace: 'pre-line' }}>{e.description}</p>}
         {e.place && <a className="link" href={'https://www.google.com/maps/search/' + encodeURIComponent(e.place)} target="_blank" rel="noopener noreferrer">Open locatie in Maps ›</a>}
       </div>

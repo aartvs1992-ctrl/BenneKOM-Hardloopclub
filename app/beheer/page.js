@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { TYPE_LABEL, fmt } from '@/lib/content';
 
-const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false };
+const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false, url: '' };
 
 export default function Beheer() {
   const { toast, refresh } = useApp();
@@ -13,6 +13,7 @@ export default function Beheer() {
   const [notify, setNotify] = useState(true);
   const [news, setNews] = useState({ author: 'Bestuur', title: '', body: '', event_id: '' });
   const [imp, setImp] = useState({ eventId: '', names: '' });
+  const [med, setMed] = useState({ outlet: '', title: '', published: '', url: '', summary: '' });
   const [push, setPush] = useState({ title: '', body: '', pref: 'events' });
 
   async function call(action, payload = {}, ok) {
@@ -60,6 +61,7 @@ export default function Beheer() {
           <div className="grid2">{field('date', 'Datum', { type: 'date', required: true })}{field('time', 'Tijd', { type: 'time' })}</div>
           {field('place', 'Locatie')}
           {field('distances', 'Afstanden')}
+          {field('url', 'Link naar info/inschrijven (optioneel)', { type: 'url', placeholder: 'https://' })}
           <div className="field"><label htmlFor="ev-desc">Omschrijving</label><textarea className="input" id="ev-desc" value={ev.description} onChange={(e) => setEv({ ...ev, description: e.target.value })} /></div>
           {field('capacity', 'Max. deelnemers (leeg = geen max.)', { type: 'number', min: 1 })}
           <div className="check-row">{flag('registration', 'Inschrijven')}{flag('carpool', 'Carpool')}{flag('replaces_training', 'Vervangt de dinsdagtraining')}</div>
@@ -101,6 +103,23 @@ export default function Beheer() {
             </div>
           )}
         </form>
+      </section>
+
+      <section className="section">
+        <h2>BenneKOM in de media</h2>
+        <form className="panel" onSubmit={async (e) => { e.preventDefault(); if (await call('saveMedia', { media: med }, 'Toegevoegd')) setMed({ outlet: '', title: '', published: '', url: '', summary: '' }); }}>
+          <div className="grid2">
+            <div className="field"><label htmlFor="md-outlet">Medium</label><input className="input" id="md-outlet" value={med.outlet} onChange={(e) => setMed({ ...med, outlet: e.target.value })} placeholder="Ede Stad" required /></div>
+            <div className="field"><label htmlFor="md-pub">Maand</label><input className="input" id="md-pub" type="month" value={med.published} onChange={(e) => setMed({ ...med, published: e.target.value })} /></div>
+          </div>
+          <div className="field"><label htmlFor="md-title">Titel</label><input className="input" id="md-title" value={med.title} onChange={(e) => setMed({ ...med, title: e.target.value })} required /></div>
+          <div className="field"><label htmlFor="md-url">Link naar het artikel</label><input className="input" id="md-url" type="url" value={med.url} onChange={(e) => setMed({ ...med, url: e.target.value })} placeholder="https://" /></div>
+          <div className="field"><label htmlFor="md-sum">Korte samenvatting</label><textarea className="input" id="md-sum" value={med.summary} onChange={(e) => setMed({ ...med, summary: e.target.value })} /></div>
+          <button className="btn btn-gold" type="submit">Toevoegen</button>
+        </form>
+        <div className="list">{(d.media || []).map((m) => (
+          <div key={m.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}><span><span className="t">{m.title}</span><br /><span className="s">{m.outlet}{m.published ? ' · ' + m.published : ''}</span></span><DeleteButton onConfirm={() => call('deleteMedia', { id: m.id }, 'Verwijderd')} /></div>
+        ))}</div>
       </section>
 
       <section className="section">
