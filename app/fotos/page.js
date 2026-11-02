@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/components/AppProvider';
-import { Loading } from '@/components/ui';
+import { Loading, PhotoHeader } from '@/components/ui';
 import { usePhotos, shrink } from '@/lib/usePhotos';
 import { CLUB_PHOTOS } from '@/lib/club';
 import { MON } from '@/lib/content';
@@ -52,8 +52,7 @@ export default function Fotos() {
 
   return (
     <>
-      <div className="section-head"><h1>Foto&apos;s</h1><span className="small muted num">{wall.length} foto&apos;s</span></div>
-      <p className="muted">Deel je mooiste moment van een training, wedstrijd of de 5km Challenge.</p>
+      <PhotoHeader src="/club/de-hele-groep.jpg" title="Foto's" sub={`${wall.length} foto's van de club. Deel ook jouw mooiste moment.`} pos="center 45%" />
 
       <input ref={input} type="file" accept="image/*" hidden onChange={pick} id="photo-input" />
       {!draft && <button className="btn btn-gold" onClick={() => input.current.click()}>+ Foto plaatsen</button>}
