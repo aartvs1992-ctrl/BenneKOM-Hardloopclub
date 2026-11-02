@@ -1,0 +1,132 @@
+'use client';
+import { useState } from 'react';
+import { useApp } from '@/components/AppProvider';
+import { TYPE_LABEL, fmt } from '@/lib/content';
+
+const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false };
+
+export default function Beheer() {
+  const { toast, refresh } = useApp();
+  const [pw, setPw] = useState('');
+  const [d, setD] = useState(null);
+  const [ev, setEv] = useState(EMPTY);
+  const [notify, setNotify] = useState(true);
+  const [news, setNews] = useState({ author: 'Bestuur', title: '', body: '', event_id: '' });
+  const [push, setPush] = useState({ title: '', body: '', pref: 'events' });
+
+  async function call(action, payload = {}, ok) {
+    const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw, action, ...payload }) });
+    const j = await r.json();
+    if (!r.ok) { toast(j.error || 'Dat lukte niet.'); return null; }
+    if (j.events) setD(j);
+    if (ok) toast(typeof ok === 'function' ? ok(j) : ok);
+    refresh();
+    return j;
+  }
+
+  if (!d) return (
+    <>
+      <h1>Beheer</h1>
+      <form className="panel" onSubmit={(e) => { e.preventDefault(); call('load'); }}>
+        <div className="field"><label htmlFor="pw">Wachtwoord</label><input className="input" id="pw" type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="current-password" /></div>
+        <button className="btn btn-gold" type="submit">Inloggen</button>
+      </form>
+    </>
+  );
+
+  const field = (k, label, props = {}) => (
+    <div className="field"><label htmlFor={'ev-' + k}>{label}</label><input className="input" id={'ev-' + k} value={ev[k] ?? ''} onChange={(e) => setEv({ ...ev, [k]: e.target.value })} {...props} /></div>
+  );
+  const flag = (k, label) => <label><input type="checkbox" checked={!!ev[k]} onChange={(e) => setEv({ ...ev, [k]: e.target.checked })} /> {label}</label>;
+  const count = (id) => d.participants.filter((p) => p.event_id === id).length;
+
+  return (
+    <div className="view admin">
+      <h1>Beheer</h1>
+      <div className="panel small">
+        <b>Status</b>
+        <span>Database: {d.status.database ? '✓ Supabase gekoppeld' : '⚠ tijdelijke opslag (stel Supabase in)'}</span>
+        <span>Pushmeldingen: {d.status.push ? `✓ aan · ${d.subscribers} abonnees` : '⚠ VAPID-sleutels ontbreken'}</span>
+        <span>Strava: {d.status.strava ? '✓ gekoppeld' : 'niet gekoppeld'}</span>
+      </div>
+
+      <section className="section">
+        <h2>{ev.id ? 'Evenement bewerken' : 'Nieuw evenement'}</h2>
+        <form className="panel" onSubmit={async (e) => { e.preventDefault(); if (await call('saveEvent', { event: ev, notify: !ev.id && notify }, 'Opgeslagen')) setEv(EMPTY); }}>
+          <div className="field"><label htmlFor="ev-type">Soort</label>
+            <select className="input" id="ev-type" value={ev.type} onChange={(e) => setEv({ ...ev, type: e.target.value })}>{['special', 'wedstrijd', 'challenge', 'training'].map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}</select></div>
+          {field('title', 'Titel', { required: true })}
+          <div className="grid2">{field('date', 'Datum', { type: 'date', required: true })}{field('time', 'Tijd', { type: 'time' })}</div>
+          {field('place', 'Locatie')}
+          {field('distances', 'Afstanden')}
+          <div className="field"><label htmlFor="ev-desc">Omschrijving</label><textarea className="input" id="ev-desc" value={ev.description} onChange={(e) => setEv({ ...ev, description: e.target.value })} /></div>
+          {field('capacity', 'Max. deelnemers (leeg = geen max.)', { type: 'number', min: 1 })}
+          <div className="check-row">{flag('registration', 'Inschrijven')}{flag('carpool', 'Carpool')}{flag('replaces_training', 'Vervangt de dinsdagtraining')}</div>
+          {!ev.id && <div className="check-row"><label><input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} /> Stuur een pushmelding</label></div>}
+          <div className="btn-row"><button className="btn btn-gold" type="submit">Opslaan</button>{ev.id && <button className="btn btn-line" type="button" onClick={() => setEv(EMPTY)}>Annuleren</button>}</div>
+        </form>
+        <div className="list">
+          {d.events.map((e) => (
+            <div key={e.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}>
+              <span style={{ minWidth: 0 }}><span className="t"><span className={'tag ' + e.type}>{TYPE_LABEL[e.type]}</span>{e.title}</span><br /><span className="s">{e.date} · {count(e.id)} aangemeld</span></span>
+              <span className="btn-row" style={{ gap: 6 }}>
+                <button className="link" onClick={() => { setEv({ ...EMPTY, ...e, capacity: e.capacity ?? '' }); window.scrollTo(0, 0); }}>Bewerk</button>
+                <DeleteButton onConfirm={() => call('deleteEvent', { id: e.id }, 'Verwijderd')} />
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <h2>Nieuwsbericht</h2>
+        <form className="panel" onSubmit={async (e) => { e.preventDefault(); if (await call('saveNews', { news }, 'Geplaatst')) setNews({ ...news, title: '', body: '', event_id: '' }); }}>
+          <div className="grid2">
+            <div className="field"><label htmlFor="n-author">Van</label><input className="input" id="n-author" value={news.author} onChange={(e) => setNews({ ...news, author: e.target.value })} /></div>
+            <div className="field"><label htmlFor="n-ev">Koppel aan evenement</label><select className="input" id="n-ev" value={news.event_id} onChange={(e) => setNews({ ...news, event_id: e.target.value })}><option value="">Geen</option>{d.events.map((e) => <option key={e.id} value={e.id}>{e.title} ({e.date})</option>)}</select></div>
+          </div>
+          <div className="field"><label htmlFor="n-title">Titel</label><input className="input" id="n-title" value={news.title} onChange={(e) => setNews({ ...news, title: e.target.value })} required /></div>
+          <div className="field"><label htmlFor="n-body">Tekst</label><textarea className="input" id="n-body" value={news.body} onChange={(e) => setNews({ ...news, body: e.target.value })} /></div>
+          <button className="btn btn-gold" type="submit">Plaatsen</button>
+        </form>
+        <div className="list">{d.news.map((n) => (
+          <div key={n.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}><span><span className="t">{n.title}</span><br /><span className="s">{n.author} · {n.published_at}</span></span><DeleteButton onConfirm={() => call('deleteNews', { id: n.id }, 'Verwijderd')} /></div>
+        ))}</div>
+      </section>
+
+      <section className="section">
+        <h2>Pushmelding sturen</h2>
+        <form className="panel" onSubmit={async (e) => { e.preventDefault(); const j = await call('push', push, (r) => `Verstuurd naar ${r.pushed?.sent ?? 0} telefoons`); if (j) setPush({ ...push, title: '', body: '' }); }}>
+          <div className="field"><label htmlFor="p-title">Titel</label><input className="input" id="p-title" value={push.title} onChange={(e) => setPush({ ...push, title: e.target.value })} required /></div>
+          <div className="field"><label htmlFor="p-body">Tekst</label><input className="input" id="p-body" value={push.body} onChange={(e) => setPush({ ...push, body: e.target.value })} /></div>
+          <div className="field"><label htmlFor="p-pref">Naar wie</label><select className="input" id="p-pref" value={push.pref} onChange={(e) => setPush({ ...push, pref: e.target.value })}>
+            <option value="events">Iedereen met &apos;specials en wedstrijden&apos; aan</option><option value="training">Trainingsherinnering aan</option><option value="challenge">5km Challenge aan</option><option value="shirt">Bestelronde clubshirt aan</option></select></div>
+          <button className="btn btn-gold" type="submit">Versturen</button>
+        </form>
+      </section>
+
+      <section className="section">
+        <h2>Voorstellen van leden</h2>
+        {d.suggestions.length ? <div className="list">{d.suggestions.map((s) => (
+          <div key={s.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}><span><span className="t">{s.name}</span><br /><span className="s">{s.date || 'geen datum'} · {s.place || '–'} · van {s.by_name || 'onbekend'}</span></span>
+            <span className="btn-row" style={{ gap: 6 }}><button className="link" onClick={() => { setEv({ ...EMPTY, type: 'wedstrijd', title: s.name, date: s.date || '', place: s.place, registration: false, carpool: true }); window.scrollTo(0, 0); }}>Overnemen</button><DeleteButton onConfirm={() => call('deleteSuggestion', { id: s.id }, 'Verwijderd')} /></span></div>
+        ))}</div> : <p className="muted">Geen nieuwe voorstellen.</p>}
+      </section>
+
+      <section className="section">
+        <h2>5km Challenge-tijden</h2>
+        {d.results.length ? <div className="list">{d.results.sort((a, b) => a.seconds - b.seconds).map((r) => (
+          <div key={r.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}><span><span className="t">{r.name} · <span className="num">{fmt(r.seconds)}</span></span><br /><span className="s">{r.edition}</span></span><DeleteButton onConfirm={() => call('deleteResult', { id: r.id }, 'Verwijderd')} /></div>
+        ))}</div> : <p className="muted">Nog geen tijden.</p>}
+      </section>
+    </div>
+  );
+}
+
+// Verwijderen met bevestiging in de pagina zelf
+function DeleteButton({ onConfirm }) {
+  const [sure, setSure] = useState(false);
+  return sure
+    ? <button className="link" style={{ color: '#C0392B' }} onClick={() => { setSure(false); onConfirm(); }}>Zeker?</button>
+    : <button className="link" onClick={() => { setSure(true); setTimeout(() => setSure(false), 3000); }}>Verwijder</button>;
+}
