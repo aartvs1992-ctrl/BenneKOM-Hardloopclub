@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
-import { Loading, ErrorNote, useReady } from '@/components/ui';
+import { Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
 import { dparts, rel, fmt, parseT, MON } from '@/lib/content';
 
 // Laatste drie maanden als keuze voor de editie
@@ -27,9 +27,8 @@ export default function Challenge() {
 
   return (
     <>
-      <h1>5km Challenge</h1>
+      <PhotoHeader src="/club/juichen.jpg" title="5km Challenge" sub="Elke laatste zaterdag van de maand, 10:00. Loop je tijd, zie je PR en de ranglijst." pos="center 15%" />
       <ErrorNote />
-      <p className="muted">Elke laatste zaterdag van de maand, 10:00. Loop je tijd, zie je PR en de ranglijst.</p>
       {next && (
         <Link className="panel" href={'/event/' + next.id} style={{ textDecoration: 'none', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <span><span className="eyebrow">Volgende editie · {rel(next.date)}</span><br /><b style={{ fontSize: 18 }}>{dparts(next.date).w} {dparts(next.date).d} {dparts(next.date).m} · {next.time || '10:00'}</b></span>

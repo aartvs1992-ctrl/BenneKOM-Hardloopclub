@@ -58,3 +58,13 @@ export function AttendButton({ e, going, act, local, long }) {
     >{label}</button>
   );
 }
+
+// Foto bovenaan een pagina met de titel erop
+export function PhotoHeader({ src, title, sub, pos = 'center 40%' }) {
+  return (
+    <header className="photo-header" style={{ backgroundImage: `url("${src}")`, backgroundPosition: pos }}>
+      <h1>{title}</h1>
+      {sub && <p>{sub}</p>}
+    </header>
+  );
+}

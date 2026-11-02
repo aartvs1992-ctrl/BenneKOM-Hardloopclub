@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useApp } from '@/components/AppProvider';
-import { EventRow, Loading, ErrorNote, useReady } from '@/components/ui';
+import { EventRow, Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
 
 const FILTERS = [['alles', 'Alles'], ['training', 'Trainingen'], ['special', 'Specials'], ['wedstrijd', 'Wedstrijden'], ['challenge', '5km Challenge']];
 
@@ -15,7 +15,7 @@ export default function Agenda() {
   const list = data.events.filter((e) => f === 'alles' || e.type === f);
   return (
     <>
-      <h1>Agenda</h1>
+      <PhotoHeader src="/club/herfstlaan.jpg" title="Agenda" sub="Trainingen, specials en wedstrijden. Iedereen is welkom." pos="center 68%" />
       <ErrorNote />
       <div className="chips" role="group" aria-label="Filter">
         {FILTERS.map(([k, l]) => <button key={k} className="chip" aria-pressed={f === k} onClick={() => setF(k)}>{l}</button>)}

@@ -207,3 +207,8 @@ body{margin:0;min-height:100%}
 .admin-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .admin-photo{display:flex;flex-direction:column;gap:4px;min-width:0}
 .admin-photo img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:var(--soft)}
+.photo-header{position:relative;border-radius:var(--r);overflow:hidden;min-height:min(78vw,320px);background-size:cover;background-color:var(--navy);display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:18px;color:#F4F1E6}
+.photo-header::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,30,62,0) 50%,rgba(7,30,62,.92) 100%)}
+.photo-header h1{font-size:34px}
+.photo-header>*{position:relative}
+.photo-header p{font-size:15px;opacity:.9;max-width:34ch}
