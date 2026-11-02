@@ -19,7 +19,7 @@ function own(p) {
   return {
     profile: {
       first_name: p.first_name, last_name: p.last_name,
-      song: p.song || '', member_since: p.member_since || '', fun_fact: p.fun_fact || '', work: p.work || '',
+      song: p.song || '', member_since: p.member_since || '', fun_fact: p.fun_fact || '', work: p.work || '', best_run: p.best_run || '',
       name: displayName(p), avatar: p.photo_path ? fileUrl(p.photo_path) : null,
       restore_code: p.restore_code,
     },
@@ -66,6 +66,7 @@ export async function POST(req) {
       member_since: /^\d{4}-\d{2}$/.test(b.member_since || '') ? b.member_since : '',
       fun_fact: clean(b.fun_fact, 200),
       work: clean(b.work, 80),
+      best_run: clean(b.best_run, 200),
       photo_path: current?.photo_path || null,
       restore_code: current?.restore_code || newCode(),
       updated_at: new Date().toISOString(),
@@ -90,7 +91,7 @@ export async function POST(req) {
     return Response.json(own(row));
   } catch (e) {
     const msg = String(e.message);
-    if (/(song|member_since|fun_fact|work)'? column|column .*(song|member_since|fun_fact|work)/i.test(msg)) return bad('De profielvragen zijn nog niet ingesteld: draai 005_profielvragen.sql in Supabase.', 500);
+    if (/(song|member_since|fun_fact|work|best_run)'? column|column .*(song|member_since|fun_fact|work|best_run)/i.test(msg)) return bad('De profielvragen zijn nog niet ingesteld: draai updates.sql in Supabase.', 500);
     if (/table .*profiles|relation .*profiles|does not exist/i.test(msg)) return bad('Profielen zijn nog niet ingesteld: draai 004_profielen.sql in Supabase.', 500);
     return bad('Opslaan lukte niet. Probeer het nog eens.', 500);
   }

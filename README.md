@@ -4,7 +4,7 @@ De app van Hardloopclub BenneKOM. Leden zetten hem op hun beginscherm en krijgen
 
 - **Agenda** met dinsdagtrainingen (automatisch), specials, wedstrijden en de 5km Challenge
 - **Ik ben erbij** bij trainingen, met teller
-- **Profielen**: naam, profielfoto (zelf inzoomen en verschuiven) en vier kennismakingsvragen; tik op een gezicht voor de ledenkaart; gezichten bij aanmeldingen, inschrijvingen en carpool. Met een herstelcode open je je profiel op een ander toestel.
+- **Profielen**: naam, profielfoto (zelf inzoomen en verschuiven) en vijf kennismakingsvragen (lid sinds, mooiste hardloopervaring, favoriete hardloopnummer, werk, wat mensen zou verbazen); tik op een gezicht voor de ledenkaart; gezichten bij aanmeldingen, inschrijvingen en carpool. Met een herstelcode open je je profiel op een ander toestel.
 - **Inschrijven** met één tik (of op naam zonder profiel), met optioneel maximum
 - **Carpool** bij wedstrijden: rit aanbieden of meerijden
 - **Jouw 5 km**: persoonlijke pagina voor de 5km Challenge — tijden op het Strava-segment komen automatisch binnen (of zelf invullen), met PR, verschil met de vorige keer en een grafiek. Alleen zichtbaar voor het lid zelf.

@@ -105,9 +105,10 @@ export const sinceLabel = (v) => (/^\d{4}-\d{2}$/.test(v || '') ? `${MONTHS[+v.s
 
 export const QUESTIONS = [
   ['since', 'Lid sinds'],
-  ['song', 'Favoriete nummer tijdens het sporten'],
-  ['work', 'Wat ik doe voor werk'],
-  ['fact', 'Wat mensen bij de club niet over me weten'],
+  ['best', 'Mooiste hardloopervaring'],
+  ['song', 'Favoriete hardloopnummer'],
+  ['work', 'Werk'],
+  ['fact', 'Wat mensen over me zou verbazen'],
 ];
 
 // Ledenkaart: grote foto en antwoorden op de vragen

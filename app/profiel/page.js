@@ -7,7 +7,7 @@ import AvatarCropper from '@/components/AvatarCropper';
 export default function Profiel() {
   const { local, updateLocal, refresh, toast } = useApp();
   const [prof, setProf] = useState(undefined); // undefined = laden, null = nog geen profiel
-  const EMPTY = { first_name: '', last_name: '', song: '', member_since: '', fun_fact: '', work: '' };
+  const EMPTY = { first_name: '', last_name: '', song: '', member_since: '', fun_fact: '', work: '', best_run: '' };
   const [f, setF] = useState(EMPTY);
   const [cropFile, setCropFile] = useState(null);
   const [preview, setPreview] = useState(false);
@@ -81,7 +81,7 @@ export default function Profiel() {
     finally { setBusy(false); setSure(false); }
   }
 
-  const card = prof && { name: prof.name, avatar: prof.avatar, since: prof.member_since, song: prof.song, work: prof.work, fact: prof.fun_fact, me: true };
+  const card = prof && { name: prof.name, avatar: prof.avatar, since: prof.member_since, song: prof.song, work: prof.work, fact: prof.fun_fact, best: prof.best_run, me: true };
   const shown = removePhoto ? null : photo || prof?.avatar;
   const fullName = [f.first_name, f.last_name].filter(Boolean).join(' ');
 
@@ -116,13 +116,15 @@ export default function Profiel() {
           <div className="field"><label htmlFor="pf-last">Achternaam</label><input className="input" id="pf-last" value={f.last_name} onChange={(e) => setF({ ...f, last_name: e.target.value })} autoComplete="family-name" maxLength={60} /></div>
         </div>
         <h3 style={{ marginTop: 4 }}>Leer elkaar kennen <span className="muted small">(allemaal optioneel)</span></h3>
-        <div className="field"><label htmlFor="pf-since">Lid sinds</label>
+        <div className="field"><label htmlFor="pf-since">Lid sinds?</label>
           <input className="input" id="pf-since" type="month" min="2025-01" max={new Date().toISOString().slice(0, 7)} value={f.member_since} onChange={(e) => setF({ ...f, member_since: e.target.value })} /></div>
-        <div className="field"><label htmlFor="pf-song">Favoriete nummer tijdens het sporten</label>
+        <div className="field"><label htmlFor="pf-best">Mooiste hardloopervaring?</label>
+          <textarea className="input" id="pf-best" rows={2} value={f.best_run} onChange={(e) => setF({ ...f, best_run: e.target.value })} placeholder="Bijv. mijn eerste halve marathon, of die zonsopkomst op de Ginkelse heide" maxLength={200} /></div>
+        <div className="field"><label htmlFor="pf-song">Favoriete hardloopnummer?</label>
           <input className="input" id="pf-song" value={f.song} onChange={(e) => setF({ ...f, song: e.target.value })} placeholder="Artiest – titel" maxLength={80} /></div>
-        <div className="field"><label htmlFor="pf-work">Wat doe je voor werk?</label>
+        <div className="field"><label htmlFor="pf-work">Werk?</label>
           <input className="input" id="pf-work" value={f.work} onChange={(e) => setF({ ...f, work: e.target.value })} placeholder="Bijv. docent, monteur, student" maxLength={80} /></div>
-        <div className="field"><label htmlFor="pf-fact">Wat weten mensen bij de club nog niet over je?</label>
+        <div className="field"><label htmlFor="pf-fact">Wat zou mensen over je verbazen? <span className="muted">(iets wat velen niet weten 😉)</span></label>
           <textarea className="input" id="pf-fact" rows={2} value={f.fun_fact} onChange={(e) => setF({ ...f, fun_fact: e.target.value })} placeholder="Iets leuks of verrassends" maxLength={200} /></div>
         <button className="btn btn-gold" type="submit" disabled={busy}>{busy ? 'Bezig met opslaan…' : prof ? 'Opslaan' : 'Profiel aanmaken'}</button>
         <p className="note">Je naam, foto en antwoorden zijn zichtbaar voor iedereen die de app gebruikt. Anderen zien ze als ze op je gezicht tikken.</p>

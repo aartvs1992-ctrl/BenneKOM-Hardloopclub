@@ -86,3 +86,6 @@ alter table profiles add column if not exists song text default '';        -- fa
 alter table profiles add column if not exists member_since text default ''; -- bijv. 2025-06
 alter table profiles add column if not exists fun_fact text default '';     -- wat mensen niet over je weten
 alter table profiles add column if not exists work text default '';         -- wat je doet voor werk
+
+-- ===== 006_mooiste_ervaring =====
+alter table profiles add column if not exists best_run text default '';
