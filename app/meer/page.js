@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
-import { Loading } from '@/components/ui';
+import { Loading, PhotoHeader } from '@/components/ui';
 import { CLUB } from '@/lib/club';
 
 export default function Meer() {
@@ -16,7 +16,7 @@ export default function Meer() {
 
   return (
     <>
-      <h1>Meer</h1>
+      <PhotoHeader src="/club/karikaturenwand.jpg" title="Meer" sub="Hardloopclub BenneKOM · sinds 2025 · iedereen welkom" pos="center 30%" />
       <form className="panel" onSubmit={(e) => { e.preventDefault(); toast('Naam opgeslagen'); if (ask) history.back(); }}>
         {ask && <p className="note">Vul eerst je naam in, dan zien andere leden wie er komt.</p>}
         <div className="field"><label htmlFor="me-name">Jouw naam</label>
