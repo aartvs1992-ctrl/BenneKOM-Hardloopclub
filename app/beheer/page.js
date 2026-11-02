@@ -12,6 +12,7 @@ export default function Beheer() {
   const [ev, setEv] = useState(EMPTY);
   const [notify, setNotify] = useState(true);
   const [news, setNews] = useState({ author: 'Bestuur', title: '', body: '', event_id: '' });
+  const [imp, setImp] = useState({ eventId: '', names: '' });
   const [push, setPush] = useState({ title: '', body: '', pref: 'events' });
 
   async function call(action, payload = {}, ok) {
@@ -76,6 +77,30 @@ export default function Beheer() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="section">
+        <h2>Aanmeldingen toevoegen</h2>
+        <p className="small muted">Neem namen over van bijvoorbeeld een Strava-event. Eén naam per regel. Dubbele namen worden overgeslagen.</p>
+        <form className="panel" onSubmit={async (e) => { e.preventDefault(); if (await call('addParticipants', imp, (r) => `${r.added ?? 0} ${r.added === 1 ? 'naam' : 'namen'} toegevoegd`)) setImp({ ...imp, names: '' }); }}>
+          <div className="field"><label htmlFor="imp-ev">Evenement</label>
+            <select className="input" id="imp-ev" value={imp.eventId} onChange={(e) => setImp({ ...imp, eventId: e.target.value })} required>
+              <option value="">Kies…</option>
+              {(d.upcoming || []).map((e) => <option key={e.id} value={e.id}>{e.date} · {e.title}</option>)}
+            </select></div>
+          <div className="field"><label htmlFor="imp-names">Namen</label>
+            <textarea className="input" id="imp-names" rows={6} value={imp.names} onChange={(e) => setImp({ ...imp, names: e.target.value })} placeholder={'Sanne de Vries\nPieter Jansen\nMark'} required /></div>
+          <button className="btn btn-gold" type="submit">Toevoegen</button>
+          {imp.eventId && d.participants.some((p) => p.event_id === imp.eventId) && (
+            <div className="section" style={{ gap: 6 }}>
+              <b className="small">Nu aangemeld ({d.participants.filter((p) => p.event_id === imp.eventId).length})</b>
+              {d.participants.filter((p) => p.event_id === imp.eventId).map((p) => (
+                <div key={p.device_id} className="setrow small"><span>{p.name}{p.device_id.startsWith('beheer-') ? <span className="muted"> · toegevoegd door beheer</span> : null}</span>
+                  <DeleteButton onConfirm={() => call('removeParticipant', { eventId: imp.eventId, device: p.device_id }, 'Verwijderd')} /></div>
+              ))}
+            </div>
+          )}
+        </form>
       </section>
 
       <section className="section">

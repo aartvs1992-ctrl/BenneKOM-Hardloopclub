@@ -1,6 +1,7 @@
 // Beheer: events, nieuws, voorstellen en handmatige pushmeldingen. Beveiligd met ADMIN_PASSWORD.
 import { all, insert, upsert, remove, usingSupabase, deleteFile } from '@/lib/db';
 import { listPhotos } from '@/lib/photos';
+import { withTrainings } from '@/lib/club';
 import { sendPush, pushReady } from '@/lib/push';
 
 export const dynamic = 'force-dynamic';
@@ -49,6 +50,26 @@ export async function POST(req) {
       case 'deleteSuggestion':
         await remove('suggestions', { id: b.id });
         break;
+      case 'addParticipants': {
+        // namen overnemen (bijv. van een Strava-event); één naam per regel
+        const ev = clean(b.eventId, 80);
+        if (!ev) return Response.json({ error: 'Kies een evenement.' }, { status: 400 });
+        const existing = new Set((await all('participants')).filter((p) => p.event_id === ev).map((p) => p.name.toLowerCase()));
+        const names = String(b.names || '').split(/\n|,/).map((n) => clean(n, 80)).filter(Boolean);
+        let added = 0;
+        for (const name of names) {
+          if (existing.has(name.toLowerCase())) continue;
+          existing.add(name.toLowerCase());
+          await upsert('participants', { event_id: ev, device_id: 'beheer-' + slug(name), name }, ['event_id', 'device_id']);
+          added++;
+        }
+        if (!names.length) return Response.json({ error: 'Vul minstens één naam in.' }, { status: 400 });
+        b.added = added;
+        break;
+      }
+      case 'removeParticipant':
+        await remove('participants', { event_id: clean(b.eventId, 80), device_id: clean(b.device, 80) });
+        break;
       case 'deleteResult':
         await remove('challenge_results', { id: b.id });
         break;
@@ -78,6 +99,8 @@ export async function POST(req) {
       news: news.sort((a, b) => String(b.published_at).localeCompare(String(a.published_at))),
       suggestions, participants, results, photos,
       subscribers: subs.length,
+      upcoming: withTrainings(events).map((e) => ({ id: e.id, title: e.title, date: e.date, type: e.type })),
+      added: b.added,
       status: { database: usingSupabase, push: pushReady },
     });
   } catch (e) {
