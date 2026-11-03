@@ -25,8 +25,8 @@ export default function Fysio() {
       {(f.phone || f.email || f.url) ? (
         <div className="panel">
           <h3>Contact</h3>
-          {f.practice && <div><span className="plbl">Praktijk</span><p>{f.practice}{f.address && <><br /><span className="small muted">{f.address}</span></>}</p></div>}
-          {f.phone && <div><span className="plbl">Telefoon praktijk</span><p className="num" style={{ userSelect: 'all' }}>{f.phone}</p><a className="btn btn-gold btn-sm" href={'tel:' + tel}>Bellen</a></div>}
+          {f.practice && <div><span className="plbl">Praktijk</span><p>{f.practice}{f.address && <><br /><span className="small muted">{f.address}</span></>}{f.practicePhone && <><br /><span className="small muted">Praktijk: {f.practicePhone}</span></>}</p></div>}
+          {f.phone && <div><span className="plbl">Telefoon David</span><p className="num" style={{ userSelect: 'all' }}>{f.phone}</p><a className="btn btn-gold btn-sm" href={'tel:' + tel}>Bellen</a></div>}
           {f.email && <div><span className="plbl">E-mail</span><p style={{ userSelect: 'all' }}>{f.email}</p></div>}
           {f.url && <a className="link" href={f.url} target="_blank" rel="noopener noreferrer">Website van de praktijk ↗</a>}
         </div>

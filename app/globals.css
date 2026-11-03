@@ -388,3 +388,5 @@ a.media-item:hover{border-color:var(--gold)}
 .size.sel{background:var(--gold);border-color:var(--gold);color:#071E3E}
 .physio-card{border-left:4px solid var(--gold)}
 .physio-ico{width:56px;height:56px;border-radius:50%;background:var(--navy);color:var(--gold);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:34px;flex:none}
+.shirt-product{background:#fff;border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+.shirt-product img{width:100%;max-width:100%;display:block}

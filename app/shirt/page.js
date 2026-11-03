@@ -12,8 +12,13 @@ export default function Shirt() {
     <>
       <ErrorNote />
       <h1>Clubshirt</h1>
-      <p>Navy met het gouden BenneKOM-logo. Loop je mee in clubkleuren?</p>
+      <p>Navy camo met gele boord en het BenneKOM-logo met kroontje, gemaakt door Bioracer. Loop je mee in clubkleuren?</p>
 
+      <div className="shirt-product">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/club/shirt-product.jpg" alt="BenneKOM clubshirt van Bioracer" />
+      </div>
+      <h2>Zo staat hij aan</h2>
       <div className="shirt-photos">
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
