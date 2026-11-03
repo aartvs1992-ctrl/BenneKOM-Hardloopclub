@@ -7,7 +7,7 @@ export default function Verhaal() {
   const v = VERHAAL;
   return (
     <>
-      <PhotoHeader src="/club/groep-in-de-mist.jpg" title="Het ontstaan" sub={v.intro} pos="center 45%" />
+      <PhotoHeader src="/club/verhaal-bennekom-bos.jpg" title="Het ontstaan" sub={v.intro} pos="center 40%" />
       <article className="article story">
         <span className="eyebrow">Het verhaal · {v.author}</span>
         <h2>{v.title}</h2>

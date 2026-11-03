@@ -7,9 +7,10 @@ export const metadata = { title: "Tempo's · BenneKOM" };
 export default function Tempo() {
   return (
     <>
-      <PhotoHeader src="/club/samen-tempo.jpg" title="Tempo's" sub="Wat bedoelen we met rustig, threshold of 45/15? Zo moet het voelen." pos="center 30%" />
+      <PhotoHeader src="/club/samen-tempo.jpg" title="Tempo's" sub="Threshold, VO2max, strides of fartlek? Zo moet het voelen." pos="center 30%" />
       <p>Bij de intervaltrainingen noemen we tempo&apos;s. Hieronder staat per tempo hoe het hoort te voelen. Je eigen snelheden per kilometer reken je uit met de <Link className="link" href="/tools">calculator</Link>.</p>
-      <div className="zone-scale" aria-hidden="true">{Object.entries(ZONES).map(([k, z]) => <span key={k} className={'z-' + k} style={{ height: z.level * 20 + '%' }} />)}</div>
+      <div className="zone-scale" aria-hidden="true">{Object.entries(ZONES).filter(([, z]) => !z.extra).map(([k, z]) => <span key={k} className={'z-' + k} style={{ height: z.level * 20 + '%' }} />)}</div>
+      <nav className="zone-nav">{Object.entries(ZONES).map(([k, z]) => <a key={k} href={'#' + k}>{z.short}</a>)}<a href="#noors">Noorse methode</a></nav>
       {Object.entries(ZONES).map(([k, z]) => (
         <section key={k} id={k} className={'panel zone-card z-' + k}>
           <span className="eyebrow">Inspanning {z.rpe}</span>

@@ -45,7 +45,15 @@ export function Workout({ w }) {
         ))}
         <li className="wo-step easy"><span className="wo-big">Uit</span><span><b>{w.cool}</b><br /><span className="small">Rustig, samen</span></span></li>
       </ol>
-      <Link className="link wo-more" href="/tempo">Wat betekenen deze tempo&apos;s? ›</Link>
+      <div className="wo-explain">
+        {[...new Set(w.sets.map((s) => s.zone))].map((z) => (
+          <p key={z}>
+            <b>Wat is {ZONES[z].short.toLowerCase() === 'hard' ? 'hard lopen' : ZONES[z].short}?</b> {ZONES[z].summary}{' '}
+            <Link className="wo-more" href={'/tempo#' + z}>Meer over {ZONES[z].short} ›</Link>
+          </p>
+        ))}
+      </div>
+      <Link className="link wo-more" href="/tempo">Alle tempo&apos;s: threshold, VO2max, strides, fartlek ›</Link>
     </section>
   );
 }
