@@ -66,6 +66,7 @@ export default function Welcome() {
           <li><span aria-hidden="true">🔔</span><span><b>Een seintje vooraf</b><br />welke training we doen en wie er komt</span></li>
           <li><span aria-hidden="true">🏷️</span><span><b>Kortingscodes</b><br />bij onze partners</span></li>
           <li><span aria-hidden="true">🏃</span><span><b>Samen naar wedstrijden</b><br />zien wie meedoet, met carpool</span></li>
+          <li><span aria-hidden="true">👑</span><span><b>Toegang tot de BenneKOM-community</b><br />clubfoto&apos;s, de lopers achter de club en alle clubevenementen</span></li>
         </ul>
 
         {!restore ? (
