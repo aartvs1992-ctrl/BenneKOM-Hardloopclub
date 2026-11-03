@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
-import { Loading, ErrorNote, useReady } from '@/components/ui';
+import { Loading, ErrorNote, useReady, People } from '@/components/ui';
 import { SHIRTS, SIZES, euro } from '@/lib/content';
 
 export default function Shirt() {
@@ -35,7 +35,7 @@ export default function Shirt() {
 
       <div className="panel callout">
         <b>We bestellen alleen in grotere aantallen</b>
-        <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling.</p>
+        <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling. De prijzen zijn indicatief.</p>
         {data.shirtCount > 0 && <span className="small muted">Er zijn nu {data.shirtCount} shirts aangevinkt.</span>}
       </div>
 
@@ -73,8 +73,14 @@ function ShirtRow({ s }) {
           else setOpen(false);
         }} />
         <span style={{ minWidth: 0 }}><b>{s.name}</b><br /><span className="small muted">{s.note}</span></span>
-        <span className="num" style={{ fontWeight: 700 }}>ca. {euro(s.price)}</span>
+        <span style={{ textAlign: 'right' }}><span className="num" style={{ fontWeight: 700 }}>± {euro(s.price)}</span><br /><span className="small muted">indicatief</span></span>
       </label>
+      {(data.shirtPeople?.[s.id] || []).length > 0 && (
+        <div className="shirt-people">
+          <span className="small muted">{data.shirtPeople[s.id].length} {data.shirtPeople[s.id].length === 1 ? 'loper heeft' : 'lopers hebben'} interesse</span>
+          <People list={data.shirtPeople[s.id]} />
+        </div>
+      )}
       {checked && (
         <div className="shirt-form">
           <div className="field"><span className="plbl">Maat</span>

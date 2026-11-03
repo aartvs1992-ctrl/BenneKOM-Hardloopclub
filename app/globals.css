@@ -400,3 +400,4 @@ a.media-item:hover{border-color:var(--gold)}
 .news-card img{width:100%;max-width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
 .news-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 .news-body p{margin:0;white-space:pre-line}
+.shirt-people{display:flex;flex-direction:column;gap:6px}
