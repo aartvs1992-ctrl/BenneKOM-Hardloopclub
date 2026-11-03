@@ -18,18 +18,27 @@ export default function Fysio() {
         <div style={{ minWidth: 0 }}>
           <b className="host-name">{f.name}</b>
           <span className="eyebrow">{f.role}{f.practice && ' · ' + f.practice}</span>
-          <p>Heb je last van een pijntje of een blessure? Neem contact op met David. Hij kijkt wat er aan de hand is en helpt je weer op weg.</p>
+          <p>Heb je last van een pijntje of een blessure? Neem contact op met David. Als sportfysiotherapeut én fanatiek (trail)loper weet hij precies wat hardlopen van je lichaam vraagt. Hij kijkt wat er aan de hand is en helpt je weer op weg.</p>
         </div>
       </div>
 
       {(f.phone || f.email || f.url) ? (
         <div className="panel">
           <h3>Contact</h3>
-          {f.phone && <div><span className="plbl">Telefoon</span><p className="num" style={{ userSelect: 'all' }}>{f.phone}</p><a className="btn btn-gold btn-sm" href={'tel:' + tel}>Bellen</a></div>}
+          {f.practice && <div><span className="plbl">Praktijk</span><p>{f.practice}{f.address && <><br /><span className="small muted">{f.address}</span></>}</p></div>}
+          {f.phone && <div><span className="plbl">Telefoon praktijk</span><p className="num" style={{ userSelect: 'all' }}>{f.phone}</p><a className="btn btn-gold btn-sm" href={'tel:' + tel}>Bellen</a></div>}
           {f.email && <div><span className="plbl">E-mail</span><p style={{ userSelect: 'all' }}>{f.email}</p></div>}
           {f.url && <a className="link" href={f.url} target="_blank" rel="noopener noreferrer">Website van de praktijk ↗</a>}
         </div>
       ) : <p className="note">Contactgegevens volgen.</p>}
+
+      {f.action && (
+        <figure className="zone-photo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={f.action} alt={f.name + ' tijdens een trailrun'} loading="lazy" style={{ aspectRatio: 'auto', maxWidth: 360 }} />
+          <figcaption className="small muted">David zelf onderweg tijdens een trailrun</figcaption>
+        </figure>
+      )}
 
       <section className="section">
         <h2>Wanneer bel je?</h2>
