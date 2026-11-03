@@ -1,6 +1,6 @@
 // BenneKOM service worker: maakt de app installeerbaar, werkt offline voor de tools en toont pushmeldingen.
-const CACHE = 'bennekom-v1';
-const SHELL = ['/', '/tools', '/voeding', '/leren', '/icons/icon-192.png'];
+const CACHE = 'bennekom-v2';
+const SHELL = ['/', '/tools', '/leren', '/icons/icon-192.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}));

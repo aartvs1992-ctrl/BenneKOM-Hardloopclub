@@ -64,7 +64,23 @@ export default function AppProvider({ children }) {
 
   // Service worker registreren (installeerbaar + pushmeldingen)
   useEffect(() => {
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').then((r) => r.update()).catch(() => {});
+  }, []);
+
+  // Nieuwe versie live gezet? Dan de app één keer verversen, zodat iedereen de nieuwste versie ziet.
+  useEffect(() => {
+    const mine = process.env.NEXT_PUBLIC_BUILD;
+    const check = async () => {
+      try {
+        const { v } = await (await fetch('/api/version', { cache: 'no-store' })).json();
+        if (v && mine && v !== mine && v !== 'dev') location.reload();
+      } catch {}
+    };
+    check();
+    const onVis = () => document.visibilityState === 'visible' && check();
+    document.addEventListener('visibilitychange', onVis);
+    const t = setInterval(check, 5 * 60 * 1000);
+    return () => { document.removeEventListener('visibilitychange', onVis); clearInterval(t); };
   }, []);
 
   const act = useCallback(async (action, payload = {}, okMsg) => {
