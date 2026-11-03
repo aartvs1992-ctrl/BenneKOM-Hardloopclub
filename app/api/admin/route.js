@@ -61,7 +61,11 @@ export async function POST(req) {
       case 'saveNews': {
         const n = b.news || {};
         if (!clean(n.title)) return Response.json({ error: 'Een bericht heeft een titel nodig.' }, { status: 400 });
-        await insert('news', { author: clean(n.author, 40) || 'Bestuur', title: clean(n.title, 120), body: clean(n.body, 4000), event_id: n.event_id || null, published_at: new Date().toISOString().slice(0, 10) });
+        const row = { author: clean(n.author, 40) || 'Bestuur', title: clean(n.title, 120), body: clean(n.body, 4000), event_id: n.event_id || null, published_at: /^\d{4}-\d{2}-\d{2}$/.test(n.published_at || '') ? n.published_at : new Date().toISOString().slice(0, 10) };
+        const link = /^https?:\/\//.test(n.url || '') ? clean(n.url, 400) : '';
+        const pic = /^(https?:\/\/|\/club\/)/.test(n.image || '') ? clean(n.image, 400) : '';
+        if (link || pic) Object.assign(row, { url: link, image: pic });
+        await insert('news', row);
         break;
       }
       case 'deleteNews':
@@ -146,6 +150,7 @@ export async function POST(req) {
       status: { database: usingSupabase, push: pushReady },
     });
   } catch (e) {
+    if (/column .*(url|image)|(url|image).* column/.test(e.message) && b.action === 'saveNews') return Response.json({ error: 'Nieuws met Strava-link is nog niet ingesteld: draai updates.sql in Supabase.' }, { status: 500 });
     if (/details/.test(e.message)) return Response.json({ error: 'De extra informatie bij specials is nog niet ingesteld: draai updates.sql in Supabase.' }, { status: 500 });
     return Response.json({ error: 'Er ging iets mis: ' + e.message }, { status: 500 });
   }

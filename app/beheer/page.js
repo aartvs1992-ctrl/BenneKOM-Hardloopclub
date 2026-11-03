@@ -11,6 +11,8 @@ export default function Beheer() {
   const [d, setD] = useState(null);
   const [ev, setEv] = useState(EMPTY);
   const [notify, setNotify] = useState(true);
+  const N0 = { author: 'Bestuur', title: '', body: '', event_id: '', url: '', image: '', published_at: '' };
+  const [news, setNews] = useState(N0);
   const [imp, setImp] = useState({ eventId: '', names: '' });
   const P0 = { id: '', name: '', about: '', benefit: '', code: '', how: '', url: '', sort: '' };
   const [par, setPar] = useState(P0);
@@ -167,6 +169,26 @@ export default function Beheer() {
             </span>
           </div>
         ))}</div> : <p className="muted">Nog geen foto&apos;s geplaatst.</p>}
+      </section>
+
+      <section className="section">
+        <h2>Nieuws (bijv. een Strava-post)</h2>
+        <p className="small muted">Zet een interessante post van de Strava-club in de app: plak de link van de post, geef een titel en een korte tekst, en voeg eventueel de foto toe.</p>
+        <form className="panel" onSubmit={async (e) => { e.preventDefault(); if (await call('saveNews', { news }, 'Geplaatst')) setNews(N0); }}>
+          <div className="field"><label htmlFor="n-url">Link naar de Strava-post (optioneel)</label><input className="input" id="n-url" type="url" value={news.url} onChange={(e) => setNews({ ...news, url: e.target.value })} placeholder="https://www.strava.com/clubs/1629265/posts/…" /></div>
+          <div className="field"><label htmlFor="n-title">Titel</label><input className="input" id="n-title" value={news.title} onChange={(e) => setNews({ ...news, title: e.target.value })} required /></div>
+          <div className="field"><label htmlFor="n-body">Tekst</label><textarea className="input" id="n-body" rows={4} value={news.body} onChange={(e) => setNews({ ...news, body: e.target.value })} /></div>
+          <ImagePick id="n-img" label="Foto (optioneel)" value={news.image} onChange={(v) => setNews({ ...news, image: v })} upload={(img) => call('uploadImage', { image: img })} />
+          <div className="grid2">
+            <div className="field"><label htmlFor="n-author">Van</label><input className="input" id="n-author" value={news.author} onChange={(e) => setNews({ ...news, author: e.target.value })} /></div>
+            <div className="field"><label htmlFor="n-date">Datum (leeg = vandaag)</label><input className="input" id="n-date" type="date" value={news.published_at} onChange={(e) => setNews({ ...news, published_at: e.target.value })} /></div>
+          </div>
+          <div className="field"><label htmlFor="n-ev">Koppel aan evenement</label><select className="input" id="n-ev" value={news.event_id} onChange={(e) => setNews({ ...news, event_id: e.target.value })}><option value="">Geen</option>{d.events.map((e) => <option key={e.id} value={e.id}>{e.title} ({e.date})</option>)}</select></div>
+          <button className="btn btn-gold" type="submit">Plaatsen</button>
+        </form>
+        <div className="list">{d.news.map((n) => (
+          <div key={n.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}><span><span className="t">{n.title}</span><br /><span className="s">{n.author} · {n.published_at}{n.url ? ' · Strava' : ''}</span></span><DeleteButton onConfirm={() => call('deleteNews', { id: n.id }, 'Verwijderd')} /></div>
+        ))}</div>
       </section>
 
       <section className="section">

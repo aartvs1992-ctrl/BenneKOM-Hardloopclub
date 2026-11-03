@@ -395,3 +395,8 @@ a.media-item:hover{border-color:var(--gold)}
 .flag-card{flex-direction:row;align-items:center;gap:14px}
 .flag-card img{width:96px;max-width:30%;height:auto;flex:none;border-radius:6px}
 .flag-card p{margin:4px 0 0}
+.tile-wide{grid-column:1/-1}
+.news-card{padding:0;overflow:hidden;gap:0}
+.news-card img{width:100%;max-width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+.news-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.news-body p{margin:0;white-space:pre-line}
