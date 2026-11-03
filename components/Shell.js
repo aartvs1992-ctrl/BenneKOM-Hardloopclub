@@ -3,6 +3,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from './AppProvider';
 import { Avatar } from './ui';
+import Welcome from './Welcome';
+
+// Pagina's die ook zonder aanmelding open zijn
+const OPEN = ['/beheer'];
 
 const TABS = [
   ['/', 'Home', <path key="h" d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />],
@@ -27,6 +31,9 @@ export default function Shell({ children }) {
   const isRoot = TABS.some(([href]) => href === path);
   const { data } = useApp();
   const me = data?.me;
+
+  // Nog niet aangemeld: eerst het beginscherm, daarna de hele app
+  if (data && !me && !OPEN.some((p) => path.startsWith(p))) return <Welcome />;
 
   return (
     <>
