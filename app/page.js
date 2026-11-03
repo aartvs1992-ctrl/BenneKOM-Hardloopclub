@@ -31,7 +31,7 @@ export default function Home() {
       {!data.me && (
         <Link className="panel join-card" href="/profiel">
           <Avatar name="?" size={56} />
-          <span style={{ minWidth: 0 }}><b>Maak je profiel</b><br /><span className="small muted">Naam en foto, dan zien anderen wie er komt. Duurt een minuut.</span></span>
+          <span style={{ minWidth: 0 }}><b>Meld je aan</b><br /><span className="small muted">Alleen naam en e-mail. Dan krijg je de kortingscodes van onze partners en een seintje over de training.</span></span>
           <span className="chev">›</span>
         </Link>
       )}

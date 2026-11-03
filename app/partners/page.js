@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { Loading, useReady, PhotoHeader } from '@/components/ui';
 
@@ -31,6 +32,12 @@ function PartnerCard({ p }) {
         <div className="code-box">
           <span className="eyebrow">Kortingscode</span>
           <div className="code-row"><span className="code num">{p.code}</span><button className="btn btn-gold btn-sm" onClick={copy}>{copied ? '✓ Gekopieerd' : 'Kopieer'}</button></div>
+        </div>
+      ) : p.locked ? (
+        <div className="code-box">
+          <span className="eyebrow">Kortingscode voor leden</span>
+          <div className="code-row"><span className="code num muted" aria-hidden="true">••••••</span><Link className="btn btn-gold btn-sm" href="/profiel?terug=1">Meld je aan</Link></div>
+          <span className="small muted">Alleen je naam en e-mail, dan zie je de code direct.</span>
         </div>
       ) : null}
       {p.how && <p className="small muted">{p.how}</p>}

@@ -7,7 +7,7 @@ import AvatarCropper from '@/components/AvatarCropper';
 export default function Profiel() {
   const { local, updateLocal, refresh, toast } = useApp();
   const [prof, setProf] = useState(undefined); // undefined = laden, null = nog geen profiel
-  const EMPTY = { first_name: '', last_name: '', song: '', member_since: '', fun_fact: '', work: '', best_run: '' };
+  const EMPTY = { first_name: '', last_name: '', email: '', song: '', member_since: '', fun_fact: '', work: '', best_run: '' };
   const [f, setF] = useState(EMPTY);
   const [cropFile, setCropFile] = useState(null);
   const [preview, setPreview] = useState(false);
@@ -57,7 +57,7 @@ export default function Profiel() {
       setProf(j.profile); setPhoto(null); setRemovePhoto(false);
       updateLocal({ name: j.profile.name });
       await refresh();
-      toast(prof ? 'Profiel bijgewerkt' : 'Welkom bij BenneKOM, ' + j.profile.first_name + '!');
+      toast(prof ? 'Profiel bijgewerkt' : 'Welkom bij BenneKOM, ' + j.profile.first_name + '! De kortingscodes staan voor je klaar.');
       if (back) history.back();
     } catch (err) { toast(err.message); }
     finally { setBusy(false); }
@@ -87,9 +87,30 @@ export default function Profiel() {
 
   return (
     <>
-      <h1>{prof ? 'Mijn profiel' : 'Word lid van de app'}</h1>
-      {!prof && <p className="muted">Maak je profiel aan met je naam en een foto. Dan zien andere lopers wie er komt, en jij herkent ze bij de training.</p>}
-      {back && !prof && <p className="note">Maak eerst je profiel aan, dan zetten we je meteen op de lijst.</p>}
+      <h1>{prof ? 'Mijn profiel' : 'Meld je aan'}</h1>
+      {!prof && (
+        <>
+          <p className="lead">Alleen je naam en e-mail. Dan krijg je:</p>
+          <ul className="perks">
+            <li><b>Kortingscodes</b> van onze partners</li>
+            <li><b>Een seintje</b> over de training en clubevenementen</li>
+            <li>Zien <b>wie er meedoet</b>, en zelf meedoen met één tik</li>
+          </ul>
+          {back && <p className="note">Meld je eerst aan, dan gaan we meteen verder.</p>}
+          <form className="panel profile-form" onSubmit={save}>
+            <div className="grid2">
+              <div className="field"><label htmlFor="su-first">Voornaam</label><input className="input" id="su-first" value={f.first_name} onChange={(e) => setF({ ...f, first_name: e.target.value })} autoComplete="given-name" required maxLength={40} /></div>
+              <div className="field"><label htmlFor="su-last">Achternaam</label><input className="input" id="su-last" value={f.last_name} onChange={(e) => setF({ ...f, last_name: e.target.value })} autoComplete="family-name" maxLength={60} /></div>
+            </div>
+            <div className="field"><label htmlFor="su-mail">E-mail</label><input className="input" id="su-mail" type="email" inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} autoComplete="email" required maxLength={120} /></div>
+            <button className="btn btn-gold" type="submit" disabled={busy}>{busy ? 'Even geduld…' : 'Aanmelden'}</button>
+            <p className="note">Je e-mail is alleen voor de club en wordt niet getoond. Een foto en wat leuke vragen kun je later toevoegen.</p>
+          </form>
+        </>
+      )}
+      {prof && !prof.avatar && !prof.song && !prof.best_run && !prof.work && !prof.fun_fact && (
+        <p className="note"><b>Maak je profiel af.</b> Met een foto en een paar leuke antwoorden herkennen anderen je bij de training. Alles is optioneel.</p>
+      )}
 
       {cropFile && (
         <section className="panel">
@@ -97,7 +118,7 @@ export default function Profiel() {
         </section>
       )}
 
-      <form className="panel profile-form" onSubmit={save} hidden={!!cropFile}>
+      {prof && <form className="panel profile-form" onSubmit={save} hidden={!!cropFile}>
         <div className="avatar-pick">
           <button type="button" className="avatar-btn" onClick={() => input.current.click()} aria-label="Kies een profielfoto">
             <Avatar name={fullName} src={shown} size={112} />
@@ -115,6 +136,7 @@ export default function Profiel() {
           <div className="field"><label htmlFor="pf-first">Voornaam</label><input className="input" id="pf-first" value={f.first_name} onChange={(e) => setF({ ...f, first_name: e.target.value })} autoComplete="given-name" required maxLength={40} /></div>
           <div className="field"><label htmlFor="pf-last">Achternaam</label><input className="input" id="pf-last" value={f.last_name} onChange={(e) => setF({ ...f, last_name: e.target.value })} autoComplete="family-name" maxLength={60} /></div>
         </div>
+        <div className="field"><label htmlFor="pf-mail">E-mail <span className="muted small">(niet zichtbaar voor anderen)</span></label><input className="input" id="pf-mail" type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} autoComplete="email" maxLength={120} /></div>
         <h3 style={{ marginTop: 4 }}>Leer elkaar kennen <span className="muted small">(allemaal optioneel)</span></h3>
         <div className="field"><label htmlFor="pf-since">Lid sinds?</label>
           <input className="input" id="pf-since" type="month" min="2025-01" max={new Date().toISOString().slice(0, 7)} value={f.member_since} onChange={(e) => setF({ ...f, member_since: e.target.value })} /></div>
@@ -127,9 +149,9 @@ export default function Profiel() {
         <div className="field"><label htmlFor="pf-fact">Wat zou mensen over je verbazen? <span className="muted">(iets wat velen niet weten 😉)</span></label>
           <textarea className="input" id="pf-fact" rows={2} value={f.fun_fact} onChange={(e) => setF({ ...f, fun_fact: e.target.value })} placeholder="Iets leuks of verrassends" maxLength={200} /></div>
         <button className="btn btn-gold" type="submit" disabled={busy}>{busy ? 'Bezig met opslaan…' : prof ? 'Opslaan' : 'Profiel aanmaken'}</button>
-        <p className="note">Je naam, foto en antwoorden zijn zichtbaar voor iedereen die de app gebruikt. Anderen zien ze als ze op je gezicht tikken.</p>
-        {prof && <button type="button" className="link" style={{ alignSelf: 'flex-start' }} onClick={() => setPreview(true)}>Bekijk hoe anderen je kaart zien ›</button>}
-      </form>
+        <p className="note">Je naam, foto en antwoorden zijn zichtbaar voor iedereen die de app gebruikt. Anderen zien ze als ze op je gezicht tikken. Je e-mail niet.</p>
+        <button type="button" className="link" style={{ alignSelf: 'flex-start' }} onClick={() => setPreview(true)}>Bekijk hoe anderen je kaart zien ›</button>
+      </form>}
 
       {prof ? (
         <section className="panel">

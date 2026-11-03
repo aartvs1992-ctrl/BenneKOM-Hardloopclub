@@ -404,3 +404,4 @@ a.media-item:hover{border-color:var(--gold)}
 .wo-seg.z-subthreshold{background:#C99A1E}
 .deadline{margin:0}
 .deadline.soon b{color:var(--gold,#c9a227)}
+.perks{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}

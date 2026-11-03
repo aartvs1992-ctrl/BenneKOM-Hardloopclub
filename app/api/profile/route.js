@@ -21,7 +21,7 @@ function own(p) {
       first_name: p.first_name, last_name: p.last_name,
       song: p.song || '', member_since: p.member_since || '', fun_fact: p.fun_fact || '', work: p.work || '', best_run: p.best_run || '',
       name: displayName(p), avatar: p.photo_path ? fileUrl(p.photo_path) : null,
-      restore_code: p.restore_code,
+      restore_code: p.restore_code, email: p.email || '',
     },
   };
 }
@@ -58,6 +58,9 @@ export async function POST(req) {
     if (b.action !== 'save') return bad('Onbekende actie.');
     const first = clean(b.first_name, 40);
     if (!first) return bad('Vul je voornaam in.');
+    const email = clean(b.email, 120).toLowerCase();
+    if (!current && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad('Vul een geldig e-mailadres in.');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad('Dit e-mailadres klopt niet.');
     const row = {
       device_id: device,
       first_name: first,
@@ -67,6 +70,7 @@ export async function POST(req) {
       fun_fact: clean(b.fun_fact, 200),
       work: clean(b.work, 80),
       best_run: clean(b.best_run, 200),
+      email: email || current?.email || '',
       photo_path: current?.photo_path || null,
       restore_code: current?.restore_code || newCode(),
       updated_at: new Date().toISOString(),
@@ -87,7 +91,13 @@ export async function POST(req) {
       row.photo_path = path;
     }
 
-    await upsert('profiles', row, ['device_id']);
+    try { await upsert('profiles', row, ['device_id']); }
+    catch (e) {
+      // e-mailkolom nog niet aangemaakt in Supabase: dan in elk geval de rest opslaan
+      if (!/email/i.test(String(e.message))) throw e;
+      const { email: _e, ...rest } = row;
+      await upsert('profiles', rest, ['device_id']);
+    }
     return Response.json(own(row));
   } catch (e) {
     const msg = String(e.message);

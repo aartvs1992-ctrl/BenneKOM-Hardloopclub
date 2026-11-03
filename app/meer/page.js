@@ -13,7 +13,7 @@ export default function Meer() {
       <PhotoHeader src="/club/karikaturenwand.jpg" title="Meer" sub="Hardloopclub BenneKOM · sinds 2025 · iedereen welkom" pos="center 30%" />
       <Link className="panel join-card" href="/profiel">
         <Avatar name={data?.me?.name || local.name || '?'} src={data?.me?.avatar} size={56} />
-        <span style={{ minWidth: 0 }}><b>{data?.me ? data.me.name : 'Maak je profiel'}</b><br /><span className="small muted">{data?.me ? 'Mijn profiel: naam, foto en code voor een ander toestel' : 'Naam en foto, dan zien anderen wie er komt'}</span></span>
+        <span style={{ minWidth: 0 }}><b>{data?.me ? data.me.name : 'Meld je aan'}</b><br /><span className="small muted">{data?.me ? 'Mijn profiel: naam, foto en code voor een ander toestel' : 'Naam en e-mail, dan krijg je de kortingscodes van onze partners'}</span></span>
         <span className="chev">›</span>
       </Link>
       <Link className="panel join-card physio-card" href="/fysio">

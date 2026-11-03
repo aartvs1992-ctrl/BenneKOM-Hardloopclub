@@ -195,3 +195,8 @@ alter table shirt_interest enable row level security;
 alter table news add column if not exists url text default '';
 alter table news add column if not exists image text default '';
 delete from news where (author = 'Wilco' and title = 'Nieuwe website') or (author = 'Bestuur' and title = 'Run-Dip-Run in Bennekom' and published_at = '2026-05-12');
+
+-- ===== 012_email =====
+-- 012: e-mailadres bij het ledenprofiel (alleen zichtbaar voor de club, niet voor andere leden)
+-- Plak dit in Supabase → SQL Editor → New query → Run. Veilig om vaker te draaien.
+alter table profiles add column if not exists email text default '';
