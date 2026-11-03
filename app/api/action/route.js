@@ -32,7 +32,14 @@ export async function POST(req) {
             const n = (await all('participants')).filter((p) => p.event_id === ev.id && p.device_id !== device).length;
             if (n >= ev.capacity) return bad('Dit evenement zit vol.');
           }
+          const already = (await all('participants')).some((p) => p.event_id === ev.id && p.device_id === device);
           await upsert('participants', { event_id: ev.id, device_id: device, name }, ['event_id', 'device_id']);
+          // Melding aan de clubgenoten, niet bij gewone trainingen (dat zou te veel meldingen geven)
+          if (!already && ev.type !== 'training') {
+            const d = new Date(ev.date + 'T12:00:00');
+            const when = d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Amsterdam' });
+            await sendPush('signups', { title: `${name.split(' ')[0]} doet mee aan ${ev.title}`, body: `${when}${ev.place ? ' · ' + ev.place.split(',')[0] : ''}. Ga je ook?`, url: '/event/' + ev.id }, device);
+          }
         } else {
           await remove('participants', { event_id: ev.id, device_id: device });
         }

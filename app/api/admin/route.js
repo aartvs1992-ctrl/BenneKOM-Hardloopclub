@@ -36,9 +36,10 @@ export async function POST(req) {
         const det = {
           image: img(dt.image), story: clean(dt.story, 4000), program: clean(dt.program, 1500),
           bring: clean(dt.bring, 800), cost: clean(dt.cost, 120),
+          deadline: /^\d{4}-\d{2}-\d{2}$/.test(dt.deadline || '') ? dt.deadline : '',
           host: clean(dt.host?.name, 80) ? { name: clean(dt.host.name, 80), role: clean(dt.host.role, 80), bio: clean(dt.host.bio, 800), photo: img(dt.host.photo) } : null,
         };
-        if (det.image || det.story || det.program || det.bring || det.cost || det.host) row.details = det;
+        if (det.image || det.story || det.program || det.bring || det.cost || det.host || det.deadline) row.details = det;
         else if (e.details) row.details = null;
         await upsert('events', row, ['id']);
         if (b.notify) await sendPush('events', { title: 'Nieuw in de agenda', body: `${row.title} · ${row.date.split('-').reverse().join('-')}`, url: '/event/' + row.id });

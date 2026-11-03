@@ -65,6 +65,7 @@ export default function Beheer() {
           {field('place', 'Locatie')}
           {field('distances', 'Afstanden')}
           {field('url', 'Link naar info/inschrijven (optioneel)', { type: 'url', placeholder: 'https://' })}
+          {ev.type !== 'training' && <div className="field"><label htmlFor="ev-deadline">Inschrijven kan tot (optioneel)</label><input className="input" id="ev-deadline" type="date" value={ev.details?.deadline || ''} onChange={(e) => setEv({ ...ev, details: { ...(ev.details || {}), deadline: e.target.value } })} /><span className="small muted">De app stuurt een week en een dag van tevoren een melding.</span></div>}
           <div className="field"><label htmlFor="ev-desc">Omschrijving</label><textarea className="input" id="ev-desc" value={ev.description} onChange={(e) => setEv({ ...ev, description: e.target.value })} /></div>
           {field('capacity', 'Max. deelnemers (leeg = geen max.)', { type: 'number', min: 1 })}
           {ev.type !== 'training' && <Details ev={ev} setEv={setEv} upload={(img) => call('uploadImage', { image: img })} />}

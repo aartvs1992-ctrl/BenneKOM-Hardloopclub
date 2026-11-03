@@ -402,3 +402,5 @@ a.media-item:hover{border-color:var(--gold)}
 .news-body p{margin:0;white-space:pre-line}
 .shirt-people{display:flex;flex-direction:column;gap:6px}
 .wo-seg.z-subthreshold{background:#C99A1E}
+.deadline{margin:0}
+.deadline.soon b{color:var(--gold,#c9a227)}

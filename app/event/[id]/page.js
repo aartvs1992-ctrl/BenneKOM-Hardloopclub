@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, AttendButton, People, Avatar } from '@/components/ui';
-import { dparts, rel, TYPE_LABEL } from '@/lib/content';
+import { dparts, rel, daysTo, TYPE_LABEL } from '@/lib/content';
 import { CHALLENGE_EASY } from '@/lib/challenge';
 import { Gallery } from '@/components/Gallery';
 import { Workout } from '@/components/Workout';
@@ -41,6 +41,7 @@ export default function EventPage() {
           <div><span className="lbl">Plaats</span><span style={{ fontWeight: 600, fontSize: 14 }}>{(e.place || '').split(',')[0]}</span></div>
         </div>
         {e.distances && <p><b>Afstanden:</b> {e.distances}</p>}
+        {dt.deadline && <Deadline iso={dt.deadline} />}
         {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km} km van Bennekom (hemelsbreed)</p>}
         {e.url && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={e.url} target="_blank" rel="noopener noreferrer">Info en inschrijven bij de organisatie ↗</a>}
         {e.type === 'wedstrijd' && !e.url && <a className="link" href={'https://www.google.com/search?q=' + encodeURIComponent(e.title + ' ' + e.place + ' ' + e.date.slice(0, 4))} target="_blank" rel="noopener noreferrer">Zoek info en inschrijving ›</a>}
@@ -208,4 +209,11 @@ function Carpool({ e }) {
       )}
     </div>
   );
+}
+
+function Deadline({ iso }) {
+  const n = daysTo(iso);
+  const p = dparts(iso);
+  if (n < 0) return <p className="small muted"><b>Inschrijving gesloten</b> sinds {p.d} {p.m}</p>;
+  return <p className={n <= 7 ? 'deadline soon' : 'deadline'}><b>Inschrijven kan tot {p.w} {p.d} {p.m}</b>{n <= 7 && <> · {n === 0 ? 'vandaag de laatste dag' : rel(iso)}</>}</p>;
 }
