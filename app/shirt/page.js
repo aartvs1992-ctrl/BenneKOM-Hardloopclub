@@ -19,10 +19,18 @@ export default function Shirt() {
         <img src="/club/shirt-product.jpg" alt="BenneKOM clubshirt van Bioracer" />
       </div>
       <h2>Zo staat hij aan</h2>
-      <figure className="shirt-worn">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/club/shirt-voorkant.jpg" alt="Loper in het nieuwe BenneKOM clubshirt" />
-      </figure>
+      <div className="shirt-photos">
+        <figure>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/club/shirt-voorkant.jpg" alt="Loper in het nieuwe BenneKOM clubshirt" style={{ objectPosition: 'center 15%' }} />
+          <figcaption>Heren</figcaption>
+        </figure>
+        <figure>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/club/shirt-dames.jpg" alt="Loopster in het nieuwe BenneKOM clubshirt" style={{ objectPosition: 'center 30%' }} />
+          <figcaption>Dames</figcaption>
+        </figure>
+      </div>
 
       <div className="panel flag-card">
         {/* eslint-disable-next-line @next/next/no-img-element */}
