@@ -36,8 +36,8 @@ function paceFor(sec, km, minutes) {
 // Elke band: [snelste, rustigste] als 'tempo dat je zoveel minuten zou volhouden', plus een vaste opslag voor rustig.
 const BANDS = [
   { id: 'rustig', name: 'Rustig / duurloop', how: 'Hele zinnen praten', calc: (s, d) => [paceFor(s, d, 60) + 50, paceFor(s, d, 60) + 90] },
-  { id: 'threshold', name: 'Threshold, lange blokken', how: '8–15 min, bijv. 3 × 10 min', calc: (s, d) => [paceFor(s, d, 85), paceFor(s, d, 120)] },
-  { id: 'threshold', name: 'Threshold, korte blokken', how: '3–6 min of 1 km, bijv. 5 × 5 min', calc: (s, d) => [paceFor(s, d, 65), paceFor(s, d, 85)] },
+  { id: 'threshold', name: 'Threshold, lange blokken', how: '8–15 min, bijv. 3 × 10 min', calc: (s, d) => [paceFor(s, d, 85) + 3, paceFor(s, d, 120) + 3] },
+  { id: 'threshold', name: 'Threshold, korte blokken', how: '3–6 min of 1 km, bijv. 5 × 5 min', calc: (s, d) => [paceFor(s, d, 65) + 1, paceFor(s, d, 85) + 1] },
   { id: 'vo2max', name: 'VO2max', how: '2–5 min, af en toe', calc: (s, d) => [paceFor(s, d, 12), paceFor(s, d, 18)] },
   { id: 'strides', name: 'Strides', how: '15–20 sec, soepel', calc: (s, d) => [paceFor(s, d, 4), paceFor(s, d, 6)] },
 ];
@@ -50,6 +50,10 @@ function Training() {
   return (
     <>
       <p className="small" style={{ margin: 0 }}>Vul een recente wedstrijd- of testtijd in. Je krijgt dan je tempo per soort training.</p>
+      <div className="callout" style={{ paddingLeft: 12 }}>
+        <b>Dit is een richtlijn, geen opdracht</b>
+        <p className="small" style={{ margin: '4px 0 0' }}>Je tempo hangt sterk af van de dag en hoe je je voelt: slaap, drukte, weer en vermoeidheid tellen allemaal mee. Luister naar je lichaam. Bij threshold moet het comfortabel zwaar voelen; is dat niet zo, loop dan gewoon wat rustiger.</p>
+      </div>
       <div className="grid2">
         <div className="field"><label htmlFor="tr-d">Afstand</label>
           <select className="input" id="tr-d" value={d} onChange={(e) => setD(+e.target.value)}>{DISTS.map(([l, x]) => <option key={l} value={x}>{l}</option>)}</select></div>
