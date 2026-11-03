@@ -4,22 +4,64 @@ import Link from 'next/link';
 import { PhotoHeader } from '@/components/ui';
 import { DISTS, fmt, parseT, riegel, ZONES, splits } from '@/lib/content';
 
-const TABS = [['tempo', 'Tempo'], ['voorspeller', 'Voorspeller'], ['zones', 'Zones'], ['splits', 'Splits']];
+const TABS = [['training', 'Trainingstempo'], ['tempo', 'Tempo'], ['voorspeller', 'Voorspeller'], ['zones', 'Zones'], ['splits', 'Splits']];
 
 export default function Tools() {
-  const [tab, setTab] = useState('tempo');
+  const [tab, setTab] = useState('training');
   return (
     <>
-      <PhotoHeader src="/club/beukenlaan.jpg" title="Calculator" sub="Tempo, voorspeller, hartslagzones en splits." pos="center 45%" />
+      <PhotoHeader src="/club/beukenlaan.jpg" title="Calculator" sub="Je trainingstempo's, voorspeller, hartslagzones en splits." pos="center 45%" />
       <div className="seg" role="group" aria-label="Calculator">
         {TABS.map(([k, l]) => <button key={k} aria-pressed={tab === k} onClick={() => setTab(k)}>{l}</button>)}
       </div>
       <div className="panel">
+        {tab === 'training' && <Training />}
         {tab === 'tempo' && <Tempo />}
         {tab === 'voorspeller' && <Predictor />}
         {tab === 'zones' && <Zones />}
         {tab === 'splits' && <Splits />}
       </div>
+    </>
+  );
+}
+
+// Tempo dat je een bepaalde tijd (minuten) zou volhouden, afgeleid van een wedstrijdtijd (Riegel 1,06)
+function paceFor(sec, km, minutes) {
+  const T = minutes * 60;
+  const d = km * Math.pow(T / sec, 1 / 1.06);
+  return T / d;
+}
+
+// Conservatief, in de geest van de Noorse aanpak van Marius Bakken: threshold gecontroleerd en eerder te rustig dan te snel.
+// Elke band: [snelste, rustigste] als 'tempo dat je zoveel minuten zou volhouden', plus een vaste opslag voor rustig.
+const BANDS = [
+  { id: 'rustig', name: 'Rustig / duurloop', how: 'Hele zinnen praten', calc: (s, d) => [paceFor(s, d, 60) + 50, paceFor(s, d, 60) + 90] },
+  { id: 'threshold', name: 'Threshold, lange blokken', how: '8–15 min, bijv. 3 × 10 min', calc: (s, d) => [paceFor(s, d, 85), paceFor(s, d, 120)] },
+  { id: 'threshold', name: 'Threshold, korte blokken', how: '3–6 min of 1 km, bijv. 5 × 5 min', calc: (s, d) => [paceFor(s, d, 65), paceFor(s, d, 85)] },
+  { id: 'vo2max', name: 'VO2max', how: '2–5 min, af en toe', calc: (s, d) => [paceFor(s, d, 12), paceFor(s, d, 18)] },
+  { id: 'strides', name: 'Strides', how: '15–20 sec, soepel', calc: (s, d) => [paceFor(s, d, 4), paceFor(s, d, 6)] },
+];
+
+function Training() {
+  const [d, setD] = useState(10);
+  const [t, setT] = useState('45:00');
+  const s = parseT(t);
+  const ok = !Number.isNaN(s) && s > 0;
+  return (
+    <>
+      <p className="small" style={{ margin: 0 }}>Vul een recente wedstrijd- of testtijd in. Je krijgt dan je tempo per soort training.</p>
+      <div className="grid2">
+        <div className="field"><label htmlFor="tr-d">Afstand</label>
+          <select className="input" id="tr-d" value={d} onChange={(e) => setD(+e.target.value)}>{DISTS.map(([l, x]) => <option key={l} value={x}>{l}</option>)}</select></div>
+        <div className="field"><label htmlFor="tr-t">Tijd</label><input className="input num" id="tr-t" value={t} onChange={(e) => setT(e.target.value)} placeholder="mm:ss of u:mm:ss" /></div>
+      </div>
+      <table>
+        <thead><tr><th>Training</th><th className="r">Tempo per km</th></tr></thead>
+        <tbody>{ok ? BANDS.map((b) => { const [a, z] = b.calc(s, d); return (
+          <tr key={b.name}><td><Link className="link" href={'/tempo#' + b.id}>{b.name}</Link><br /><span className="small muted">{b.how}</span></td><td className="r num">{fmt(a)}–{fmt(z)}</td></tr>
+        ); }) : <tr><td colSpan="2">Vul een tijd in als 45:00 of 1:39:00.</td></tr>}</tbody>
+      </table>
+      <p className="note">We rekenen bewust conservatief, in de lijn van Marius Bakken en de Noorse aanpak: threshold net onder je omslagpunt, zodat je het vaker per week kunt doen. Dat is iets rustiger dan de tabellen van Jack Daniels. Voelt het zwaarder dan &quot;comfortabel zwaar&quot;? Dan loop je de rustige kant van de band, of nog iets langzamer. Bij warm weer, wind of heuvels loop je op gevoel.</p>
     </>
   );
 }
