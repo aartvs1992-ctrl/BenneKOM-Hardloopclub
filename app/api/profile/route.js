@@ -2,6 +2,9 @@
 // Met de herstelcode open je hetzelfde profiel op een ander toestel.
 import { all, upsert, remove, putFile, deleteFile, fileUrl } from '@/lib/db';
 import { displayName } from '@/lib/profiles';
+import { mailReady, makeCode, checkCode, sendCodeMail } from '@/lib/mailcode';
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const dynamic = 'force-dynamic';
 
@@ -47,6 +50,37 @@ export async function POST(req) {
     }
 
     if (!device) return bad('Apparaat onbekend. Herlaad de app.');
+
+    // Stap 1: code per mail. Bestaat het e-mailadres al, dan is het inloggen op dat profiel.
+    if (b.action === 'sendCode') {
+      const email = clean(b.email, 120).toLowerCase();
+      if (!EMAIL.test(email)) return bad('Vul een geldig e-mailadres in.');
+      const existing = (await all('profiles')).find((p) => (p.email || '').toLowerCase() === email);
+      const first = clean(b.first_name, 40);
+      if (!existing && !first) return bad(b.login ? 'Dit e-mailadres kennen we nog niet. Meld je aan met je naam.' : 'Vul je voornaam in.');
+      if (!mailReady) return Response.json({ skip: true }); // bevestiging staat (nog) uit
+      const { code, token } = makeCode({ email, first, last: clean(b.last_name, 60), device });
+      try { await sendCodeMail(email, code, existing?.first_name || first); }
+      catch (e) { console.error(e); return bad('De mail kon niet worden verstuurd. Probeer het later nog eens.', 502); }
+      return Response.json({ token, existing: Boolean(existing) });
+    }
+
+    // Stap 2: code invullen
+    if (b.action === 'verify') {
+      const r = checkCode(b.token, b.code);
+      if (r.error) return bad(r.error);
+      const { email, first, last } = r.payload;
+      const existing = (await all('profiles')).find((p) => (p.email || '').toLowerCase() === email);
+      if (existing) return Response.json({ device: existing.device_id, ...own(existing) });
+      const row = {
+        device_id: device, first_name: first, last_name: last || '', email,
+        song: '', member_since: '', fun_fact: '', work: '', best_run: '',
+        photo_path: null, restore_code: newCode(), updated_at: new Date().toISOString(),
+      };
+      await upsert('profiles', row, ['device_id']);
+      return Response.json({ device, ...own(row) });
+    }
+
     const current = await find(device);
 
     if (b.action === 'delete') {
@@ -59,7 +93,8 @@ export async function POST(req) {
     const first = clean(b.first_name, 40);
     if (!first) return bad('Vul je voornaam in.');
     const email = clean(b.email, 120).toLowerCase();
-    if (!current && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad('Vul een geldig e-mailadres in.');
+    if (!current && mailReady) return bad('Bevestig eerst je e-mailadres met de code.');
+    if (!current && !EMAIL.test(email)) return bad('Vul een geldig e-mailadres in.');
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad('Dit e-mailadres klopt niet.');
     const row = {
       device_id: device,
