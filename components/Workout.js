@@ -46,9 +46,9 @@ export function Workout({ w }) {
         <li className="wo-step easy"><span className="wo-big">Uit</span><span><b>{w.cool}</b><br /><span className="small">Rustig, samen</span></span></li>
       </ol>
       <div className="wo-explain">
-        {[...new Set(w.sets.map((s) => s.zone))].map((z) => (
+        {[...new Set(w.sets.map((s) => s.zone))].filter((z) => z !== 'hard').map((z) => (
           <p key={z}>
-            <b>Wat is {ZONES[z].short.toLowerCase() === 'hard' ? 'hard lopen' : ZONES[z].short}?</b> {ZONES[z].summary}{' '}
+            <b>Wat is {ZONES[z].short}?</b> {ZONES[z].summary}{' '}
             {!ZONES[z].hidden && <Link className="wo-more" href={'/tempo#' + z}>Meer over {ZONES[z].short} ›</Link>}
           </p>
         ))}

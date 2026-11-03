@@ -124,7 +124,7 @@ function Attend({ e }) {
       <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></div>
       <AttendButton e={e} going={Boolean(data.mine[e.id])} act={act} local={local} long />
       <People list={data.names[e.id]} />
-      <p className="note">Zo weet de trainer vooraf hoeveel mensen er komen en kan hij de groepen indelen.</p>
+      <p className="note">Zo weten we vooraf hoeveel lopers er komen en zien anderen wie er meeloopt.</p>
     </div>
   );
 }
