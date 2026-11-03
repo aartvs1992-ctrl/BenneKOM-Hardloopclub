@@ -42,7 +42,7 @@ export async function POST(req) {
         if (det.image || det.story || det.program || det.bring || det.cost || det.host || det.deadline) row.details = det;
         else if (e.details) row.details = null;
         await upsert('events', row, ['id']);
-        if (b.notify) await sendPush('events', { title: 'Nieuw in de agenda', body: `${row.title} · ${row.date.split('-').reverse().join('-')}`, url: '/event/' + row.id });
+        if (b.notify) await sendPush(row.type === 'wedstrijd' ? 'races' : 'events', { title: row.type === 'wedstrijd' ? 'Nieuwe wedstrijd in de agenda' : 'Nieuw van BenneKOM', body: `${row.title} · ${row.date.split('-').reverse().join('-')}`, url: '/event/' + row.id });
         break;
       }
       case 'uploadImage': {

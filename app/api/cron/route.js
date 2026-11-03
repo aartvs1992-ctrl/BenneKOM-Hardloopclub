@@ -36,6 +36,15 @@ export async function GET(req) {
       url: '/event/' + chal.id,
     }));
   }
+  // BenneKOM-specials: de dag ervoor een herinnering
+  for (const e of list.filter((x) => x.date === tomorrow && x.type === 'special')) {
+    out.push(await sendPush('events', {
+      title: `Morgen: ${e.title}`,
+      body: `${e.time ? e.time + ' · ' : ''}${(e.place || '').split(',')[0] || 'Bennekom'}. Ben jij erbij?`,
+      url: '/event/' + e.id,
+    }));
+  }
+
   // Inschrijfdeadlines: een week en een dag van tevoren
   const inWeek = todayISO(new Date(Date.now() + 7 * 864e5));
   for (const e of list) {
