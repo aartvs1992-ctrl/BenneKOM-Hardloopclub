@@ -66,6 +66,7 @@ export default function Beheer() {
           {field('url', 'Link naar info/inschrijven (optioneel)', { type: 'url', placeholder: 'https://' })}
           <div className="field"><label htmlFor="ev-desc">Omschrijving</label><textarea className="input" id="ev-desc" value={ev.description} onChange={(e) => setEv({ ...ev, description: e.target.value })} /></div>
           {field('capacity', 'Max. deelnemers (leeg = geen max.)', { type: 'number', min: 1 })}
+          {ev.type !== 'training' && <Details ev={ev} setEv={setEv} upload={(img) => call('uploadImage', { image: img })} />}
           <div className="check-row">{flag('registration', 'Inschrijven')}{flag('carpool', 'Carpool')}{flag('replaces_training', 'Vervangt de dinsdagtraining')}</div>
           {!ev.id && <div className="check-row"><label><input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} /> Stuur een pushmelding</label></div>}
           <div className="btn-row"><button className="btn btn-gold" type="submit">Opslaan</button>{ev.id && <button className="btn btn-line" type="button" onClick={() => setEv(EMPTY)}>Annuleren</button>}</div>
@@ -75,7 +76,7 @@ export default function Beheer() {
             <div key={e.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}>
               <span style={{ minWidth: 0 }}><span className="t"><span className={'tag ' + e.type}>{TYPE_LABEL[e.type]}</span>{e.title}</span><br /><span className="s">{e.date} · {count(e.id)} aangemeld</span></span>
               <span className="btn-row" style={{ gap: 6 }}>
-                <button className="link" onClick={() => { setEv({ ...EMPTY, ...e, capacity: e.capacity ?? '' }); window.scrollTo(0, 0); }}>Bewerk</button>
+                <button className="link" onClick={() => { setEv({ ...EMPTY, ...e, capacity: e.capacity ?? '', details: e.details || {} }); window.scrollTo(0, 0); }}>Bewerk</button>
                 <DeleteButton onConfirm={() => call('deleteEvent', { id: e.id }, 'Verwijderd')} />
               </span>
             </div>
@@ -208,4 +209,65 @@ function DeleteButton({ onConfirm }) {
   return sure
     ? <button className="link" style={{ color: '#C0392B' }} onClick={() => { setSure(false); onConfirm(); }}>Zeker?</button>
     : <button className="link" onClick={() => { setSure(true); setTimeout(() => setSure(false), 3000); }}>Verwijder</button>;
+}
+
+// Verkleint een gekozen foto in de browser tot max. 1600 px (JPEG)
+function shrink(file, max = 1600) {
+  return new Promise((ok, fail) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src);
+      ok(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = fail;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function ImagePick({ id, label, value, onChange, upload }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
+      {value && /* eslint-disable-next-line @next/next/no-img-element */ <img src={value} alt="" style={{ width: 120, height: 80, objectFit: 'cover', borderRadius: 8 }} />}
+      <input id={id} type="file" accept="image/*" disabled={busy} onChange={async (e) => {
+        const f = e.target.files?.[0]; if (!f) return;
+        setBusy(true);
+        try { const r = await upload(await shrink(f)); if (r?.url) onChange(r.url); } finally { setBusy(false); e.target.value = ''; }
+      }} />
+      {busy && <span className="small muted">Uploaden…</span>}
+      {value && <button type="button" className="link" style={{ alignSelf: 'flex-start' }} onClick={() => onChange('')}>Foto weghalen</button>}
+    </div>
+  );
+}
+
+function Details({ ev, setEv, upload }) {
+  const dt = ev.details || {};
+  const host = dt.host || {};
+  const set = (k, v) => setEv({ ...ev, details: { ...dt, [k]: v } });
+  const setHost = (k, v) => set('host', { ...host, [k]: v });
+  const area = (k, label, ph, rows = 4) => (
+    <div className="field"><label htmlFor={'dt-' + k}>{label}</label><textarea className="input" rows={rows} id={'dt-' + k} value={dt[k] || ''} placeholder={ph} onChange={(e) => set(k, e.target.value)} /></div>
+  );
+  return (
+    <fieldset className="panel" style={{ background: 'transparent' }}>
+      <b>Extra informatie op de eventpagina</b>
+      <ImagePick id="dt-image" label="Sfeerfoto bovenaan" value={dt.image} onChange={(v) => set('image', v)} upload={upload} />
+      {area('story', 'Het verhaal (wat gaan we doen, waarom leuk)', 'Een paar alinea\'s over het evenement', 6)}
+      {area('program', 'Programma (één onderdeel per regel, tijd vooraan)', '18:00 Verzamelen\n18:15 Start')}
+      {area('bring', 'Wat neem je mee (één per regel)', 'Handdoek\nDroge kleren', 3)}
+      <div className="field"><label htmlFor="dt-cost">Kosten</label><input className="input" id="dt-cost" value={dt.cost || ''} placeholder="Gratis, of bijv. €10 incl. eten" onChange={(e) => set('cost', e.target.value)} /></div>
+      <b>Gastspreker of partner (optioneel)</b>
+      <div className="grid2">
+        <div className="field"><label htmlFor="dt-hn">Naam</label><input className="input" id="dt-hn" value={host.name || ''} onChange={(e) => setHost('name', e.target.value)} /></div>
+        <div className="field"><label htmlFor="dt-hr">Rol of bedrijf</label><input className="input" id="dt-hr" value={host.role || ''} onChange={(e) => setHost('role', e.target.value)} /></div>
+      </div>
+      <div className="field"><label htmlFor="dt-hb">Over deze persoon</label><textarea className="input" rows={3} id="dt-hb" value={host.bio || ''} onChange={(e) => setHost('bio', e.target.value)} /></div>
+      <ImagePick id="dt-hp" label="Foto van de gastspreker" value={host.photo} onChange={(v) => setHost('photo', v)} upload={upload} />
+    </fieldset>
+  );
 }

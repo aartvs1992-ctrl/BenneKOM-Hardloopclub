@@ -1,5 +1,5 @@
 // Beheer: events, nieuws, voorstellen en handmatige pushmeldingen. Beveiligd met ADMIN_PASSWORD.
-import { all, insert, upsert, remove, usingSupabase, deleteFile } from '@/lib/db';
+import { all, insert, upsert, remove, usingSupabase, deleteFile, putFile, fileUrl } from '@/lib/db';
 import { listPhotos } from '@/lib/photos';
 import { withTrainings } from '@/lib/club';
 import { sendPush, pushReady } from '@/lib/push';
@@ -31,9 +31,28 @@ export async function POST(req) {
           registration: !!e.registration, carpool: !!e.carpool, replaces_training: !!e.replaces_training,
           url: /^https?:\/\//.test(e.url || '') ? clean(e.url, 300) : '',
         };
+        const dt = e.details || {};
+        const img = (u) => (/^(https?:\/\/|\/club\/)/.test(u || '') ? clean(u, 400) : '');
+        const det = {
+          image: img(dt.image), story: clean(dt.story, 4000), program: clean(dt.program, 1500),
+          bring: clean(dt.bring, 800), cost: clean(dt.cost, 120),
+          host: clean(dt.host?.name, 80) ? { name: clean(dt.host.name, 80), role: clean(dt.host.role, 80), bio: clean(dt.host.bio, 800), photo: img(dt.host.photo) } : null,
+        };
+        if (det.image || det.story || det.program || det.bring || det.cost || det.host) row.details = det;
+        else if (e.details) row.details = null;
         await upsert('events', row, ['id']);
         if (b.notify) await sendPush('events', { title: 'Nieuw in de agenda', body: `${row.title} · ${row.date.split('-').reverse().join('-')}`, url: '/event/' + row.id });
         break;
+      }
+      case 'uploadImage': {
+        // foto voor een special (sfeerfoto of gastspreker), al verkleind in de browser
+        const m = /^data:(image\/jpeg);base64,(.+)$/.exec(b.image || '');
+        if (!m) return Response.json({ error: 'Dit bestand is geen foto.' }, { status: 400 });
+        const buf = Buffer.from(m[2], 'base64');
+        if (buf.length > 1500 * 1024) return Response.json({ error: 'Deze foto is te groot.' }, { status: 400 });
+        const path = `specials/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.jpg`;
+        await putFile(path, buf, m[1]);
+        return Response.json({ url: fileUrl(path) });
       }
       case 'deleteEvent':
         await remove('events', { id: clean(b.id) });
@@ -126,6 +145,7 @@ export async function POST(req) {
       status: { database: usingSupabase, push: pushReady },
     });
   } catch (e) {
+    if (/details/.test(e.message)) return Response.json({ error: 'De extra informatie bij specials is nog niet ingesteld: draai updates.sql in Supabase.' }, { status: 500 });
     return Response.json({ error: 'Er ging iets mis: ' + e.message }, { status: 500 });
   }
 }

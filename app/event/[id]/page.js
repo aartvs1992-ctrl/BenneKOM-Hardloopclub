@@ -15,9 +15,19 @@ export default function EventPage() {
 
   const p = dparts(e.date);
   const isTraining = e.type === 'training';
+  const dt = e.details || {};
+  const lines = (t) => String(t || '').split('\n').map((x) => x.trim()).filter(Boolean);
+  const program = lines(dt.program).map((l) => { const m = /^(\d{1,2}[:.]\d{2})\s+(.*)$/.exec(l); return m ? [m[1].replace('.', ':'), m[2]] : ['', l]; });
+  const bring = lines(dt.bring);
   return (
     <>
       <ErrorNote />
+      {dt.image && (
+        <div className="event-hero">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={dt.image} alt="" />
+        </div>
+      )}
       <div className="section">
         <span><span className={'tag ' + e.type}>{TYPE_LABEL[e.type]}</span><span className="eyebrow">{rel(e.date)}</span></span>
         <h1>{e.title}</h1>
@@ -30,9 +40,53 @@ export default function EventPage() {
         {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km} km van Bennekom (hemelsbreed)</p>}
         {e.url && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={e.url} target="_blank" rel="noopener noreferrer">Info en inschrijven bij de organisatie ↗</a>}
         {e.type === 'wedstrijd' && !e.url && <a className="link" href={'https://www.google.com/search?q=' + encodeURIComponent(e.title + ' ' + e.place + ' ' + e.date.slice(0, 4))} target="_blank" rel="noopener noreferrer">Zoek info en inschrijving ›</a>}
-        {e.description && <p style={{ whiteSpace: 'pre-line' }}>{e.description}</p>}
-        {e.place && <a className="link" href={'https://www.google.com/maps/search/' + encodeURIComponent(e.place)} target="_blank" rel="noopener noreferrer">Open locatie in Maps ›</a>}
+        {e.description && <p className={dt.story ? 'lead' : ''} style={{ whiteSpace: 'pre-line' }}>{e.description}</p>}
+        {!dt.story && e.place && <a className="link" href={'https://www.google.com/maps/search/' + encodeURIComponent(e.place)} target="_blank" rel="noopener noreferrer">Open locatie in Maps ›</a>}
       </div>
+
+      {dt.story && (
+        <section className="section">
+          <h2>Wat gaan we doen</h2>
+          {dt.story.split(/\n\s*\n/).map((par, i) => <p key={i} style={{ whiteSpace: 'pre-line' }}>{par}</p>)}
+        </section>
+      )}
+
+      {program.length > 0 && (
+        <section className="section">
+          <h2>Programma</h2>
+          <ol className={'program' + (program.some(([t]) => t) ? '' : ' no-time')}>
+            {program.map(([t, x], i) => <li key={i}>{t ? <span className="num">{t}</span> : program.some(([x]) => x) ? <span /> : null}<span>{x}</span></li>)}
+          </ol>
+        </section>
+      )}
+
+      {dt.host && (
+        <section className="section">
+          <h2>Met</h2>
+          <div className="panel host-card">
+            {dt.host.photo
+              ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="host-photo" src={dt.host.photo} alt={dt.host.name} />
+              : <Avatar name={dt.host.name} size={84} />}
+            <div style={{ minWidth: 0 }}>
+              <b className="host-name">{dt.host.name}</b>
+              {dt.host.role && <span className="eyebrow">{dt.host.role}</span>}
+              {dt.host.bio && <p>{dt.host.bio}</p>}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {(bring.length > 0 || dt.cost || dt.story) && (
+        <section className="section">
+          <h2>Praktisch</h2>
+          <div className="panel">
+            {e.place && <div><span className="plbl">Waar</span><p>{e.place}<br /><a className="link" href={'https://www.google.com/maps/search/' + encodeURIComponent(e.place)} target="_blank" rel="noopener noreferrer">Open in Maps ›</a></p></div>}
+            {dt.cost && <div><span className="plbl">Kosten</span><p>{dt.cost}</p></div>}
+            {e.capacity && <div><span className="plbl">Plekken</span><p>Maximaal {e.capacity} lopers</p></div>}
+            {bring.length > 0 && <div><span className="plbl">Neem mee</span><ul className="bring">{bring.map((b, i) => <li key={i}>{b}</li>)}</ul></div>}
+          </div>
+        </section>
+      )}
 
       {isTraining && <Attend e={e} />}
       {e.registration && <Register e={e} />}

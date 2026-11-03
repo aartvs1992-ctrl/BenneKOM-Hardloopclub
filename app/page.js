@@ -87,7 +87,7 @@ function NextTraining({ e, img }) {
         <video className="hero-video" src="/media/backyard-montage.mp4" poster="/media/backyard-montage.jpg"
           autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
       )}
-      <span className="eyebrow">Volgende clubtraining · {rel(e.date)}</span>
+      <span className="eyebrow">{e.kind === 'interval' ? 'Intervaltraining' : e.kind === 'duurloop' ? 'Duurloop' : 'Volgende clubtraining'} · {rel(e.date)}</span>
       <h1>{p.W} {p.d} {p.m}</h1>
       <div className="meta"><span className="num">{e.time}</span><span>{e.place}</span></div>
       <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span>
