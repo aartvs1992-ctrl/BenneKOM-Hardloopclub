@@ -37,7 +37,7 @@ export function Workout({ w }) {
             <span className="wo-big num">{s.reps}×</span>
             <span>
               <b>{s.label || `${s.reps} × ${s.work}`}</b>{s.label && <span className="small"> · {s.work}</span>}<br />
-              <Link className="wo-chip" href={'/tempo#' + s.zone}>{ZONES[s.zone].short} ›</Link>
+              {ZONES[s.zone].hidden ? <span className="wo-chip">{ZONES[s.zone].short}</span> : <Link className="wo-chip" href={'/tempo#' + s.zone}>{ZONES[s.zone].short} ›</Link>}
               <span className="small"> {s.rest}</span>
               {s.note && <span className="wo-note">{s.note}</span>}
             </span>
@@ -49,7 +49,7 @@ export function Workout({ w }) {
         {[...new Set(w.sets.map((s) => s.zone))].map((z) => (
           <p key={z}>
             <b>Wat is {ZONES[z].short.toLowerCase() === 'hard' ? 'hard lopen' : ZONES[z].short}?</b> {ZONES[z].summary}{' '}
-            <Link className="wo-more" href={'/tempo#' + z}>Meer over {ZONES[z].short} ›</Link>
+            {!ZONES[z].hidden && <Link className="wo-more" href={'/tempo#' + z}>Meer over {ZONES[z].short} ›</Link>}
           </p>
         ))}
       </div>

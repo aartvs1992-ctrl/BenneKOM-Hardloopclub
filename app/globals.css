@@ -372,3 +372,5 @@ a.media-item:hover{border-color:var(--gold)}
 .zone-nav{display:flex;flex-wrap:wrap;gap:6px}
 .zone-nav a{font-size:13px;font-weight:700;padding:4px 10px;border-radius:99px;border:1px solid var(--line);color:var(--ink);text-decoration:none;background:var(--surface)}
 .section > h1{font-size:clamp(30px,10vw,44px);overflow-wrap:break-word;hyphens:auto}
+.zone-photo{margin:0;display:flex;flex-direction:column;gap:6px}
+.zone-photo img{width:100%;max-width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center 25%;border-radius:10px}
