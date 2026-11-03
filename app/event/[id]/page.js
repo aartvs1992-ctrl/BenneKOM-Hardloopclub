@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, AttendButton, People, Avatar } from '@/components/ui';
 import { dparts, rel, TYPE_LABEL } from '@/lib/content';
+import { CHALLENGE_EASY } from '@/lib/challenge';
+import { Gallery } from '@/components/Gallery';
 
 export default function EventPage() {
   const { id } = useParams();
@@ -71,8 +73,24 @@ export default function EventPage() {
               <b className="host-name">{dt.host.name}</b>
               {dt.host.role && <span className="eyebrow">{dt.host.role}</span>}
               {dt.host.bio && <p>{dt.host.bio}</p>}
+              {dt.host.url && <a className="link" href={dt.host.url} target="_blank" rel="noopener noreferrer">Website ↗</a>}
             </div>
           </div>
+        </section>
+      )}
+
+      {e.type === 'challenge' && (
+        <div className="panel callout">
+          <b>{CHALLENGE_EASY.title}</b>
+          <p>{CHALLENGE_EASY.text}</p>
+          <Link className="link" href="/challenge">Bekijk jouw 5 km-tijden ›</Link>
+        </div>
+      )}
+
+      {dt.gallery?.length > 0 && (
+        <section className="section">
+          <h2>Sfeer</h2>
+          <Gallery photos={dt.gallery.map((src) => ({ src }))} />
         </section>
       )}
 

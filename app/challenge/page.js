@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
 import { dparts, rel, fmt, parseT, MON } from '@/lib/content';
+import { CHALLENGE_EASY, CHALLENGE_PHOTOS } from '@/lib/challenge';
+import { Gallery } from '@/components/Gallery';
 
 const STATUS = {
   ok: 'Strava gekoppeld! Je tijden op het segment worden opgehaald.',
@@ -90,7 +92,7 @@ export default function Challenge() {
 
   return (
     <>
-      <PhotoHeader src="/club/juichen.jpg" title="Jouw 5 km" sub="Elke laatste zaterdag van de maand. Je loopt tegen jezelf: word sneller dan de vorige keer." pos="center 15%" />
+      <PhotoHeader src="/club/challenge-start.jpg" title="Jouw 5 km" sub="Elke laatste zaterdag van de maand. Je loopt tegen jezelf, en samen is het leuker." pos="center 35%" />
       <ErrorNote />
 
       {next && (
@@ -99,6 +101,11 @@ export default function Challenge() {
           <span className="btn btn-gold btn-sm">{data.mine[next.id] ? '✓ Ingeschreven' : 'Inschrijven'}</span>
         </Link>
       )}
+
+      <div className="panel callout">
+        <b>{CHALLENGE_EASY.title}</b>
+        <p>{CHALLENGE_EASY.text}</p>
+      </div>
 
       {attempts.length || official ? (
         <section className="panel">
@@ -190,6 +197,10 @@ export default function Challenge() {
           </div>
         </section>
       )}
+      <section className="section">
+        <h2>Zo ziet een Challenge eruit</h2>
+        <Gallery photos={CHALLENGE_PHOTOS} />
+      </section>
     </>
   );
 }
