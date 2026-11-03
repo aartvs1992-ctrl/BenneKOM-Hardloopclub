@@ -392,3 +392,6 @@ a.media-item:hover{border-color:var(--gold)}
 .shirt-product img{width:100%;max-width:100%;display:block}
 .shirt-worn{margin:0}
 .shirt-worn img{width:100%;max-width:100%;display:block;border-radius:var(--r);aspect-ratio:10/11;object-fit:cover;object-position:center 20%}
+.flag-card{flex-direction:row;align-items:center;gap:14px}
+.flag-card img{width:96px;max-width:30%;height:auto;flex:none;border-radius:6px}
+.flag-card p{margin:4px 0 0}

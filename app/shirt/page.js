@@ -24,6 +24,15 @@ export default function Shirt() {
         <img src="/club/shirt-voorkant.jpg" alt="Loper in het nieuwe BenneKOM clubshirt" />
       </figure>
 
+      <div className="panel flag-card">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/club/vlag-bennekom.jpg" alt="De vlag van Bennekom" />
+        <div style={{ minWidth: 0 }}>
+          <b>Geïnspireerd op de vlag van Bennekom</b>
+          <p>Het shirt draagt de kleuren van ons dorp: het blauw en geel van de Bennekomse vlag. Zo loop je overal herkenbaar als BenneKOM.</p>
+        </div>
+      </div>
+
       <div className="panel callout">
         <b>We bestellen alleen in grotere aantallen</b>
         <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling.</p>
