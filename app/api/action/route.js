@@ -79,6 +79,18 @@ export async function POST(req) {
         await remove('challenge_results', { id: r.id });
         break;
       }
+      case 'shirt': {
+        // interesse voor een clubshirt: aanvinken (met maat en aantal) of weer uitvinken
+        const item = ['kort', 'lang'].includes(b.item) ? b.item : null;
+        if (!item) return bad('Kies een shirt.');
+        if (b.on === false) { await remove('shirt_interest', { device_id: device, item }); break; }
+        const size = ['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(b.size) ? b.size : null;
+        if (!size) return bad('Kies je maat.');
+        if (!name) return bad('Vul eerst je naam in.');
+        const qty = Math.min(5, Math.max(1, parseInt(b.qty, 10) || 1));
+        await upsert('shirt_interest', { device_id: device, item, size, qty, name, updated_at: new Date().toISOString() }, ['device_id', 'item']);
+        break;
+      }
       case 'suggest': {
         if (!clean(b.title)) return bad('Geef de wedstrijd een naam.');
         await insert('suggestions', { name: clean(b.title), date: b.date || null, place: clean(b.place), by_name: name });
@@ -98,6 +110,7 @@ export async function POST(req) {
     }
     return Response.json(await buildState(device));
   } catch (e) {
+    if (/shirt_interest/.test(String(e.message))) return bad('Shirtbestellingen zijn nog niet ingesteld: draai updates.sql in Supabase.', 500);
     return Response.json({ error: 'Opslaan lukte niet. Probeer het nog eens.' }, { status: 500 });
   }
 }

@@ -374,3 +374,15 @@ a.media-item:hover{border-color:var(--gold)}
 .section > h1{font-size:clamp(30px,10vw,44px);overflow-wrap:break-word;hyphens:auto}
 .zone-photo{margin:0;display:flex;flex-direction:column;gap:6px}
 .zone-photo img{width:100%;max-width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center 25%;border-radius:10px}
+/* clubshirt */
+.shirt-photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.shirt-photos figure{margin:0;display:flex;flex-direction:column;gap:6px}
+.shirt-photos img{width:100%;max-width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:12px;background:var(--navy)}
+.shirt-photos figcaption{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.shirt-row.on{border-color:var(--gold)}
+.shirt-check{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;cursor:pointer}
+.shirt-check input{width:22px;height:22px;accent-color:var(--gold)}
+.shirt-form{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:12px}
+.sizes{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.size{min-width:46px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;cursor:pointer}
+.size.sel{background:var(--gold);border-color:var(--gold);color:#071E3E}

@@ -139,6 +139,7 @@ export async function POST(req) {
       suggestions, participants, results, photos,
       subscribers: subs.length,
       media: await all('media').catch(() => []),
+      shirts: await all('shirt_interest').catch(() => []),
       partners: (await all('partners').catch(() => [])).sort((a, b) => (a.sort || 0) - (b.sort || 0)),
       upcoming: withTrainings(events).map((e) => ({ id: e.id, title: e.title, date: e.date, type: e.type })),
       added: b.added,

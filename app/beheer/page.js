@@ -186,6 +186,25 @@ export default function Beheer() {
       </section>
 
       <section className="section">
+        <h2>Clubshirts: interesse</h2>
+        {d.shirts?.length ? (
+          <>
+            <div className="panel small">
+              {['kort', 'lang'].map((it) => {
+                const rows = d.shirts.filter((r) => r.item === it);
+                const per = {}; rows.forEach((r) => { per[r.size] = (per[r.size] || 0) + (r.qty || 1); });
+                const tot = rows.reduce((n, r) => n + (r.qty || 1), 0);
+                return <span key={it}><b>{it === 'kort' ? 'Korte mouw' : 'Lange mouw'}: {tot}</b>{tot > 0 && ' · ' + Object.entries(per).map(([s, n]) => `${s} ${n}`).join(', ')}</span>;
+              })}
+            </div>
+            <div className="list">{d.shirts.map((r) => (
+              <div key={r.device_id + r.item} className="row" style={{ gridTemplateColumns: '1fr', cursor: 'default' }}><span><span className="t">{r.name || 'onbekend'}</span><br /><span className="s">{r.item === 'kort' ? 'Korte mouw' : 'Lange mouw'} · maat {r.size} · {r.qty || 1}×</span></span></div>
+            ))}</div>
+          </>
+        ) : <p className="muted">Nog niemand heeft een shirt aangevinkt.</p>}
+      </section>
+
+      <section className="section">
         <h2>Voorstellen van leden</h2>
         {d.suggestions.length ? <div className="list">{d.suggestions.map((s) => (
           <div key={s.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}><span><span className="t">{s.name}</span><br /><span className="s">{s.date || 'geen datum'} · {s.place || '–'} · van {s.by_name || 'onbekend'}</span></span>
