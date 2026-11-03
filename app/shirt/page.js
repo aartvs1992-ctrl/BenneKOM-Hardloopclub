@@ -19,18 +19,10 @@ export default function Shirt() {
         <img src="/club/shirt-product.jpg" alt="BenneKOM clubshirt van Bioracer" />
       </div>
       <h2>Zo staat hij aan</h2>
-      <div className="shirt-photos">
-        <figure>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/club/shirt-voorkant.jpg" alt="Clubshirt, voorkant" />
-          <figcaption>Voorkant</figcaption>
-        </figure>
-        <figure>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/club/shirt-achterkant.jpg" alt="Clubshirt, achterkant" />
-          <figcaption>Achterkant</figcaption>
-        </figure>
-      </div>
+      <figure className="shirt-worn">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/club/shirt-voorkant.jpg" alt="Loper in het nieuwe BenneKOM clubshirt" />
+      </figure>
 
       <div className="panel callout">
         <b>We bestellen alleen in grotere aantallen</b>
