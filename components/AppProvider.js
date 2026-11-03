@@ -68,19 +68,23 @@ export default function AppProvider({ children }) {
   }, []);
 
   // Nieuwe versie live gezet? Dan de app één keer verversen, zodat iedereen de nieuwste versie ziet.
+  // De eerste keer onthouden we welke versie live staat; verandert die later, dan verversen we.
   useEffect(() => {
-    const mine = process.env.NEXT_PUBLIC_BUILD;
+    let mine = null;
     const check = async () => {
       try {
         const { v } = await (await fetch('/api/version', { cache: 'no-store' })).json();
-        if (v && mine && mine !== 'dev' && v !== 'dev' && v !== mine) location.reload();
+        if (!v || v === 'dev') return;
+        if (mine === null) mine = v;
+        else if (v !== mine) location.reload();
       } catch {}
     };
     check();
     const onVis = () => document.visibilityState === 'visible' && check();
     document.addEventListener('visibilitychange', onVis);
-    const t = setInterval(check, 5 * 60 * 1000);
-    return () => { document.removeEventListener('visibilitychange', onVis); clearInterval(t); };
+    window.addEventListener('focus', onVis);
+    const t = setInterval(check, 2 * 60 * 1000);
+    return () => { document.removeEventListener('visibilitychange', onVis); window.removeEventListener('focus', onVis); clearInterval(t); };
   }, []);
 
   const act = useCallback(async (action, payload = {}, okMsg) => {
