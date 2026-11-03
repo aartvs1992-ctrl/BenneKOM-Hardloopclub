@@ -36,8 +36,8 @@ function paceFor(sec, km, minutes) {
 // Elke band: [snelste, rustigste] als 'tempo dat je zoveel minuten zou volhouden', plus een vaste opslag voor rustig.
 const BANDS = [
   { id: 'rustig', name: 'Rustig / duurloop', how: 'Hele zinnen praten', calc: (s, d) => [paceFor(s, d, 60) + 50, paceFor(s, d, 60) + 90] },
-  { id: 'threshold', name: 'Threshold, lange blokken', how: '8–15 min, bijv. 3 × 10 min', calc: (s, d) => [paceFor(s, d, 85) + 3, paceFor(s, d, 120) + 3] },
-  { id: 'threshold', name: 'Threshold, korte blokken', how: '3–6 min of 1 km, bijv. 5 × 5 min', calc: (s, d) => [paceFor(s, d, 65) + 1, paceFor(s, d, 85) + 1] },
+  { id: 'threshold', name: 'Threshold', how: 'Korte intervallen, 1–3 min', calc: (s, d) => { const t = paceFor(s, d, 65) + 1; return [t, t + 6]; } },
+  { id: 'subthreshold', name: 'Sub-threshold', how: 'Langere blokken, 5–10 min', calc: (s, d) => { const t = paceFor(s, d, 65) + 1; return [t + 6, t + 13]; } },
   { id: 'vo2max', name: 'VO2max', how: '2–5 min, af en toe', calc: (s, d) => [paceFor(s, d, 12), paceFor(s, d, 18)] },
   { id: 'strides', name: 'Strides', how: '15–20 sec, soepel', calc: (s, d) => [paceFor(s, d, 4), paceFor(s, d, 6)] },
 ];
@@ -65,7 +65,7 @@ function Training() {
           <tr key={b.name}><td><Link className="link" href={'/tempo#' + b.id}>{b.name}</Link><br /><span className="small muted">{b.how}</span></td><td className="r num">{fmt(a)}–{fmt(z)}</td></tr>
         ); }) : <tr><td colSpan="2">Vul een tijd in als 45:00 of 1:39:00.</td></tr>}</tbody>
       </table>
-      <p className="note">We rekenen bewust conservatief, in de lijn van Marius Bakken en de Noorse aanpak: threshold net onder je omslagpunt, zodat je het vaker per week kunt doen. Dat is iets rustiger dan de tabellen van Jack Daniels. Voelt het zwaarder dan &quot;comfortabel zwaar&quot;? Dan loop je de rustige kant van de band, of nog iets langzamer. Bij warm weer, wind of heuvels loop je op gevoel.</p>
+      <p className="note">We rekenen bewust conservatief, in de lijn van Marius Bakken en de Noorse aanpak: threshold voor de korte intervallen, sub-threshold (5 tot 10 seconden per km rustiger) voor de langere blokken. Zo kun je het vaker per week doen. De ranges zijn ruim omdat elke dag anders is. Dat is iets rustiger dan de tabellen van Jack Daniels. Voelt het zwaarder dan &quot;comfortabel zwaar&quot;? Dan loop je de rustige kant van de band, of nog iets langzamer. Bij warm weer, wind of heuvels loop je op gevoel.</p>
     </>
   );
 }

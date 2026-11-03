@@ -92,7 +92,7 @@ export default function Challenge() {
 
   return (
     <>
-      <PhotoHeader src="/club/challenge-start.jpg" title="Jouw 5 km" sub="Elke laatste zaterdag van de maand. Je loopt tegen jezelf, en samen is het leuker." pos="center 35%" />
+      <PhotoHeader src="/club/challenge-start.jpg" title="5km Challenge" sub="Elke laatste zaterdag van de maand. Je loopt tegen jezelf, en samen is het leuker." pos="center 35%" />
       <ErrorNote />
 
       {next && (

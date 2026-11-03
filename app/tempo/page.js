@@ -8,7 +8,7 @@ export default function Tempo() {
   return (
     <>
       <PhotoHeader src="/club/samen-tempo.jpg" title="Tempo's" sub="Rustig, threshold, VO2max, strides of fartlek? Zo moet het voelen." pos="center 30%" />
-      <p>Bij de intervaltrainingen noemen we tempo&apos;s. Hieronder staat per tempo hoe het hoort te voelen. Je eigen tempo per kilometer voor elke training reken je uit in de <Link className="link" href="/tools">calculator</Link> (tabblad Trainingstempo): vul een recente wedstrijdtijd in en je ziet je threshold-, VO2max- en rustige tempo.</p>
+      <p>Bij de intervaltrainingen noemen we tempo&apos;s. Hieronder staat per tempo hoe het hoort te voelen. Je eigen tempo per kilometer voor elke training reken je uit in de <Link className="link" href="/tools">calculator</Link> (tabblad Trainingstempo): vul een recente wedstrijdtijd in en je ziet je threshold-, sub-threshold-, VO2max- en rustige tempo.</p>
       <div className="zone-scale" aria-hidden="true">{Object.entries(ZONES).filter(([, z]) => !z.extra && !z.hidden).map(([k, z]) => <span key={k} className={'z-' + k} style={{ height: z.level * 20 + '%' }} />)}</div>
       <nav className="zone-nav">{Object.entries(ZONES).filter(([, z]) => !z.hidden).map(([k, z]) => <a key={k} href={'#' + k}>{z.short}</a>)}</nav>
       {Object.entries(ZONES).filter(([, z]) => !z.hidden).map(([k, z]) => (
@@ -16,6 +16,7 @@ export default function Tempo() {
           <span className="eyebrow">Inspanning {z.rpe}</span>
           <h2>{z.name}</h2>
           <p><b>Zo voelt het:</b> {z.feel}</p>
+          {z.when && <p><b>Wanneer:</b> {z.when}</p>}
           <p><b>Waarom:</b> {z.why}</p>
           {z.tip && <p className="wo-note">{z.tip}</p>}
           {z.photo && (
