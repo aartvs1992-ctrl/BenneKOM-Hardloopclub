@@ -73,7 +73,7 @@ export default function AppProvider({ children }) {
     const check = async () => {
       try {
         const { v } = await (await fetch('/api/version', { cache: 'no-store' })).json();
-        if (v && mine && v !== mine && v !== 'dev') location.reload();
+        if (v && mine && mine !== 'dev' && v !== 'dev' && v !== mine) location.reload();
       } catch {}
     };
     check();
