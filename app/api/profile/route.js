@@ -60,7 +60,7 @@ export async function POST(req) {
       if (!existing && !first) return bad(b.login ? 'Dit e-mailadres kennen we nog niet. Meld je aan met je naam.' : 'Vul je voornaam in.');
       if (!mailReady) return Response.json({ skip: true }); // bevestiging staat (nog) uit
       const { code, token } = makeCode({ email, first, last: clean(b.last_name, 60), device });
-      try { await sendCodeMail(email, code, existing?.first_name || first); }
+      try { await sendCodeMail(email, code, existing?.first_name || first, new URL(req.url).origin); }
       catch (e) { console.error(e); return bad('De mail kon niet worden verstuurd. Probeer het later nog eens.', 502); }
       return Response.json({ token, existing: Boolean(existing) });
     }
