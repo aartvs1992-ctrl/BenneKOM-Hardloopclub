@@ -7,6 +7,8 @@ import { Loading, ErrorNote, useReady, AttendButton, People, Avatar } from '@/co
 import { dparts, rel, TYPE_LABEL } from '@/lib/content';
 import { CHALLENGE_EASY } from '@/lib/challenge';
 import { Gallery } from '@/components/Gallery';
+import { Workout } from '@/components/Workout';
+import { workoutFor } from '@/lib/workouts';
 
 export default function EventPage() {
   const { id } = useParams();
@@ -106,6 +108,7 @@ export default function EventPage() {
         </section>
       )}
 
+      {isTraining && workoutFor(e.date) && <Workout w={workoutFor(e.date)} />}
       {isTraining && <Attend e={e} />}
       {e.registration && <Register e={e} />}
       {e.carpool && <Carpool e={e} />}

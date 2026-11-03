@@ -15,11 +15,11 @@ export function Gallery({ photos }) {
         ))}
       </div>
       {open != null && (
-        <div className="lightbox" role="dialog" aria-modal="true" onClick={() => setOpen(null)}>
+        <div className="glb" role="dialog" aria-modal="true" onClick={() => setOpen(null)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={photos[open].src} alt={photos[open].caption || ''} />
-          {photos[open].caption && <span className="cap">{photos[open].caption}</span>}
-          <div className="lb-nav" onClick={(e) => e.stopPropagation()}>
+          {photos[open].caption && <span className="glb-cap">{photos[open].caption}</span>}
+          <div className="glb-nav" onClick={(e) => e.stopPropagation()}>
             <button className="btn btn-line btn-sm" onClick={() => setOpen((open + photos.length - 1) % photos.length)} aria-label="Vorige">‹</button>
             <button className="btn btn-line btn-sm" onClick={() => setOpen(null)}>Sluiten</button>
             <button className="btn btn-line btn-sm" onClick={() => setOpen((open + 1) % photos.length)} aria-label="Volgende">›</button>
