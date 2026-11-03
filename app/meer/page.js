@@ -16,8 +16,13 @@ export default function Meer() {
         <span style={{ minWidth: 0 }}><b>{data?.me ? data.me.name : 'Maak je profiel'}</b><br /><span className="small muted">{data?.me ? 'Mijn profiel: naam, foto en code voor een ander toestel' : 'Naam en foto, dan zien anderen wie er komt'}</span></span>
         <span className="chev">›</span>
       </Link>
+      <Link className="panel join-card physio-card" href="/fysio">
+        <span className="physio-ico" aria-hidden="true">+</span>
+        <span style={{ minWidth: 0 }}><b>Pijntje of blessure?</b><br /><span className="small muted">Neem contact op met fysiotherapeut {CLUB.physio.name}</span></span>
+        <span className="chev">›</span>
+      </Link>
       <div className="list">
-        {[['/partners', 'Partners', 'Korting bij Runners World Ede en Fitsynergy'], ['/tools', 'Calculator', 'Tempo, voorspeller, zones en splits'], ['/tempo', "Tempo's", 'Rustig, threshold, 45/15: zo voelt het'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/nieuws', 'Nieuws', 'Berichten van de club'], ['/verhaal', 'Het ontstaan van BenneKOM', 'Hoe Bennekom een loopclub kreeg'], ['/media', 'BenneKOM in de media', 'Krant, lokale media en partners'], ['/shirt', 'Clubshirt', 'Korte of lange mouw: vink aan wat je wilt'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
+        {[['/partners', 'Partners', 'Korting bij Runners World Ede en Fitsynergy'], ['/tools', 'Calculator', 'Tempo, voorspeller, zones en splits'], ['/tempo', "Tempo's", 'Threshold, VO2max, strides en fartlek'], ['/leren', 'Leren', local.done.length + '/15 modules'], ['/verhaal', 'Het ontstaan van BenneKOM', 'Hoe Bennekom een loopclub kreeg'], ['/media', 'BenneKOM in de media', 'Krant, lokale media en partners'], ['/shirt', 'Clubshirt', 'Korte of lange mouw: vink aan wat je wilt'], ['/meldingen', 'Meldingen', 'Pushmeldingen instellen']].map(([h, t, s]) => (
           <Link key={h} className="row" style={{ gridTemplateColumns: '1fr auto' }} href={h}><span><span className="t">{t}</span><br /><span className="s">{s}</span></span><span className="chev">›</span></Link>
         ))}
         {[[CLUB.strava, 'Strava-club', ''], [CLUB.instagram, 'Instagram', 'Foto\'s en impressies']].map(([h, t, s]) => (

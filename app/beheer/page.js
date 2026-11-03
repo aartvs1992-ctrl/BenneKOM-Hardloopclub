@@ -11,7 +11,6 @@ export default function Beheer() {
   const [d, setD] = useState(null);
   const [ev, setEv] = useState(EMPTY);
   const [notify, setNotify] = useState(true);
-  const [news, setNews] = useState({ author: 'Bestuur', title: '', body: '', event_id: '' });
   const [imp, setImp] = useState({ eventId: '', names: '' });
   const P0 = { id: '', name: '', about: '', benefit: '', code: '', how: '', url: '', sort: '' };
   const [par, setPar] = useState(P0);
@@ -142,21 +141,6 @@ export default function Beheer() {
         ))}</div>
       </section>
 
-      <section className="section">
-        <h2>Nieuwsbericht</h2>
-        <form className="panel" onSubmit={async (e) => { e.preventDefault(); if (await call('saveNews', { news }, 'Geplaatst')) setNews({ ...news, title: '', body: '', event_id: '' }); }}>
-          <div className="grid2">
-            <div className="field"><label htmlFor="n-author">Van</label><input className="input" id="n-author" value={news.author} onChange={(e) => setNews({ ...news, author: e.target.value })} /></div>
-            <div className="field"><label htmlFor="n-ev">Koppel aan evenement</label><select className="input" id="n-ev" value={news.event_id} onChange={(e) => setNews({ ...news, event_id: e.target.value })}><option value="">Geen</option>{d.events.map((e) => <option key={e.id} value={e.id}>{e.title} ({e.date})</option>)}</select></div>
-          </div>
-          <div className="field"><label htmlFor="n-title">Titel</label><input className="input" id="n-title" value={news.title} onChange={(e) => setNews({ ...news, title: e.target.value })} required /></div>
-          <div className="field"><label htmlFor="n-body">Tekst</label><textarea className="input" id="n-body" value={news.body} onChange={(e) => setNews({ ...news, body: e.target.value })} /></div>
-          <button className="btn btn-gold" type="submit">Plaatsen</button>
-        </form>
-        <div className="list">{d.news.map((n) => (
-          <div key={n.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}><span><span className="t">{n.title}</span><br /><span className="s">{n.author} · {n.published_at}</span></span><DeleteButton onConfirm={() => call('deleteNews', { id: n.id }, 'Verwijderd')} /></div>
-        ))}</div>
-      </section>
 
       <section className="section">
         <h2>Pushmelding sturen</h2>
