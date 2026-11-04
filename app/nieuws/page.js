@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
@@ -11,6 +12,7 @@ const when = (v) => (/^\d{4}-\d{2}$/.test(v || '') ? `${MONTHS[+v.slice(5) - 1]}
 
 export default function Nieuws() {
   const { data } = useApp();
+  const [open, setOpen] = useState({});
   if (!useReady()) return <Loading />;
   const news = data.news || [];
   const media = data.media || [];
@@ -22,21 +24,27 @@ export default function Nieuws() {
 
       <section className="section">
         <h2>Van de club</h2>
-        {news.length ? news.map((n) => (
+        {news.length ? news.map((n) => {
+          const long = (n.body || '').length > 160;
+          const isOpen = !long || open[n.id];
+          const toggle = () => long && setOpen((o) => ({ ...o, [n.id]: !o[n.id] }));
+          return (
           <article key={n.id} className="panel news-card">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            {n.image && <img src={n.image} alt="" loading="lazy" />}
+            {n.image && <img src={n.image} alt="" loading="lazy" onClick={toggle} style={long ? { cursor: 'pointer' } : undefined} />}
             <div className="news-body">
               <span className="eyebrow">{n.author}{date(n.published_at) && ' · ' + date(n.published_at)}</span>
-              <h3>{n.title}</h3>
-              {n.body && <p>{n.body}</p>}
+              <h3 onClick={toggle} style={long ? { cursor: 'pointer' } : undefined}>{n.title}</h3>
+              {n.body && <p className={isOpen ? '' : 'clamp'}>{n.body}</p>}
               <span className="btn-row" style={{ gap: 14 }}>
+                {long && <button type="button" className="link link-btn" onClick={toggle} aria-expanded={isOpen}>{isOpen ? 'Minder tonen' : 'Lees meer ›'}</button>}
                 {n.url && <a className="link" href={n.url} target="_blank" rel="noopener noreferrer">Bekijk op Strava ↗</a>}
                 {n.event_id && <Link className="link" href={'/event/' + n.event_id}>Naar het evenement ›</Link>}
               </span>
             </div>
           </article>
-        )) : <p className="panel muted">Nog geen berichten. Volg de club ondertussen op Strava.</p>}
+          );
+        }) : <p className="panel muted">Nog geen berichten. Volg de club ondertussen op Strava.</p>}
         <a className="link" href={CLUB.strava} target="_blank" rel="noopener noreferrer">Alle posts van de club op Strava ↗</a>
       </section>
 

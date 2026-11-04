@@ -427,3 +427,5 @@ a.media-item:hover{border-color:var(--gold)}
 .welcome .panel{color:var(--ink)}
 .welcome .link{color:#E2B74A}
 .otp{font-size:26px;letter-spacing:.4em;text-align:center}
+.news-body p.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.link-btn{background:none;border:0;padding:0;font:inherit;cursor:pointer}
