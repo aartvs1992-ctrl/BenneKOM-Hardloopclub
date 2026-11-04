@@ -80,7 +80,7 @@ export default function Welcome() {
         </div>
         <div className="welcome-claim">
           <h1>Samen lopen in Bennekom</h1>
-          <p>Dinsdag en donderdag, elk niveau. Iedereen is welkom.</p>
+          <p>Elke dinsdag, elk niveau. Iedereen is welkom.</p>
         </div>
       </section>
 
