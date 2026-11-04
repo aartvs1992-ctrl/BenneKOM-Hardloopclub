@@ -120,6 +120,7 @@ export default function EventPage() {
 
       {isTraining && workoutFor(e.date) && <Workout w={workoutFor(e.date)} />}
       {(isTraining || isRun) && <Attend e={e} />}
+      {e.type === 'wedstrijd' && <RaceAttend e={e} />}
       {isRun && e.own && <CancelRun e={e} />}
       {e.registration && <Register e={e} />}
       {e.carpool && <Carpool e={e} />}
@@ -136,6 +137,27 @@ function Attend({ e }) {
       <AttendButton e={e} going={Boolean(data.mine[e.id])} act={act} local={local} long />
       <People list={data.names[e.id]} />
       <p className="note">Zo weten we vooraf hoeveel lopers er komen en zien anderen wie er meeloopt.</p>
+    </div>
+  );
+}
+
+// Wedstrijden: aanvinken dat je meedoet, zodat clubgenoten zien wie er gaat.
+function RaceAttend({ e }) {
+  const { data, local, act } = useApp();
+  const n = data.counts[e.id] || 0;
+  const going = Boolean(data.mine[e.id]);
+  return (
+    <div className="panel">
+      <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'BenneKOM\'er doet mee' : 'BenneKOM\'ers doen mee'}</span></div>
+      <button
+        className={'btn ' + (going ? 'btn-done' : 'btn-gold')}
+        onClick={() => {
+          if (!going && !local.name) { location.href = '/profiel?terug=1'; return; }
+          act('participate', { eventId: e.id, on: !going }, going ? 'Je staat niet meer op de lijst' : 'Gaaf! Clubgenoten zien dat je meedoet.');
+        }}
+      >{going ? '✓ Ik doe mee · tik om af te melden' : 'Ik doe mee'}</button>
+      <People list={data.names[e.id]} />
+      <p className="note">Vink aan als je meedoet. Inschrijven doe je zelf bij de organisatie. Zo zie je wie er nog meer gaat en kun je samen rijden via de carpool.</p>
     </div>
   );
 }

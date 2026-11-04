@@ -36,7 +36,7 @@ export function EventRow({ e, noTag }) {
             : e.type === 'samenloop'
             ? <>{e.time} · {(e.place || '').split(',')[0]}<br /><span className="run-tags"><span>{e.distances}</span><span>{e.details?.pace}</span></span> door {e.organizer?.name?.split(' ')[0]}</>
             : <>{e.time ? e.time + ' · ' : ''}{(e.place || '').split(',')[0]}</>}
-          {going ? <b style={{ color: 'var(--ok)' }}> · je bent erbij</b> : n > 0 ? ` · ${n} ${e.type === 'training' || e.type === 'samenloop' ? (n === 1 ? 'loper' : 'lopers') : 'aangemeld'}` : null}
+          {going ? <b style={{ color: 'var(--ok)' }}> · {e.type === 'wedstrijd' ? (n > 1 ? `jij + ${n - 1} doen mee` : 'je doet mee') : 'je bent erbij'}</b> : n > 0 ? ` · ${n} ${e.type === 'training' || e.type === 'samenloop' ? (n === 1 ? 'loper' : 'lopers') : e.type === 'wedstrijd' ? (n === 1 ? 'doet mee' : 'doen mee') : 'aangemeld'}` : null}
           {rides > 0 ? ` · ${rides} ${rides === 1 ? 'rit' : 'ritten'}` : null}
         </span>
       </span>
