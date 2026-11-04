@@ -38,7 +38,7 @@ export default function Feedback() {
         <h1>Bedankt!</h1>
         <div className="panel callout">
           <b>Je bericht is binnen</b>
-          <p>Aart leest alles zelf. Met jouw tip wordt de app en de club weer een stukje beter.</p>
+          <p>Aart leest alles zelf. Met jouw tip worden de app en de club weer een stukje beter.</p>
         </div>
         <div className="btn-row">
           <button className="btn btn-line" onClick={() => setSent(false)}>Nog iets kwijt</button>
