@@ -15,6 +15,7 @@ export default function Home() {
 
   const next = data.events.find((e) => e.type === 'training' || e.replaces_training);
   const specials = data.events.filter((e) => e.type === 'special' && e.id !== next?.id).slice(0, 3);
+  const runs = data.events.filter((e) => e.type === 'samenloop').slice(0, 2);
   const races = data.events.filter((e) => e.type === 'wedstrijd' && (e.km == null || e.km <= 50)).slice(0, 3);
 
   // Achtergrond van de trainingskaart: uitgelichte foto, anders de eerste clubfoto
@@ -27,6 +28,19 @@ export default function Home() {
       <ErrorNote />
       <InstallBanner />
       {next && <NextTraining e={next} img={heroImg} />}
+
+      <section className="section">
+        <div className="section-head"><h2>Ook samen lopen</h2><Link className="link" href="/agenda#samenloop">{runs.length ? 'Alles ›' : 'Plan een loopje ›'}</Link></div>
+        {runs.length
+          ? <div className="list">{runs.map((e) => <EventRow key={e.id} e={e} noTag />)}</div>
+          : (
+            <Link className="panel run-invite" href="/agenda#samenloop">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/club/lachen-onderweg.jpg" alt="" loading="lazy" />
+              <span><b>Zin om ook buiten de dinsdag te lopen?</b><br /><span className="small muted">Plan een loopje met afstand en tempo, dan haken clubgenoten aan.</span></span>
+            </Link>
+          )}
+      </section>
 
       {!data.me && (
         <Link className="panel join-card" href="/profiel">

@@ -24,7 +24,7 @@ export async function POST(req) {
         if (!clean(e.title) || !/^\d{4}-\d{2}-\d{2}$/.test(e.date || '')) return Response.json({ error: 'Titel en datum zijn verplicht.' }, { status: 400 });
         const row = {
           id: e.id || `${slug(e.title)}-${e.date}`,
-          type: ['special', 'wedstrijd', 'challenge', 'training'].includes(e.type) ? e.type : 'special',
+          type: ['special', 'wedstrijd', 'challenge', 'training', 'samenloop'].includes(e.type) ? e.type : 'special',
           title: clean(e.title, 100), date: e.date, time: clean(e.time, 5), place: clean(e.place, 120),
           description: clean(e.description, 1000), distances: clean(e.distances, 120),
           capacity: e.capacity ? parseInt(e.capacity, 10) : null,

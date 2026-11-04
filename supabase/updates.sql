@@ -220,3 +220,10 @@ Tot slot grote dank aan Daniel Nijland voor het prachtig vastleggen van deze dag
   'https://www.strava.com/clubs/1629265/posts/50381871',
   '/club/samen-lachen.jpg'
 where not exists (select 1 from news where url = 'https://www.strava.com/clubs/1629265/posts/50381871');
+
+-- ===== 014_samen_lopen =====
+-- 014: Samen lopen: loopjes die leden zelf plannen buiten de dinsdag
+-- Plak dit in Supabase → SQL Editor → New query → Run. Veilig om vaker te draaien.
+alter table events drop constraint if exists events_type_check;
+alter table events add constraint events_type_check check (type in ('training','special','wedstrijd','challenge','samenloop'));
+alter table events add column if not exists details jsonb;

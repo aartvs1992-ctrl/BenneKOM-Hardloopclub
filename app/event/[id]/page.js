@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, AttendButton, People, Avatar } from '@/components/ui';
 import { dparts, rel, daysTo, TYPE_LABEL } from '@/lib/content';
@@ -19,6 +19,7 @@ export default function EventPage() {
 
   const p = dparts(e.date);
   const isTraining = e.type === 'training';
+  const isRun = e.type === 'samenloop';
   const dt = e.details || {};
   const lines = (t) => String(t || '').split('\n').map((x) => x.trim()).filter(Boolean);
   const program = lines(dt.program).map((l) => { const m = /^(\d{1,2}[:.]\d{2})\s+(.*)$/.exec(l); return m ? [m[1].replace('.', ':'), m[2]] : ['', l]; });
@@ -26,6 +27,12 @@ export default function EventPage() {
   return (
     <>
       <ErrorNote />
+      {isRun && !dt.image && (
+        <div className="event-hero">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/club/groep-lacht.jpg" alt="" />
+        </div>
+      )}
       {dt.image && (
         <div className="event-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -40,7 +47,9 @@ export default function EventPage() {
           <div><span className="lbl">Tijd</span><span className="big" style={{ fontSize: 16 }}>{e.time || 'volgt'}</span></div>
           <div><span className="lbl">Plaats</span><span style={{ fontWeight: 600, fontSize: 14 }}>{(e.place || '').split(',')[0]}</span></div>
         </div>
-        {e.distances && <p><b>Afstanden:</b> {e.distances}</p>}
+        {isRun ? <p><b>Afstand en tempo:</b> {e.distances} · {dt.pace}</p> : e.distances && <p><b>Afstanden:</b> {e.distances}</p>}
+        {isRun && e.organizer && <div className="organizer"><Avatar name={e.organizer.name} src={e.organizer.avatar} size={32} /><span className="small">Georganiseerd door <b>{e.organizer.name}</b></span></div>}
+        {isRun && dt.route && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={dt.route} target="_blank" rel="noopener noreferrer">Bekijk de route ↗</a>}
         {dt.deadline && <Deadline iso={dt.deadline} />}
         {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km} km van Bennekom (hemelsbreed)</p>}
         {e.url && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={e.url} target="_blank" rel="noopener noreferrer">Info en inschrijven bij de organisatie ↗</a>}
@@ -110,7 +119,8 @@ export default function EventPage() {
       )}
 
       {isTraining && workoutFor(e.date) && <Workout w={workoutFor(e.date)} />}
-      {isTraining && <Attend e={e} />}
+      {(isTraining || isRun) && <Attend e={e} />}
+      {isRun && e.own && <CancelRun e={e} />}
       {e.registration && <Register e={e} />}
       {e.carpool && <Carpool e={e} />}
     </>
@@ -127,6 +137,17 @@ function Attend({ e }) {
       <People list={data.names[e.id]} />
       <p className="note">Zo weten we vooraf hoeveel lopers er komen en zien anderen wie er meeloopt.</p>
     </div>
+  );
+}
+
+function CancelRun({ e }) {
+  const { act } = useApp();
+  const router = useRouter();
+  return (
+    <button className="btn btn-line" onClick={async () => {
+      if (!confirm('Dit loopje afzeggen? Wie zich heeft aangemeld krijgt een seintje.')) return;
+      if (await act('cancelRun', { eventId: e.id }, 'Loopje afgezegd')) router.push('/agenda#samenloop');
+    }}>Loopje afzeggen</button>
   );
 }
 

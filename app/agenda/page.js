@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { EventRow, Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
 
@@ -7,7 +8,9 @@ const TABS = [
   ['training', 'Trainingen', 'Elke dinsdag samen lopen, alle niveaus.'],
   ['special', 'Specials', 'Clubactiviteiten en de maandelijkse 5km Challenge.'],
   ['wedstrijd', 'Wedstrijden', 'Races binnen 50 km van Bennekom. De club gaat samen: regel je rit via de carpool.'],
+  ['samenloop', 'Samen lopen', 'Loopjes van leden buiten de dinsdag. Haak aan of plan er zelf een.'],
 ];
+const EMPTY_RUN = { title: '', date: '', time: '09:00', place: 'Dunantlaan 18, Bennekom', km: '', pace: '', route: '', note: '' };
 const MONTH = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
 
 export default function Agenda() {
@@ -15,6 +18,8 @@ export default function Agenda() {
   const [tab, setTab] = useState('training');
   const [open, setOpen] = useState(false);
   const [sg, setSg] = useState({ title: '', date: '', place: '' });
+  const [plan, setPlan] = useState(false);
+  const [run, setRun] = useState(EMPTY_RUN);
   useEffect(() => {
     const fromHash = () => { const h = location.hash.slice(1); if (TABS.some(([k]) => k === h)) setTab(h); };
     fromHash();
@@ -37,7 +42,9 @@ export default function Agenda() {
 
   return (
     <>
-      <PhotoHeader src="/club/herfstlaan.jpg" title="Agenda" sub="Trainingen, specials en wedstrijden. Iedereen is welkom." pos="center 68%" />
+      {tab === 'samenloop'
+        ? <PhotoHeader src="/club/groep-lacht.jpg" title="Samen lopen" sub="Ook buiten de dinsdag samen op pad. Plan een loopje of haak aan." pos="center 45%" />
+        : <PhotoHeader src="/club/herfstlaan.jpg" title="Agenda" sub="Trainingen, specials en wedstrijden. Iedereen is welkom." pos="center 68%" />}
       <ErrorNote />
       <div className="seg agenda-tabs" role="tablist" aria-label="Soort">
         {TABS.map(([k, l]) => (
@@ -47,12 +54,37 @@ export default function Agenda() {
         ))}
       </div>
       <p className="muted small">{intro}</p>
+      {tab === 'samenloop' && (data.me
+        ? <button className="btn btn-gold" onClick={() => setPlan(!plan)} aria-expanded={plan}>{plan ? 'Sluiten' : '+ Loop plannen'}</button>
+        : <Link className="panel muted small" href="/profiel">Meld je aan om zelf een loopje te plannen ›</Link>)}
+      {tab === 'samenloop' && plan && (
+        <form className="panel" onSubmit={async (ev) => {
+          ev.preventDefault();
+          if (await act('planRun', { run }, 'Je loopje staat in de agenda')) { setPlan(false); setRun(EMPTY_RUN); }
+        }}>
+          <div className="grid2">
+            <div className="field"><label htmlFor="rn-date">Dag</label><input className="input" id="rn-date" type="date" required value={run.date} onChange={(e) => setRun({ ...run, date: e.target.value })} /></div>
+            <div className="field"><label htmlFor="rn-time">Tijd</label><input className="input" id="rn-time" type="time" required value={run.time} onChange={(e) => setRun({ ...run, time: e.target.value })} /></div>
+          </div>
+          <div className="field"><label htmlFor="rn-place">Startpunt</label><input className="input" id="rn-place" required value={run.place} onChange={(e) => setRun({ ...run, place: e.target.value })} /></div>
+          <div className="grid2">
+            <div className="field"><label htmlFor="rn-km">Afstand (km)</label><input className="input num" id="rn-km" inputMode="decimal" required value={run.km} onChange={(e) => setRun({ ...run, km: e.target.value })} placeholder="15" /></div>
+            <div className="field"><label htmlFor="rn-pace">Tempo</label><input className="input num" id="rn-pace" list="rn-paces" required value={run.pace} onChange={(e) => setRun({ ...run, pace: e.target.value })} placeholder="5:30" /></div>
+          </div>
+          <datalist id="rn-paces"><option value="praattempo" /><option value="rustig" /></datalist>
+          <div className="field"><label htmlFor="rn-title">Naam van het loopje (optioneel)</label><input className="input" id="rn-title" value={run.title} onChange={(e) => setRun({ ...run, title: e.target.value })} placeholder="Rondje Ginkelse Heide" /></div>
+          <div className="field"><label htmlFor="rn-route">Route (optioneel)</label><input className="input" id="rn-route" type="url" value={run.route} onChange={(e) => setRun({ ...run, route: e.target.value })} placeholder="Link naar Strava- of Komoot-route" /></div>
+          <div className="field"><label htmlFor="rn-note">Toelichting (optioneel)</label><textarea className="input" id="rn-note" rows="2" value={run.note} onChange={(e) => setRun({ ...run, note: e.target.value })} placeholder="Over de heide, koffie na afloop" /></div>
+          <button className="btn btn-gold" type="submit">Plaatsen</button>
+          <p className="note">Je naam staat bij het loopje en je staat zelf al op de lijst. Wie meldingen voor loopjes aan heeft staan, krijgt een seintje.</p>
+        </form>
+      )}
       {groups.length ? groups.map((g) => (
         <section key={g.key} className="section">
           <h3 className="month">{MONTH[+g.key.slice(5) - 1]} {g.key.slice(0, 4)}</h3>
           <div className="list">{g.items.map((e) => <EventRow key={e.id} e={e} noTag={tab !== 'special'} />)}</div>
         </section>
-      )) : <p className="panel">Niets gepland in deze categorie.</p>}
+      )) : <p className="panel">{tab === 'samenloop' ? 'Nog geen loopjes gepland. Zin om zondag samen te lopen? Plan de eerste!' : 'Niets gepland in deze categorie.'}</p>}
 
       {tab === 'wedstrijd' && <p className="small muted">Bron: hardloopkalenders van Nederland. Controleer datum en inschrijven altijd bij de organisatie.</p>}
       {tab === 'wedstrijd' && <button className="btn btn-line" onClick={() => setOpen(!open)}>+ Mis je een wedstrijd? Stel hem voor</button>}

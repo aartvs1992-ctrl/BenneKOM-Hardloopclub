@@ -13,7 +13,7 @@ function writeLocal(v) {
   try { localStorage.setItem(LS, JSON.stringify(v)); } catch {}
 }
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
-const DEFAULT_NOTIF = Object.fromEntries(NOTIF_TYPES.map(([k]) => [k, k !== 'shirt']));
+const DEFAULT_NOTIF = Object.fromEntries(NOTIF_TYPES.map(([k]) => [k, k !== 'shirt' && k !== 'samenloop']));
 
 export default function AppProvider({ children }) {
   const [local, setLocal] = useState(null); // { device, name, done:[], notif:{} }
