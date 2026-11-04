@@ -429,3 +429,8 @@ a.media-item:hover{border-color:var(--gold)}
 .otp{font-size:26px;letter-spacing:.4em;text-align:center}
 .news-body p.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .link-btn{background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.zone-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.zone-head h3{margin:0}
+.zone-pace{font-size:20px;font-weight:700;white-space:nowrap}
+.zone-pace small{font-size:12px;font-weight:400;margin-left:2px;opacity:.7}
+.zone-card .link-btn{align-self:flex-start}

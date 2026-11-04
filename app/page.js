@@ -71,7 +71,7 @@ export default function Home() {
           <Link className="tile" href="/partners"><span className="k">Partners</span><span className="v">Ledenkorting bij onze partners</span></Link>
           <Link className="tile" href="/nieuws"><span className="k">Nieuws & media</span><span className="v">Van de club en in de media</span></Link>
           <Link className="tile" href="/fysio"><span className="k">Blessure?</span><span className="v">Fysiotherapeut David Hemstede</span></Link>
-          <Link className="tile tile-wide" href="/tools"><span className="k">Calculator</span><span className="v">Tempo, voorspeller, zones, splits</span></Link>
+          <Link className="tile tile-wide" href="/tools"><span className="k">Training &amp; tempo</span><span className="v">Jouw tempo&apos;s, uitleg, voorspeller en splits</span></Link>
         </div>
       </section>
     </>

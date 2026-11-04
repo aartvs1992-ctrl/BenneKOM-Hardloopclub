@@ -1,27 +1,83 @@
 'use client';
-import { useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { PhotoHeader } from '@/components/ui';
 import { DISTS, fmt, parseT, riegel, ZONES, splits } from '@/lib/content';
+import { ZONES as TEMPOS } from '@/lib/workouts';
 
-const TABS = [['training', 'Trainingstempo'], ['tempo', 'Tempo'], ['voorspeller', 'Voorspeller'], ['zones', 'Zones'], ['splits', 'Splits']];
+const TABS = [['tempo', 'Tempo'], ['voorspeller', 'Voorspeller'], ['zones', 'Zones'], ['splits', 'Splits']];
 
 export default function Tools() {
-  const [tab, setTab] = useState('training');
+  const [tab, setTab] = useState('tempo');
+  const [open, setOpen] = useState({});
+  const toggle = (k) => setOpen((o) => ({ ...o, [k]: !o[k] }));
+
+  // Link als /tools#threshold: dat kaartje openklappen en ernaartoe scrollen
+  useEffect(() => {
+    const k = decodeURIComponent(location.hash.slice(1));
+    if (!TEMPOS[k]) return;
+    setOpen((o) => ({ ...o, [k]: true }));
+    setTimeout(() => document.getElementById(k)?.scrollIntoView({ block: 'start' }), 60);
+  }, []);
+
   return (
     <>
-      <PhotoHeader src="/club/beukenlaan.jpg" title="Calculator" sub="Je trainingstempo's, voorspeller, hartslagzones en splits." pos="center 45%" />
-      <div className="seg" role="group" aria-label="Calculator">
-        {TABS.map(([k, l]) => <button key={k} aria-pressed={tab === k} onClick={() => setTab(k)}>{l}</button>)}
-      </div>
-      <div className="panel">
-        {tab === 'training' && <Training />}
-        {tab === 'tempo' && <Tempo />}
-        {tab === 'voorspeller' && <Predictor />}
-        {tab === 'zones' && <Zones />}
-        {tab === 'splits' && <Splits />}
-      </div>
+      <PhotoHeader src="/club/samen-tempo.jpg" title="Training & tempo" sub="Jouw tempo's, hoe ze moeten voelen, en rekenhulp voor wedstrijden." pos="center 30%" />
+
+      <section className="section" id="tempos">
+        <h2>Jouw tempo&apos;s</h2>
+        <Training open={open} toggle={toggle} />
+      </section>
+
+      <section className="section">
+        <h2>Zonder vast tempo</h2>
+        <ZoneCard k="fartlek" open={open.fartlek} toggle={() => toggle('fartlek')} />
+      </section>
+
+      <section className="section" id="rekenhulp">
+        <h2>Meer rekenhulp</h2>
+        <div className="seg" role="group" aria-label="Rekenhulp">
+          {TABS.map(([k, l]) => <button key={k} aria-pressed={tab === k} onClick={() => setTab(k)}>{l}</button>)}
+        </div>
+        <div className="panel">
+          {tab === 'tempo' && <Tempo />}
+          {tab === 'voorspeller' && <Predictor />}
+          {tab === 'zones' && <Zones />}
+          {tab === 'splits' && <Splits />}
+        </div>
+      </section>
     </>
+  );
+}
+
+// Eén tempo: naam, eventueel je tempo per km, hoe het voelt, en uitklapbare uitleg
+function ZoneCard({ k, pace, how, open, toggle }) {
+  const z = TEMPOS[k];
+  return (
+    <article id={k} className={'panel zone-card z-' + k}>
+      <div className="zone-head">
+        <div><h3>{z.short}</h3>{how && <span className="small muted">{how}</span>}</div>
+        {pace && <span className="zone-pace num">{pace}<small>/km</small></span>}
+      </div>
+      <p><b>Zo voelt het:</b> {z.feel}</p>
+      {open && (
+        <>
+          <p className="small muted">Inspanning {z.rpe}</p>
+          {z.when && <p><b>Wanneer:</b> {z.when}</p>}
+          <p><b>Waarom:</b> {z.why}</p>
+          {z.tip && <p className="wo-note">{z.tip}</p>}
+          {z.photo && (
+            <figure className="zone-photo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={z.photo.src} alt={z.photo.caption} loading="lazy" />
+              <figcaption className="small muted">{z.photo.caption}</figcaption>
+            </figure>
+          )}
+          {z.norway && <p id={k === 'threshold' ? 'noors' : undefined}><b>De Noorse school:</b> {z.norway}</p>}
+          {z.norway && <p className="small"><a className="link" href="https://www.outsideonline.com/health/training-performance/norwegian-method-jakob-ingebrigtsen/" target="_blank" rel="noopener noreferrer">Lees meer over de Noorse methode ↗</a></p>}
+        </>
+      )}
+      <button type="button" className="link link-btn" onClick={toggle} aria-expanded={!!open}>{open ? 'Minder uitleg' : 'Meer uitleg ›'}</button>
+    </article>
   );
 }
 
@@ -42,29 +98,27 @@ const BANDS = [
   { id: 'strides', name: 'Strides', how: '15–20 sec, soepel', calc: (s, d) => [paceFor(s, d, 4), paceFor(s, d, 6)] },
 ];
 
-function Training() {
+function Training({ open, toggle }) {
   const [d, setD] = useState(10);
   const [t, setT] = useState('45:00');
   const s = parseT(t);
   const ok = !Number.isNaN(s) && s > 0;
   return (
     <>
-      <p className="small" style={{ margin: 0 }}>Vul een recente wedstrijd- of testtijd in. Je krijgt dan je tempo per soort training.</p>
-      <div className="callout" style={{ paddingLeft: 12 }}>
-        <b>Dit is een richtlijn, geen opdracht</b>
-        <p className="small" style={{ margin: '4px 0 0' }}>Je tempo hangt sterk af van de dag en hoe je je voelt: slaap, drukte, weer en vermoeidheid tellen allemaal mee. Luister naar je lichaam. Bij threshold moet het comfortabel zwaar voelen; is dat niet zo, loop dan gewoon wat rustiger.</p>
-      </div>
-      <div className="grid2">
+      <p className="small" style={{ margin: 0 }}>Vul een recente wedstrijd- of testtijd in. Je krijgt dan je tempo per soort training, met hoe het hoort te voelen.</p>
+      <div className="panel grid2">
         <div className="field"><label htmlFor="tr-d">Afstand</label>
           <select className="input" id="tr-d" value={d} onChange={(e) => setD(+e.target.value)}>{DISTS.map(([l, x]) => <option key={l} value={x}>{l}</option>)}</select></div>
         <div className="field"><label htmlFor="tr-t">Tijd</label><input className="input num" id="tr-t" value={t} onChange={(e) => setT(e.target.value)} placeholder="mm:ss of u:mm:ss" /></div>
       </div>
-      <table>
-        <thead><tr><th>Training</th><th className="r">Tempo per km</th></tr></thead>
-        <tbody>{ok ? BANDS.map((b) => { const [a, z] = b.calc(s, d); return (
-          <tr key={b.name}><td><Link className="link" href={'/tempo#' + b.id}>{b.name}</Link><br /><span className="small muted">{b.how}</span></td><td className="r num">{fmt(a)}–{fmt(z)}</td></tr>
-        ); }) : <tr><td colSpan="2">Vul een tijd in als 45:00 of 1:39:00.</td></tr>}</tbody>
-      </table>
+      {!ok && <p className="small muted">Vul een tijd in als 45:00 of 1:39:00.</p>}
+      {BANDS.map((b) => { const [a, z] = ok ? b.calc(s, d) : []; return (
+        <ZoneCard key={b.id} k={b.id} how={b.how} pace={ok ? `${fmt(a)}–${fmt(z)}` : null} open={open[b.id]} toggle={() => toggle(b.id)} />
+      ); })}
+      <div className="callout" style={{ paddingLeft: 12 }}>
+        <b>Dit is een richtlijn, geen opdracht</b>
+        <p className="small" style={{ margin: '4px 0 0' }}>Je tempo hangt sterk af van de dag en hoe je je voelt: slaap, drukte, weer en vermoeidheid tellen allemaal mee. Luister naar je lichaam. Bij threshold moet het comfortabel zwaar voelen; is dat niet zo, loop dan gewoon wat rustiger.</p>
+      </div>
       <p className="note">We rekenen bewust conservatief, in de lijn van Marius Bakken en de Noorse aanpak: threshold voor de korte intervallen, sub-threshold (5 tot 10 seconden per km rustiger) voor de langere blokken. Zo kun je het vaker per week doen. De ranges zijn ruim omdat elke dag anders is. Dat is iets rustiger dan de tabellen van Jack Daniels. Voelt het zwaarder dan &quot;comfortabel zwaar&quot;? Dan loop je de rustige kant van de band, of nog iets langzamer. Bij warm weer, wind of heuvels loop je op gevoel.</p>
     </>
   );
