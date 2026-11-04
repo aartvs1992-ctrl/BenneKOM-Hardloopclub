@@ -76,7 +76,6 @@ export default function Agenda() {
           <div className="field"><label htmlFor="rn-route">Route (optioneel)</label><input className="input" id="rn-route" type="url" value={run.route} onChange={(e) => setRun({ ...run, route: e.target.value })} placeholder="Link naar Strava- of Komoot-route" /></div>
           <div className="field"><label htmlFor="rn-note">Toelichting (optioneel)</label><textarea className="input" id="rn-note" rows="2" value={run.note} onChange={(e) => setRun({ ...run, note: e.target.value })} placeholder="Over de heide, koffie na afloop" /></div>
           <button className="btn btn-gold" type="submit">Plaatsen</button>
-          <p className="note">Je naam staat bij het loopje en je staat zelf al op de lijst. Wie meldingen voor loopjes aan heeft staan, krijgt een seintje.</p>
         </form>
       )}
       {groups.length ? groups.map((g) => (
