@@ -21,6 +21,8 @@ export default function AppProvider({ children }) {
   const [error, setError] = useState('');
   const [toastMsg, setToastMsg] = useState('');
   const t = useRef();
+  const dataRef = useRef(null);
+  useEffect(() => { dataRef.current = data; }, [data]);
 
   useEffect(() => {
     (async () => {
@@ -98,7 +100,29 @@ export default function AppProvider({ children }) {
     return () => { document.removeEventListener('visibilitychange', onVis); window.removeEventListener('focus', onVis); clearInterval(t); };
   }, []);
 
+  // Aan- of afmelden meteen zichtbaar maken, nog voordat de server antwoordt
+  const optimistic = useCallback((action, payload) => {
+    if (action !== 'participate' || !payload.eventId) return false;
+    const id = payload.eventId, on = Boolean(payload.on);
+    const cur = dataRef.current;
+    if (!cur || Boolean(cur.mine[id]) === on) return false;
+    setData((d) => {
+      if (!d || Boolean(d.mine[id]) === on) return d;
+      const nm = d.me?.name || payload.name || local.name || 'Jij';
+      const mine = { ...d.mine }, counts = { ...d.counts }, names = { ...d.names };
+      const list = (names[id] || []).filter((p) => !p.me);
+      if (on) { mine[id] = nm; counts[id] = (counts[id] || 0) + 1; names[id] = [...list, { ...(d.me || {}), name: nm, avatar: d.me?.avatar || null, me: true }]; }
+      else { delete mine[id]; counts[id] = Math.max(0, (counts[id] || 1) - 1); names[id] = list; }
+      const next = { ...d, mine, counts, names };
+      dataRef.current = next;
+      return next;
+    });
+    return true;
+  }, [local]);
+
   const act = useCallback(async (action, payload = {}, okMsg) => {
+    const quick = optimistic(action, payload);
+    if (quick && okMsg) toast(okMsg);
     try {
       const r = await fetch('/api/action', {
         method: 'POST',
@@ -106,15 +130,16 @@ export default function AppProvider({ children }) {
         body: JSON.stringify({ action, device: local.device, name: payload.name ?? local.name, ...payload }),
       });
       const j = await r.json();
-      if (!r.ok) { toast(j.error || 'Dat lukte niet.'); return false; }
+      if (!r.ok) { toast(j.error || 'Dat lukte niet.'); if (quick) refresh(); return false; }
       if (j.events) setData(j);
-      if (okMsg) toast(okMsg);
+      if (okMsg && !quick) toast(okMsg);
       return true;
     } catch {
       toast('Geen verbinding. Probeer het zo nog eens.');
+      if (quick) refresh();
       return false;
     }
-  }, [local, toast]);
+  }, [local, toast, optimistic, refresh]);
 
   return (
     <Ctx.Provider value={{ local, updateLocal, data, error, refresh, act, toast }}>

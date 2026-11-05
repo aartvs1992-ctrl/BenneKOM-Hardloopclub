@@ -1,8 +1,12 @@
 // Alle acties van leden. Geen account nodig: een apparaat-id + naam, net als op de website.
-import { all, insert, upsert, remove } from '@/lib/db';
+import { after } from 'next/server';
+import { all, find, insert, upsert, remove } from '@/lib/db';
 import { buildState } from '@/lib/state';
 import { withTrainings } from '@/lib/club';
-import { sendPush } from '@/lib/push';
+import { sendPush as pushNow } from '@/lib/push';
+
+// Meldingen pas versturen nadat het antwoord terug is, zodat de knop meteen reageert
+const sendPush = (...args) => { after(() => pushNow(...args).catch(() => {})); };
 import { profileMap } from '@/lib/profiles';
 
 export const dynamic = 'force-dynamic';
@@ -28,19 +32,17 @@ export async function POST(req) {
         if (!ev) return bad('Dit evenement bestaat niet (meer).');
         if (b.on) {
           if (!name) return bad('Vul je naam in.');
-          if (ev.capacity) {
-            const n = (await all('participants')).filter((p) => p.event_id === ev.id && p.device_id !== device).length;
-            if (n >= ev.capacity) return bad('Dit evenement zit vol.');
-          }
-          const already = (await all('participants')).some((p) => p.event_id === ev.id && p.device_id === device);
+          const here = await find('participants', { event_id: ev.id });
+          if (ev.capacity && here.filter((p) => p.device_id !== device).length >= ev.capacity) return bad('Dit evenement zit vol.');
+          const already = here.some((p) => p.device_id === device);
           await upsert('participants', { event_id: ev.id, device_id: device, name }, ['event_id', 'device_id']);
           // Melding aan de clubgenoten, niet bij gewone trainingen (dat zou te veel meldingen geven)
           if (!already && ev.type === 'samenloop' && ev.details?.by && ev.details.by !== device) {
-            await sendPush('signups', { title: `${name.split(' ')[0]} loopt mee`, body: `${ev.title}, ${ev.date.split('-').reverse().join('-')} om ${ev.time}`, url: '/event/' + ev.id }, null, ev.details.by);
+            sendPush('signups', { title: `${name.split(' ')[0]} loopt mee`, body: `${ev.title}, ${ev.date.split('-').reverse().join('-')} om ${ev.time}`, url: '/event/' + ev.id }, null, ev.details.by);
           } else if (!already && ev.type !== 'training') {
             const d = new Date(ev.date + 'T12:00:00');
             const when = d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Amsterdam' });
-            await sendPush('signups', { title: `${name.split(' ')[0]} doet mee aan ${ev.title}`, body: `${when}${ev.place ? ' · ' + ev.place.split(',')[0] : ''}. Ga je ook?`, url: '/event/' + ev.id }, device);
+            sendPush('signups', { title: `${name.split(' ')[0]} doet mee aan ${ev.title}`, body: `${when}${ev.place ? ' · ' + ev.place.split(',')[0] : ''}. Ga je ook?`, url: '/event/' + ev.id }, device);
           }
         } else {
           await remove('participants', { event_id: ev.id, device_id: device });
@@ -51,7 +53,7 @@ export async function POST(req) {
         if (!name) return bad('Vul eerst je naam in bij Meer.');
         const seats = Math.max(1, Math.min(8, parseInt(b.seats, 10) || 1));
         await insert('rides', { event_id: clean(b.eventId), device_id: device, driver: name, from_place: clean(b.from, 120) || 'Bennekom', depart_time: clean(b.time, 5) || '08:30', seats });
-        await sendPush('carpool', { title: 'Nieuwe rit in de carpool', body: `${name} heeft ${seats} ${seats === 1 ? 'plek' : 'plekken'} vrij.`, url: '/event/' + clean(b.eventId) }, device);
+        sendPush('carpool', { title: 'Nieuwe rit in de carpool', body: `${name} heeft ${seats} ${seats === 1 ? 'plek' : 'plekken'} vrij.`, url: '/event/' + clean(b.eventId) }, device);
         break;
       }
       case 'cancelRide': {
@@ -69,7 +71,7 @@ export async function POST(req) {
           const pax = (await all('ride_passengers')).filter((p) => p.ride_id === ride.id && p.device_id !== device);
           if (pax.length >= ride.seats) return bad('Deze auto is vol.');
           await upsert('ride_passengers', { ride_id: ride.id, device_id: device, name }, ['ride_id', 'device_id']);
-          await sendPush('carpool', { title: 'Iemand rijdt met je mee', body: `${name} rijdt mee naar je rit van ${ride.depart_time}.`, url: '/event/' + ride.event_id }, null, ride.device_id);
+          sendPush('carpool', { title: 'Iemand rijdt met je mee', body: `${name} rijdt mee naar je rit van ${ride.depart_time}.`, url: '/event/' + ride.event_id }, null, ride.device_id);
         } else {
           await remove('ride_passengers', { ride_id: ride.id, device_id: device });
         }
@@ -124,7 +126,7 @@ export async function POST(req) {
         await upsert('participants', { event_id: id, device_id: device, name }, ['event_id', 'device_id']);
         const d = new Date(r.date + 'T12:00:00');
         const when = d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Amsterdam' });
-        await sendPush('samenloop', { title: `${name.split(' ')[0]} gaat ${kmTxt} lopen`, body: `${when} om ${r.time} · ${clean(r.place, 120).split(',')[0]}. Haak je aan?`, url: '/event/' + id }, device);
+        sendPush('samenloop', { title: `${name.split(' ')[0]} gaat ${kmTxt} lopen`, body: `${when} om ${r.time} · ${clean(r.place, 120).split(',')[0]}. Haak je aan?`, url: '/event/' + id }, device);
         break;
       }
       case 'cancelRun': {
@@ -134,7 +136,7 @@ export async function POST(req) {
         const others = (await all('participants')).filter((p) => p.event_id === ev.id && p.device_id !== device);
         await remove('participants', { event_id: ev.id });
         await remove('events', { id: ev.id });
-        for (const p of others) await sendPush('signups', { title: `${ev.title} gaat niet door`, body: `${name.split(' ')[0]} heeft het loopje afgezegd.`, url: '/agenda#samenloop' }, null, p.device_id);
+        for (const p of others) sendPush('signups', { title: `${ev.title} gaat niet door`, body: `${name.split(' ')[0]} heeft het loopje afgezegd.`, url: '/agenda#samenloop' }, null, p.device_id);
         break;
       }
       case 'suggest': {
