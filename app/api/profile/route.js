@@ -3,6 +3,7 @@
 import { all, upsert, remove, putFile, deleteFile, fileUrl } from '@/lib/db';
 import { displayName } from '@/lib/profiles';
 import { mailReady, makeCode, checkCode, sendCodeMail } from '@/lib/mailcode';
+import { clearSessionCookie } from '@/lib/session';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -86,7 +87,7 @@ export async function POST(req) {
     if (b.action === 'delete') {
       if (current?.photo_path) await deleteFile(current.photo_path).catch(() => {});
       await remove('profiles', { device_id: device });
-      return Response.json({ profile: null });
+      return Response.json({ profile: null }, { headers: { 'Set-Cookie': clearSessionCookie() } });
     }
 
     if (b.action !== 'save') return bad('Onbekende actie.');

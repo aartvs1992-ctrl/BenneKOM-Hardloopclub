@@ -23,10 +23,21 @@ export default function AppProvider({ children }) {
   const t = useRef();
 
   useEffect(() => {
-    const l = readLocal();
-    const v = { device: l.device || newId(), name: l.name || '', done: l.done || [], notif: { ...DEFAULT_NOTIF, ...(l.notif || {}) } };
-    writeLocal(v);
-    setLocal(v);
+    (async () => {
+      const l = readLocal();
+      let device = l.device, name = l.name || '';
+      // Geen naam in de browser bewaard (nieuw apparaat, gewist geheugen of app op beginscherm)?
+      // Dan kijken of dit apparaat je herkent via de inlogcookie.
+      if (!device || !name) {
+        try {
+          const s = await fetch('/api/session', { cache: 'no-store' }).then((r) => r.json());
+          if (s.device) { device = s.device; name = s.name || name; }
+        } catch {}
+      }
+      const v = { device: device || newId(), name, done: l.done || [], notif: { ...DEFAULT_NOTIF, ...(l.notif || {}) } };
+      writeLocal(v);
+      setLocal(v);
+    })();
   }, []);
 
   const updateLocal = useCallback((patch) => {

@@ -107,7 +107,8 @@ export default function Welcome() {
           </form>
         ) : mode === 'signup' ? (
           <form className="panel profile-form" onSubmit={requestCode}>
-            <b>Meld je aan, het duurt tien seconden</b>
+            <button type="button" className="btn btn-line btn-sm login-switch" onClick={() => switchTo('login')}>Al aangemeld op een ander apparaat? Log in</button>
+            <b>Nieuw? Meld je aan, het duurt tien seconden</b>
             <div className="grid2">
               <div className="field"><label htmlFor="w-first">Voornaam</label><input className="input" id="w-first" value={f.first_name} onChange={(e) => setF({ ...f, first_name: e.target.value })} autoComplete="given-name" required maxLength={40} /></div>
               <div className="field"><label htmlFor="w-last">Achternaam</label><input className="input" id="w-last" value={f.last_name} onChange={(e) => setF({ ...f, last_name: e.target.value })} autoComplete="family-name" maxLength={60} /></div>
@@ -119,7 +120,7 @@ export default function Welcome() {
         ) : mode === 'login' ? (
           <form className="panel profile-form" onSubmit={requestCode}>
             <b>Inloggen</b>
-            <span className="small muted">Vul het e-mailadres in waarmee je je hebt aangemeld. Je krijgt een code per mail.</span>
+            <span className="small muted">Vul het e-mailadres in waarmee je je hebt aangemeld, bijvoorbeeld op je telefoon. Je krijgt een code per mail en daarna zie je hier je eigen profiel, aanmeldingen en foto&apos;s.</span>
             <div className="field"><label htmlFor="w-lmail">E-mail</label><input className="input" id="w-lmail" type="email" inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} autoComplete="email" required maxLength={120} /></div>
             <button className="btn btn-gold" type="submit" disabled={busy || !local}>{busy ? 'Even geduld…' : 'Stuur mij een code'}</button>
             <button type="button" className="link small" style={{ alignSelf: 'flex-start' }} onClick={() => switchTo('restore')}>Of gebruik de code van je andere toestel</button>

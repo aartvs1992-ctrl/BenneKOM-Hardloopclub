@@ -463,3 +463,5 @@ a.media-item:hover{border-color:var(--gold)}
 .draft-video{position:relative}
 .video-box{touch-action:pan-y}
 .video-box video{max-width:100%;max-height:100%;background:#000}
+
+.login-switch{align-self:stretch;margin-bottom:6px}

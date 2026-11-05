@@ -127,6 +127,14 @@ export async function POST(req) {
         if (p) await upsert('photos', { ...p, featured: !p.featured }, ['id']);
         break;
       }
+      case 'removeMember': {
+        const p = (await all('profiles')).find((x) => x.device_id === b.device);
+        if (!p) return Response.json({ error: 'Dit lid bestaat niet (meer).' }, { status: 404 });
+        if (p.photo_path) await deleteFile(p.photo_path).catch(() => {});
+        await remove('participants', { device_id: p.device_id }).catch(() => {});
+        await remove('profiles', { device_id: p.device_id });
+        break;
+      }
       case 'push': {
         if (!clean(b.title)) return Response.json({ error: 'Geef de melding een titel.' }, { status: 400 });
         const r = await sendPush(b.pref || 'events', { title: clean(b.title, 80), body: clean(b.body, 200), url: b.url || '/' });
@@ -146,6 +154,11 @@ export async function POST(req) {
       media: await all('media').catch(() => []),
       shirts: await all('shirt_interest').catch(() => []),
       partners: (await all('partners').catch(() => [])).sort((a, b) => (a.sort || 0) - (b.sort || 0)),
+      members: (await all('profiles').catch(() => [])).map((p) => ({
+        device: p.device_id, name: [p.first_name, p.last_name].filter(Boolean).join(' '), email: p.email || '',
+        avatar: p.photo_path ? fileUrl(p.photo_path) : null, joined: p.created_at, last_seen: p.last_seen || null,
+        going: participants.filter((x) => x.device_id === p.device_id).length,
+      })).sort((a, b) => String(b.joined).localeCompare(String(a.joined))),
       upcoming: withTrainings(events).map((e) => ({ id: e.id, title: e.title, date: e.date, type: e.type })),
       added: b.added,
       status: { database: usingSupabase, push: pushReady },

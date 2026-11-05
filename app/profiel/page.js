@@ -156,9 +156,14 @@ export default function Profiel() {
       {prof ? (
         <section className="panel">
           <h3>Op een ander toestel</h3>
-          <p className="small">Gebruik deze code om je profiel op een andere telefoon of computer te openen. Deel hem met niemand.</p>
+          <p className="small">Op je computer of een andere telefoon log je in met je e-mailadres: je krijgt een code per mail. Lukt dat niet, gebruik dan deze code. Deel hem met niemand.</p>
           <p className="restore-code num">{prof.restore_code}</p>
           <div className="btn-row">
+            <button className="btn btn-line btn-sm" disabled={busy} onClick={async () => {
+              await fetch('/api/session', { method: 'POST' }).catch(() => {});
+              updateLocal({ device: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), name: '' });
+              location.assign('/');
+            }}>Uitloggen op dit toestel</button>
             {sure
               ? <button className="btn btn-sm btn-danger" onClick={del} disabled={busy}>Zeker verwijderen?</button>
               : <button className="btn btn-line btn-sm" onClick={() => setSure(true)}>Profiel verwijderen</button>}

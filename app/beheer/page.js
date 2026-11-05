@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { TYPE_LABEL, fmt } from '@/lib/content';
+import { Avatar } from '@/components/ui';
 
 const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false, url: '' };
 
@@ -211,6 +212,8 @@ export default function Beheer() {
         ) : <p className="muted">Nog niemand heeft een shirt aangevinkt.</p>}
       </section>
 
+      <Members list={d.members || []} call={call} />
+
       <section className="section">
         <h2>Voorstellen van leden</h2>
         {d.suggestions.length ? <div className="list">{d.suggestions.map((s) => (
@@ -230,6 +233,39 @@ export default function Beheer() {
 }
 
 // Verwijderen met bevestiging in de pagina zelf
+const ago = (iso) => {
+  if (!iso) return '–';
+  const days = Math.floor((Date.now() - new Date(iso)) / 864e5);
+  return days <= 0 ? 'vandaag' : days === 1 ? 'gisteren' : days < 30 ? days + ' dagen geleden' : new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+};
+
+// Ledenoverzicht: wie is er aangemeld, wanneer voor het laatst actief, en een lid verwijderen
+function Members({ list, call }) {
+  const [q, setQ] = useState('');
+  const shown = list.filter((m) => (m.name + ' ' + m.email).toLowerCase().includes(q.toLowerCase()));
+  const week = list.filter((m) => m.last_seen && Date.now() - new Date(m.last_seen) < 7 * 864e5).length;
+  return (
+    <section className="section">
+      <h2>Leden ({list.length})</h2>
+      <p className="small muted">{list.some((m) => m.last_seen) ? `${week} leden waren de afgelopen week actief.` : 'Laatst actief wordt bijgehouden zodra 017_leden.sql in Supabase is gedraaid.'}</p>
+      <input className="input" placeholder="Zoek op naam of e-mail" value={q} onChange={(e) => setQ(e.target.value)} />
+      <div className="list">
+        {shown.map((m) => (
+          <div key={m.device} className="row" style={{ gridTemplateColumns: 'auto 1fr auto', alignItems: 'center' }}>
+            <Avatar name={m.name} src={m.avatar} size={36} />
+            <span style={{ minWidth: 0 }}>
+              <span className="t">{m.name || '(geen naam)'}</span><br />
+              <span className="s">{m.email || 'geen e-mail'} · lid sinds {ago(m.joined)} · actief {ago(m.last_seen)}{m.going ? ` · ${m.going}× aangemeld` : ''}</span>
+            </span>
+            <DeleteButton onConfirm={() => call('removeMember', { device: m.device }, m.name + ' is verwijderd')} />
+          </div>
+        ))}
+        {!shown.length && <p className="small muted">Geen leden gevonden.</p>}
+      </div>
+    </section>
+  );
+}
+
 function DeleteButton({ onConfirm }) {
   const [sure, setSure] = useState(false);
   return sure
