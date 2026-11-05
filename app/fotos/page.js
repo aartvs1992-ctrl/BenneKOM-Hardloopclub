@@ -12,6 +12,60 @@ const fullDate = (iso) => { const d = new Date(iso + 'T12:00:00Z'); return `${d.
 const monthLabel = (iso) => { const d = new Date(iso + 'T12:00:00Z'); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
+const MAX_VIDEO_MB = 50;
+const MAX_VIDEO_SEC = 30;
+const secs = (d) => { const n = Math.round(d || 0); return `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`; };
+
+// Lees een video in: lengte, afmetingen en een stilstaand voorbeeldplaatje (JPEG, max. 1200px)
+function readVideo(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = url;
+    let done = false;
+    const fail = () => { if (done) return; done = true; URL.revokeObjectURL(url); reject(new Error('read')); };
+    // Lukt het plaatje niet (sommige telefoons), dan een eenvoudig navy plaatje met afspeelknop
+    const placeholder = () => {
+      if (done) return; done = true;
+      const w = v.videoWidth || 720, h = v.videoHeight || 1280, scale = Math.min(1, 1200 / Math.max(w, h));
+      const c = document.createElement('canvas'); c.width = Math.round(w * scale); c.height = Math.round(h * scale);
+      const x = c.getContext('2d'); x.fillStyle = '#071E3E'; x.fillRect(0, 0, c.width, c.height);
+      x.fillStyle = '#E2B74A'; x.font = `bold ${Math.round(c.width / 5)}px sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('▶', c.width / 2, c.height / 2);
+      URL.revokeObjectURL(url);
+      resolve({ image: c.toDataURL('image/jpeg', 0.8), width: c.width, height: c.height, duration: v.duration });
+    };
+    v.onerror = fail;
+    v.onloadedmetadata = () => { v.currentTime = Math.min(0.5, (v.duration || 1) / 2); setTimeout(placeholder, 5000); };
+    v.onseeked = () => {
+      if (done) return; done = true;
+      const scale = Math.min(1, 1200 / Math.max(v.videoWidth, v.videoHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.round(v.videoWidth * scale); c.height = Math.round(v.videoHeight * scale);
+      c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+      const out = { image: c.toDataURL('image/jpeg', 0.8), width: c.width, height: c.height, duration: v.duration };
+      URL.revokeObjectURL(url);
+      resolve(out);
+    };
+    setTimeout(() => (v.duration ? placeholder() : fail()), 15000);
+  });
+}
+
+// Stuur het filmpje rechtstreeks naar de opslag, met voortgang
+function putVideo(url, file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('cacheControl', '31536000');
+    fd.append('', file);
+    const x = new XMLHttpRequest();
+    x.open('PUT', url);
+    x.setRequestHeader('x-upsert', 'false');
+    x.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.round((e.loaded / e.total) * 100));
+    x.onload = () => (x.status < 300 ? resolve() : reject(new Error(x.status + ' ' + x.responseText)));
+    x.onerror = () => reject(new Error('net'));
+    x.send(fd);
+  });
+}
+
 function when(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -43,6 +97,7 @@ export default function Fotos() {
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [progress, setProgress] = useState(null);
   const input = useRef(null);
 
   const wall = useMemo(() => {
@@ -73,8 +128,20 @@ export default function Fotos() {
     e.target.value = '';
     if (!file) return;
     if (!local.name) { location.href = '/profiel?terug=1'; return; }
+    const base = { caption: '', moment: '', other: '', date: todayISO() };
+    if (file.type.startsWith('video/')) {
+      if (file.size > MAX_VIDEO_MB * 1024 * 1024) { toast(`Deze video is te groot (max. ${MAX_VIDEO_MB} MB). Kies een kortere video.`); return; }
+      try {
+        const v = await readVideo(file);
+        if (v.duration > MAX_VIDEO_SEC + 1) { toast(`Deze video duurt ${secs(v.duration)}. Video's mogen maximaal ${MAX_VIDEO_SEC} seconden zijn. Kort hem eerst in op je telefoon.`); return; }
+        setDraft({ ...v, ...base, file, video: true });
+      } catch {
+        toast('Deze video kan niet worden gelezen. Probeer een andere.');
+      }
+      return;
+    }
     try {
-      setDraft({ ...(await shrink(file, 2400, 0.85)), caption: '', moment: '', other: '', date: todayISO() });
+      setDraft({ ...(await shrink(file, 2400, 0.85)), ...base });
     } catch {
       toast('Deze foto kan niet worden gelezen. Probeer een andere.');
     }
@@ -87,8 +154,23 @@ export default function Fotos() {
     if (draft.moment.startsWith('training:')) { album = 'Dinsdagtraining'; date = draft.moment.slice(9); }
     else if (draft.moment === 'other') album = draft.other.trim();
     else if (draft.moment) album = draft.moment;
-    const ok = await call('upload', { image: draft.image, width: draft.width, height: draft.height, caption: draft.caption, album, taken_on: date }, 'Foto geplaatst!');
-    setBusy(false);
+    let video_path, duration;
+    if (draft.video) {
+      try {
+        const r = await fetch('/api/photos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'videoSlot', device: local.device, name: local.name, type: draft.file.type, size: draft.file.size }) });
+        const slot = await r.json();
+        if (!r.ok) throw new Error(slot.error || 'Dat lukte niet.');
+        setProgress(0);
+        await putVideo(slot.url, draft.file, setProgress);
+        video_path = slot.path; duration = draft.duration;
+      } catch (err) {
+        setBusy(false); setProgress(null);
+        toast(/^\d|net/.test(err.message) ? 'Uploaden van de video lukte niet. Controleer je verbinding en probeer het opnieuw.' : err.message);
+        return;
+      }
+    }
+    const ok = await call('upload', { image: draft.image, width: draft.width, height: draft.height, caption: draft.caption, album, taken_on: date, video_path, duration }, draft.video ? 'Video geplaatst!' : 'Foto geplaatst!');
+    setBusy(false); setProgress(null);
     if (ok) setDraft(null);
   }
 
@@ -96,14 +178,16 @@ export default function Fotos() {
     <>
       <PhotoHeader src="/club/de-hele-groep.jpg" title="Foto's" sub={`${wall.length} foto's van de club. Deel ook jouw mooiste moment.`} pos="center 45%" />
 
-      <input ref={input} type="file" accept="image/*" hidden onChange={pick} id="photo-input" />
-      {!draft && <button className="btn btn-gold" onClick={() => input.current.click()}>+ Foto plaatsen</button>}
+      <input ref={input} type="file" accept="image/*,video/*" hidden onChange={pick} id="photo-input" />
+      {!draft && <button className="btn btn-gold" onClick={() => input.current.click()}>+ Foto of video plaatsen</button>}
 
       {draft && (
         <form className="panel" onSubmit={post}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={draft.image} alt="Voorbeeld van je foto" className="draft-img" />
-          <div className="field"><label htmlFor="ph-moment">Bij welk moment hoort deze foto?</label>
+          {draft.video
+            ? <div className="draft-video"><img src={draft.image} alt="Voorbeeld van je video" className="draft-img" /><span className="play-badge">▶ {secs(draft.duration)}</span></div>
+            : <img src={draft.image} alt="Voorbeeld van je foto" className="draft-img" />}
+          <div className="field"><label htmlFor="ph-moment">Bij welk moment hoort deze {draft.video ? 'video' : 'foto'}?</label>
             <select className="input" id="ph-moment" value={draft.moment} onChange={(e) => setDraft({ ...draft, moment: e.target.value })}>
               <option value="">Geen specifiek moment</option>
               {tuesdays.map((t) => <option key={t} value={'training:' + t}>Dinsdagtraining · {dayLabel(t)}</option>)}
@@ -124,7 +208,7 @@ export default function Fotos() {
             <input className="input" id="ph-cap" maxLength={140} value={draft.caption} onChange={(e) => setDraft({ ...draft, caption: e.target.value })} placeholder="Bijv. Intervallen in de Kraats" /></div>
           <p className="note">Plaats alleen foto&apos;s waarop iedereen het goedvindt om in de app te staan.</p>
           <div className="btn-row">
-            <button className="btn btn-gold" type="submit" disabled={busy || (draft.moment === 'other' && !draft.other.trim())}>{busy ? 'Bezig met plaatsen…' : 'Plaatsen'}</button>
+            <button className="btn btn-gold" type="submit" disabled={busy || (draft.moment === 'other' && !draft.other.trim())}>{busy ? (progress != null && progress < 100 ? `Video uploaden… ${progress}%` : 'Bezig met plaatsen…') : 'Plaatsen'}</button>
             <button className="btn btn-line" type="button" onClick={() => setDraft(null)} disabled={busy}>Annuleren</button>
           </div>
         </form>
@@ -146,6 +230,7 @@ export default function Fotos() {
             <button key={p.id} className="wall-item" onClick={() => setOpen(i)} aria-label={p.caption || 'Foto van ' + p.name}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={p.url} alt={p.caption || p.alt || ''} loading="lazy" style={p.width && p.height ? { aspectRatio: `${p.width} / ${p.height}` } : undefined} />
+              {p.video && <span className="play-badge">▶ {secs(p.duration)}</span>}
               {p.likes > 0 && <span className="wall-likes">👍 {p.likes}</span>}
             </button>
           ))}
@@ -239,6 +324,18 @@ function ZoomImg({ src, alt, onSwipe, onTap }) {
   );
 }
 
+// Video in het grote scherm: speelt pas af als je hem opent (het overzicht laadt alleen het plaatje)
+function VideoView({ p, onSwipe }) {
+  const start = useRef(null);
+  return (
+    <div className="zoom-box video-box"
+      onTouchStart={(e) => { start.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
+      onTouchEnd={(e) => { const s = start.current; if (!s) return; const dx = e.changedTouches[0].clientX - s.x, dy = e.changedTouches[0].clientY - s.y; if (Math.abs(dx) > 80 && Math.abs(dx) > 2 * Math.abs(dy)) onSwipe(dx > 0 ? 'prev' : 'next'); }}>
+      <video key={p.id} src={p.video} poster={p.url} controls playsInline autoPlay preload="metadata" />
+    </div>
+  );
+}
+
 function Lightbox({ p, pos, onClose, onPrev, onNext, onLike, onDelete }) {
   const [sure, setSure] = useState(false);
   const [ui, setUi] = useState(true);
@@ -257,7 +354,9 @@ function Lightbox({ p, pos, onClose, onPrev, onNext, onLike, onDelete }) {
         <button className="lb-close" onClick={onClose} aria-label="Sluiten">×</button>
       </div>
       <div className="lb-img">
-        <ZoomImg src={p.url} alt={p.caption || p.alt || ''} onSwipe={(d) => (d === 'prev' ? onPrev?.() : onNext?.())} onTap={() => setUi((v) => !v)} />
+        {p.video
+          ? <VideoView p={p} onSwipe={(d) => (d === 'prev' ? onPrev?.() : onNext?.())} />
+          : <ZoomImg src={p.url} alt={p.caption || p.alt || ''} onSwipe={(d) => (d === 'prev' ? onPrev?.() : onNext?.())} onTap={() => setUi((v) => !v)} />}
         {onPrev && <button className="lb-nav prev" onClick={onPrev} aria-label="Vorige">‹</button>}
         {onNext && <button className="lb-nav next" onClick={onNext} aria-label="Volgende">›</button>}
       </div>
@@ -265,7 +364,7 @@ function Lightbox({ p, pos, onClose, onPrev, onNext, onLike, onDelete }) {
         <div style={{ minWidth: 0 }}>
           {p.caption && <p className="lb-cap">{p.caption}</p>}
           <p className="lb-meta">{p.club ? p.album + (p.date ? ' · ' + fullDate(p.date) : '') : p.name + (p.album ? ' · ' + p.album : '')}{p.club ? '' : p.created_at ? ' · ' + when(p.created_at) : ''}</p>
-          <p className="lb-hint">Dubbeltik of knijp om in te zoomen</p>
+          {!p.video && <p className="lb-hint">Dubbeltik of knijp om in te zoomen</p>}
         </div>
         {!p.club && (
           <div className="btn-row" style={{ flexWrap: 'nowrap' }}>
