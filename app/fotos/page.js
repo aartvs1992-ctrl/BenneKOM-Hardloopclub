@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { Loading, PhotoHeader } from '@/components/ui';
 import { usePhotos, shrink } from '@/lib/usePhotos';
-import { CLUB_PHOTOS, clubAlbum, todayISO } from '@/lib/club';
+import { CLUB_PHOTOS, CLUB_VIDEOS, clubAlbum, todayISO } from '@/lib/club';
 import { MON } from '@/lib/content';
 
 const MONTHS = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
@@ -105,7 +105,8 @@ export default function Fotos() {
     const own = photos.map((p) => ({ ...p, date: p.taken_on || String(p.created_at || '').slice(0, 10) }));
     // Clubfoto's staan achteraan, als vaste basis van de wall
     const club = CLUB_PHOTOS.map((p, i) => ({ id: 'club-' + i, url: p.src, caption: '', alt: p.caption, name: 'BenneKOM', club: true, width: p.w, height: p.h, ...(({ album, date }) => ({ album, date }))(clubAlbum(p.src)) }));
-    return [...own, ...club].map((p) => ({ ...p, group: groupOf(p) }));
+    const clubVideos = CLUB_VIDEOS.map((v, i) => ({ id: 'clubvideo-' + i, url: v.poster, video: v.src, duration: v.duration, caption: '', alt: v.title, name: 'BenneKOM', club: true, width: v.w, height: v.h, album: v.album, date: v.date }));
+    return [...own, ...clubVideos, ...club].map((p) => ({ ...p, group: groupOf(p) }));
   }, [photos]);
 
   const groups = useMemo(() => {
