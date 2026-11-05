@@ -37,13 +37,24 @@ export default function Challenge() {
   const [day, setDay] = useState(lastChallengeDate);
   const [manualOpen, setManualOpen] = useState(false);
   const [stravaMsg, setStravaMsg] = useState('');
+  const [syncing, setSyncing] = useState(false);
 
+  // Eerst meteen de opgeslagen tijden tonen, daarna op de achtergrond nieuwe Strava-loopjes ophalen
   const load = useCallback(async () => {
     if (!local?.device) return;
+    const device = encodeURIComponent(local.device);
+    let first = null;
     try {
-      const r = await fetch('/api/strava/me?device=' + encodeURIComponent(local.device), { cache: 'no-store' });
-      setSv(await r.json());
-    } catch { setSv({ configured: false, connected: false, efforts: [] }); }
+      const r = await fetch('/api/strava/me?device=' + device, { cache: 'no-store' });
+      first = await r.json(); setSv(first);
+    } catch { setSv({ configured: false, connected: false, efforts: [] }); return; }
+    if (!first?.connected) return;
+    setSyncing(true);
+    try {
+      const r = await fetch('/api/strava/me', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'sync', device: local.device }) });
+      if (r.ok) setSv(await r.json());
+    } catch { /* dan blijven de opgeslagen tijden staan */ }
+    finally { setSyncing(false); }
   }, [local?.device]);
 
   useEffect(() => { load(); }, [load]);
@@ -54,19 +65,20 @@ export default function Challenge() {
   }, [toast]);
 
   const ready = useReady();
-  if (!ready || !sv) return <Loading />;
+  if (!ready) return <Loading />;
+  const S = sv || { configured: true, connected: false, efforts: [], loading: true };
 
   const manual = data.results.map((r) => ({
     id: r.id, seconds: r.seconds, source: 'handmatig',
     date: /^\d{4}-\d{2}-\d{2}$/.test(r.edition) ? r.edition + 'T10:00:00' : r.date || r.edition,
   }));
-  const attempts = [...(sv.efforts || []), ...manual].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const attempts = [...(S.efforts || []), ...manual].sort((a, b) => String(a.date).localeCompare(String(b.date)));
   attempts.forEach((a, i) => { a.delta = i ? a.seconds - attempts[i - 1].seconds : null; });
   // PR: het officiële all-time PR van Strava gaat voor; anders de snelste tijd die we kennen
-  const official = sv.pr?.seconds || null;
+  const official = S.pr?.seconds || null;
   const known = attempts.length ? Math.min(...attempts.map((a) => a.seconds)) : null;
   const best = official ? Math.min(official, known ?? Infinity) : known;
-  const prDate = official && official === best ? sv.pr.date : attempts.find((a) => a.seconds === best)?.date;
+  const prDate = official && official === best ? S.pr.date : attempts.find((a) => a.seconds === best)?.date;
   const recent = attempts.slice(-10);
   const last = attempts[attempts.length - 1];
   const next = data.events.find((e) => e.type === 'challenge');
@@ -109,12 +121,12 @@ export default function Challenge() {
 
       {attempts.length || official ? (
         <section className="panel">
-          <div className="section-head"><h3>Jouw stand</h3><span className="small muted">{sv.pr?.count || attempts.length} {(sv.pr?.count || attempts.length) === 1 ? 'poging' : 'pogingen'}</span></div>
+          <div className="section-head"><h3>Jouw stand</h3><span className="small muted">{S.pr?.count || attempts.length} {(S.pr?.count || attempts.length) === 1 ? 'poging' : 'pogingen'}</span></div>
           <div className="pr-big">
             <span className="lbl">Persoonlijk record{official ? ' · all-time volgens Strava' : ''}</span>
             <span className="num">{fmt(best)}</span>
             <span className="small muted">{fmt(best / 5)} per km{prDate ? ' · ' + dateLabel(prDate) : ''}
-              {official && sv.pr.activity && <> · <a href={`https://www.strava.com/activities/${sv.pr.activity}`} target="_blank" rel="noopener noreferrer">bekijk op Strava</a></>}</span>
+              {official && S.pr.activity && <> · <a href={`https://www.strava.com/activities/${S.pr.activity}`} target="_blank" rel="noopener noreferrer">bekijk op Strava</a></>}</span>
           </div>
           {last && <>
           <div className="readout">
@@ -131,6 +143,8 @@ export default function Challenge() {
           <p className="note">{message(attempts, best)}</p>
           </>}
         </section>
+      ) : S.loading ? (
+        <section className="panel"><p className="muted">Je tijden laden…</p></section>
       ) : (
         <section className="panel">
           <h3>Nog geen tijden</h3>
@@ -139,16 +153,18 @@ export default function Challenge() {
       )}
 
       <section className="panel">
-        <div className="section-head"><h3>Strava</h3><a className="link" href={sv.segment?.url} target="_blank" rel="noopener noreferrer">Bekijk het segment ↗</a></div>
+        <div className="section-head"><h3>Strava</h3><a className="link" href={S.segment?.url} target="_blank" rel="noopener noreferrer">Bekijk het segment ↗</a></div>
         {stravaMsg && <p className="err">Koppelen lukte niet. {stravaMsg}</p>}
-        {!sv.configured ? (
+        {S.loading ? (
+          <p className="muted small">Strava laden…</p>
+        ) : !S.configured ? (
           <p className="muted small">De koppeling met Strava wordt binnenkort ingesteld. Tot die tijd vul je je tijd zelf in.</p>
-        ) : sv.connected ? (
+        ) : S.connected ? (
           <>
-            <p className="small">Gekoppeld{sv.firstname ? ` als ${sv.firstname}` : ''}. Na elke loop over het segment staat je tijd hier vanzelf.{sv.lastSync ? ` Laatst bijgewerkt ${new Date(sv.lastSync).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.` : ''}</p>
-            {sv.note && <p className="note">{sv.note}</p>}
+            <p className="small">Gekoppeld{S.firstname ? ` als ${S.firstname}` : ''}. Na elke loop over het segment staat je tijd hier vanzelf.{syncing ? ' Nieuwe loopjes worden nu opgehaald…' : ''}{!syncing && S.lastSync ? ` Laatst bijgewerkt ${new Date(S.lastSync).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.` : ''}</p>
+            {S.note && <p className="note">{S.note}</p>}
             <div className="btn-row">
-              <button className="btn btn-line btn-sm" disabled={busy} onClick={() => strava('refresh', 'Bijgewerkt')}>{busy ? 'Bezig…' : 'Nu bijwerken'}</button>
+              <button className="btn btn-line btn-sm" disabled={busy || syncing} onClick={() => strava('refresh', 'Bijgewerkt')}>{busy || syncing ? 'Bezig…' : 'Nu bijwerken'}</button>
               {sure
                 ? <button className="btn btn-sm btn-danger" disabled={busy} onClick={() => strava('disconnect', 'Strava ontkoppeld en je Strava-tijden verwijderd')}>Zeker ontkoppelen?</button>
                 : <button className="btn btn-line btn-sm" onClick={() => setSure(true)}>Ontkoppelen</button>}
