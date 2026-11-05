@@ -39,10 +39,19 @@ export async function POST(req) {
         const ext = m[2] === 'jpeg' ? 'jpg' : m[2];
         const path = `${today}/${crypto.randomUUID()}.${ext}`;
         await putFile(path, buf, m[1]);
-        await insert('photos', {
+        const row = {
           device_id: device, name, caption: clean(b.caption, 140), path,
           width: parseInt(b.width, 10) || null, height: parseInt(b.height, 10) || null,
-        });
+        };
+        const album = clean(b.album, 60);
+        const takenOn = /^\d{4}-\d{2}-\d{2}$/.test(b.taken_on || '') && b.taken_on <= today ? b.taken_on : null;
+        try {
+          await insert('photos', { ...row, album, taken_on: takenOn });
+        } catch (e) {
+          // kolommen album/taken_on bestaan nog niet (015_foto_albums.sql nog niet gedraaid)
+          if (!/album|taken_on|column/i.test(String(e.message))) throw e;
+          await insert('photos', row);
+        }
         break;
       }
       case 'like': {

@@ -181,8 +181,8 @@ body{margin:0;min-height:100%}
 .draft-img{width:100%;max-height:60vh;object-fit:contain;border-radius:10px;background:var(--soft)}
 .empty{align-items:flex-start}
 .lightbox{position:fixed;inset:0;z-index:30;background:#030A16;color:#F4F1E6;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-.lb-img{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:8px}
-.lb-img img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
+.lb-img{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:0;overflow:hidden}
+.lb-img img{max-width:100%;max-height:100%;object-fit:contain}
 .lb-close{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));z-index:2;background:rgba(255,255,255,.12);color:#fff;border:0;width:40px;height:40px;border-radius:50%;font-size:26px;line-height:1;cursor:pointer}
 .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);color:#fff;border:0;width:44px;height:44px;border-radius:50%;font-size:28px;cursor:pointer}
 .lb-nav.prev{left:calc(8px + env(safe-area-inset-left,0px))}.lb-nav.next{right:calc(8px + env(safe-area-inset-right,0px))}
@@ -444,3 +444,17 @@ a.media-item:hover{border-color:var(--gold)}
 .race-about{border-left:3px solid var(--gold);padding:2px 0 2px 14px}
 .race-about h3{margin:0 0 4px;font-size:15px}
 .race-about p{margin:0}
+
+.chip.on{background:var(--navy);border-color:var(--navy);color:var(--on-navy)}
+.chip span{opacity:.6;font-weight:500;margin-left:2px}
+.zoom-box{width:100%;height:100%;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;-webkit-user-select:none}
+.zoom-box img{will-change:transform;transform-origin:center center}
+.lb-top{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:calc(8px + env(safe-area-inset-top,0px)) calc(10px + env(safe-area-inset-right,0px)) 8px calc(14px + env(safe-area-inset-left,0px));pointer-events:none}
+.lb-top>*{pointer-events:auto}
+.lb-top .lb-close{position:static}
+.lb-pos{font-size:13px;opacity:.75;font-variant-numeric:tabular-nums}
+.lb-hint{font-size:12px;opacity:.5;margin-top:2px}
+.lightbox .lb-bar,.lightbox .lb-top,.lightbox .lb-nav{transition:opacity .2s}
+.lightbox.lb-clean .lb-bar,.lightbox.lb-clean .lb-top,.lightbox.lb-clean .lb-nav{opacity:0;pointer-events:none}
+.lightbox.lb-clean .lb-bar{position:absolute;bottom:0}
+@media (hover:none){.lb-nav{display:none}}
