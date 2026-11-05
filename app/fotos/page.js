@@ -8,6 +8,7 @@ import { MON } from '@/lib/content';
 
 const MONTHS = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
 const dayLabel = (iso) => { const d = new Date(iso + 'T12:00:00Z'); return `${d.getUTCDate()} ${MON[d.getUTCMonth()]}`; };
+const fullDate = (iso) => { const d = new Date(iso + 'T12:00:00Z'); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 const monthLabel = (iso) => { const d = new Date(iso + 'T12:00:00Z'); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
@@ -48,7 +49,7 @@ export default function Fotos() {
     if (!photos) return [];
     const own = photos.map((p) => ({ ...p, date: p.taken_on || String(p.created_at || '').slice(0, 10) }));
     // Clubfoto's staan achteraan, als vaste basis van de wall
-    const club = CLUB_PHOTOS.map((p, i) => ({ id: 'club-' + i, url: p.src, caption: p.caption, name: 'BenneKOM', club: true, width: p.w, height: p.h, ...(({ album, date }) => ({ album, date }))(clubAlbum(p.src)) }));
+    const club = CLUB_PHOTOS.map((p, i) => ({ id: 'club-' + i, url: p.src, caption: '', alt: p.caption, name: 'BenneKOM', club: true, width: p.w, height: p.h, ...(({ album, date }) => ({ album, date }))(clubAlbum(p.src)) }));
     return [...own, ...club].map((p) => ({ ...p, group: groupOf(p) }));
   }, [photos]);
 
@@ -144,7 +145,7 @@ export default function Fotos() {
           {shown.map((p, i) => (
             <button key={p.id} className="wall-item" onClick={() => setOpen(i)} aria-label={p.caption || 'Foto van ' + p.name}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.url} alt={p.caption || ''} loading="lazy" style={p.width && p.height ? { aspectRatio: `${p.width} / ${p.height}` } : undefined} />
+              <img src={p.url} alt={p.caption || p.alt || ''} loading="lazy" style={p.width && p.height ? { aspectRatio: `${p.width} / ${p.height}` } : undefined} />
               {p.likes > 0 && <span className="wall-likes">👍 {p.likes}</span>}
             </button>
           ))}
@@ -256,14 +257,14 @@ function Lightbox({ p, pos, onClose, onPrev, onNext, onLike, onDelete }) {
         <button className="lb-close" onClick={onClose} aria-label="Sluiten">×</button>
       </div>
       <div className="lb-img">
-        <ZoomImg src={p.url} alt={p.caption || ''} onSwipe={(d) => (d === 'prev' ? onPrev?.() : onNext?.())} onTap={() => setUi((v) => !v)} />
+        <ZoomImg src={p.url} alt={p.caption || p.alt || ''} onSwipe={(d) => (d === 'prev' ? onPrev?.() : onNext?.())} onTap={() => setUi((v) => !v)} />
         {onPrev && <button className="lb-nav prev" onClick={onPrev} aria-label="Vorige">‹</button>}
         {onNext && <button className="lb-nav next" onClick={onNext} aria-label="Volgende">›</button>}
       </div>
       <div className="lb-bar">
         <div style={{ minWidth: 0 }}>
           {p.caption && <p className="lb-cap">{p.caption}</p>}
-          <p className="lb-meta">{p.name}{p.album ? ' · ' + p.album : ''}{p.club ? '' : p.created_at ? ' · ' + when(p.created_at) : ''}</p>
+          <p className="lb-meta">{p.club ? p.album + (p.date ? ' · ' + fullDate(p.date) : '') : p.name + (p.album ? ' · ' + p.album : '')}{p.club ? '' : p.created_at ? ' · ' + when(p.created_at) : ''}</p>
           <p className="lb-hint">Dubbeltik of knijp om in te zoomen</p>
         </div>
         {!p.club && (
