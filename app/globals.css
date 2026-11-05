@@ -441,3 +441,6 @@ a.media-item:hover{border-color:var(--gold)}
 .run-invite img{width:100%;aspect-ratio:16/8;object-fit:cover;display:block}
 .run-invite>span{padding:12px 16px}
 .agenda-tabs{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr))}
+.race-about{border-left:3px solid var(--gold);padding:2px 0 2px 14px}
+.race-about h3{margin:0 0 4px;font-size:15px}
+.race-about p{margin:0}

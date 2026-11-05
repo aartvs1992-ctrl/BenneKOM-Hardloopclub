@@ -10,6 +10,8 @@ import { Gallery } from '@/components/Gallery';
 import { Workout } from '@/components/Workout';
 import { workoutFor } from '@/lib/workouts';
 
+const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
+
 export default function EventPage() {
   const { id } = useParams();
   const { data } = useApp();
@@ -52,9 +54,21 @@ export default function EventPage() {
         {isRun && dt.route && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={dt.route} target="_blank" rel="noopener noreferrer">Bekijk de route ↗</a>}
         {dt.deadline && <Deadline iso={dt.deadline} />}
         {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km} km van Bennekom (hemelsbreed)</p>}
-        {e.url && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={e.url} target="_blank" rel="noopener noreferrer">Info en inschrijven bij de organisatie ↗</a>}
+        {e.type === 'wedstrijd' && e.about && (
+          <div className="race-about">
+            <h3>Over deze wedstrijd</h3>
+            <p>{e.about}</p>
+          </div>
+        )}
+        {e.url && (
+          <a className="btn btn-gold btn-sm" style={{ alignSelf: 'flex-start' }} href={e.url} target="_blank" rel="noopener noreferrer">
+            {e.type === 'wedstrijd' ? 'Website en inschrijven ↗' : 'Info en inschrijven bij de organisatie ↗'}
+          </a>
+        )}
+        {e.type === 'wedstrijd' && e.url && <span className="small muted">{hostOf(e.url)}</span>}
         {e.type === 'wedstrijd' && !e.url && <a className="link" href={'https://www.google.com/search?q=' + encodeURIComponent(e.title + ' ' + e.place + ' ' + e.date.slice(0, 4))} target="_blank" rel="noopener noreferrer">Zoek info en inschrijving ›</a>}
-        {e.description && <p className={dt.story ? 'lead' : ''} style={{ whiteSpace: 'pre-line' }}>{e.description}</p>}
+        {e.description && !(e.type === 'wedstrijd' && e.about) && <p className={dt.story ? 'lead' : ''} style={{ whiteSpace: 'pre-line' }}>{e.description}</p>}
+        {e.type === 'wedstrijd' && e.about && <p className="small muted">Tijden en inschrijving kunnen veranderen: check altijd de site van de organisatie.</p>}
         {!dt.story && e.place && <a className="link" href={'https://www.google.com/maps/search/' + encodeURIComponent(e.place)} target="_blank" rel="noopener noreferrer">Open locatie in Maps ›</a>}
       </div>
 
