@@ -38,7 +38,7 @@ export default function Nieuws() {
               {n.body && <p className={isOpen ? '' : 'clamp'}>{n.body}</p>}
               <span className="btn-row" style={{ gap: 14 }}>
                 {long && <button type="button" className="link link-btn" onClick={toggle} aria-expanded={isOpen}>{isOpen ? 'Minder tonen' : 'Lees meer ›'}</button>}
-                {n.url && <a className="link" href={n.url} target="_blank" rel="noopener noreferrer">Bekijk op Strava ↗</a>}
+                {n.url && <a className="link" href={n.url} target="_blank" rel="noopener noreferrer">{linkLabel(n.url)}</a>}
                 {n.event_id && <Link className="link" href={'/event/' + n.event_id}>Naar het evenement ›</Link>}
               </span>
             </div>
@@ -69,4 +69,14 @@ export default function Nieuws() {
       </section>
     </>
   );
+}
+
+// Tekst van de link onder een bericht, afhankelijk van waar de link naartoe gaat.
+function linkLabel(url) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '');
+    if (host.endsWith('strava.com')) return 'Bekijk op Strava ↗';
+    if (host.endsWith('edestad.nl')) return 'Lees het artikel op EdeStad ↗';
+    return 'Lees meer op ' + host + ' ↗';
+  } catch { return 'Bekijk ↗'; }
 }
