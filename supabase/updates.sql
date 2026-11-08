@@ -227,3 +227,7 @@ where not exists (select 1 from news where url = 'https://www.strava.com/clubs/1
 alter table events drop constraint if exists events_type_check;
 alter table events add constraint events_type_check check (type in ('training','special','wedstrijd','challenge','samenloop'));
 alter table events add column if not exists details jsonb;
+
+-- ===== 018_strava_historie =====
+-- Plak dit in Supabase → SQL Editor → New query → Run. Veilig om vaker te draaien.
+alter table strava_links add column if not exists history_before bigint; -- tot hoe ver terug al gezocht is (unix-tijd); 1 = klaar
