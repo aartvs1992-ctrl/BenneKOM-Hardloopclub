@@ -141,6 +141,9 @@ export default function Challenge() {
             <Chart attempts={recent} best={best} />
           </>}
           <p className="note">{message(attempts, best)}</p>
+          {S.connected && S.pr?.count > attempts.length && (
+            <p className="small muted">De app heeft {attempts.length} van je {S.pr.count} pogingen gevonden.{S.history === 'bezig' ? ' Je oudere loopjes worden nog doorzocht; druk af en toe op “Nu bijwerken”.' : ''}</p>
+          )}
           </>}
         </section>
       ) : S.loading ? (

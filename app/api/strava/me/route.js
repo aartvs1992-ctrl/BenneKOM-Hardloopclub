@@ -18,6 +18,7 @@ async function payload(device, extra = {}, { quick = false } = {}) {
     connected: Boolean(link),
     firstname: link?.firstname || '',
     lastSync: link?.last_sync || null,
+    history: !link || !('history_before' in link) ? 'uit' : link.history_before === 1 ? 'klaar' : 'bezig',
     efforts: link ? await effortsFor(device) : [],
     ...extra,
   };
