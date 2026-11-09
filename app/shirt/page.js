@@ -41,6 +41,11 @@ export default function Shirt() {
         </div>
       </div>
 
+      <Link className="panel join-card" href="/singlet">
+        <span style={{ minWidth: 0 }}><b>Nieuw: de BenneKOM race singlet</b><br /><span className="small muted">Beperkte oplage van 25 stuks. Claim de jouwe.</span></span>
+        <span className="chev">›</span>
+      </Link>
+
       <div className="panel callout">
         <b>We bestellen alleen in grotere aantallen</b>
         <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling. De prijzen zijn indicatief.</p>
