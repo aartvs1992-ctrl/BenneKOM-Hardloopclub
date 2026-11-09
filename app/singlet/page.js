@@ -5,7 +5,7 @@ import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, People } from '@/components/ui';
 import { SINGLET, euro } from '@/lib/content';
 
-const STATUS = { geclaimd: 'Geclaimd · je krijgt een betaalverzoek', betaald: 'Betaald · je hoort wanneer je hem kunt ophalen', opgehaald: 'Opgehaald · veel plezier ermee!' };
+const STATUS = { geclaimd: 'Geclaimd · je hoort wanneer hij binnen is; betalen doe je pas bij overhandiging', opgehaald: 'Overhandigd · het betaalverzoek komt eraan', betaald: 'Betaald · veel plezier ermee!' };
 
 export default function Singlet() {
   const { data, act } = useApp();
@@ -29,7 +29,7 @@ export default function Singlet() {
     <>
       <ErrorNote />
       <h1>Race singlet</h1>
-      <p>De BenneKOM race singlet: topkwaliteit met gelaserde naden, zoals je ziet bij SOAR, Bandit en On. Licht, strak en gemaakt om hard in te lopen.</p>
+      <p>De BenneKOM race singlet: topkwaliteit met gelaserde naden, zoals je ziet bij topmerken als SOAR, Bandit, On en Nike AeroSwift. Licht, strak en gemaakt om hard in te lopen.</p>
 
       <div className="shirt-product">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -55,8 +55,10 @@ export default function Singlet() {
       </div>
 
       <div className="panel callout">
-        <b>Beperkte oplage: {total} stuks</b>
-        <p>Op is op. Claim je singlet in jouw maat; daarna krijg je een betaalverzoek van {euro(SINGLET.price)}. Eén singlet per lid.</p>
+        <b>Eerste batch: {total} stuks</b>
+        <p>Op is op. Claim je singlet in jouw maat, één per lid. Je betaalt pas als de singlets geleverd zijn en je de jouwe in handen hebt: dan krijg je een betaalverzoek van {euro(SINGLET.price)}.</p>
+        <p className="small"><b>Pasvorm:</b> valt normaal, dus kies je gewone maat.</p>
+        <p className="small muted">Dit is de eerste batch. Is er meer interesse, dan volgen er zeker nieuwe batches.</p>
         <div className="singlet-stock">
           {Object.entries(SINGLET.stock).map(([z, n]) => (
             <div key={z} className={'stock' + (left[z] === 0 ? ' out' : '')}>
@@ -66,7 +68,7 @@ export default function Singlet() {
             </div>
           ))}
         </div>
-        <span className="small muted">{rest === 0 ? 'Alle singlets zijn geclaimd.' : `Nog ${rest} van de ${total} beschikbaar.`}</span>
+        <span className="small muted">{rest === 0 ? 'Deze batch is helemaal geclaimd. Een volgende batch komt eraan.' : `Nog ${rest} van de ${total} beschikbaar.`}</span>
       </div>
 
       {s.ready === false ? (

@@ -340,7 +340,7 @@ function Singlets({ s, call }) {
   if (!s) return null;
   const claims = s.claims || [];
   const per = Object.fromEntries(Object.keys(s.stock).map((z) => [z, claims.filter((r) => r.size === z).length]));
-  const paid = claims.filter((r) => r.status !== 'geclaimd').length;
+  const paid = claims.filter((r) => r.status === 'betaald').length;
   return (
     <section className="section">
       <h2>Race singlets: claims</h2>
@@ -352,7 +352,7 @@ function Singlets({ s, call }) {
         <div key={r.id} className="row" style={{ gridTemplateColumns: '1fr auto auto', cursor: 'default', gap: 8 }}>
           <span><span className="t">{r.name}</span><br /><span className="s">maat {r.size} · {String(r.created_at).slice(0, 10)}</span></span>
           <select className="input" value={r.status} onChange={(e) => call('singletStatus', { id: r.id, status: e.target.value }, 'Bijgewerkt')}>
-            <option value="geclaimd">Geclaimd</option><option value="betaald">Betaald</option><option value="opgehaald">Opgehaald</option>
+            <option value="geclaimd">Geclaimd</option><option value="opgehaald">Overhandigd</option><option value="betaald">Betaald</option>
           </select>
           <DeleteButton onConfirm={() => call('removeSinglet', { id: r.id }, 'Claim verwijderd')} />
         </div>

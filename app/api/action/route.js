@@ -116,7 +116,7 @@ export async function POST(req) {
       case 'unclaimSinglet': {
         const mine = await find('singlet_claims', { batch: SINGLET.batch, device_id: device });
         if (!mine.length) break;
-        if (mine[0].status !== 'geclaimd') return bad('Je singlet is al betaald. Neem contact op met Aart om te annuleren.');
+        if (mine[0].status !== 'geclaimd') return bad('Je singlet is al overhandigd. Neem contact op met Aart.');
         await remove('singlet_claims', { batch: SINGLET.batch, device_id: device });
         break;
       }
