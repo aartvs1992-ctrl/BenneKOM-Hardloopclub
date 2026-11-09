@@ -43,7 +43,7 @@ export default function Welcome() {
       const j = await post({ action: 'sendCode', ...f, login: mode === 'login' });
       if (j.skip) {
         // bevestiging per mail staat nog uit
-        if (mode === 'login') { toast('Inloggen met e-mail kan nog niet. Gebruik je code van je andere toestel.'); setMode('restore'); setBusy(false); return; }
+        if (mode === 'login' && !j.existing) { toast('Dit e-mailadres kennen we nog niet. Meld je aan met je naam.'); setMode('signup'); setBusy(false); return; }
         return await done(await post({ action: 'save', ...f }));
       }
       setToken(j.token); setMailCode(''); setBusy(false);
