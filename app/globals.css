@@ -485,3 +485,16 @@ a.media-item:hover{border-color:var(--gold)}
 .singlet-drop .tag{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
 .singlet-drop .bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:4px}
 .singlet-drop .bar span{display:block;height:100%;background:var(--gold)}
+
+/* promotie evenement op voorpagina */
+.promo{border-color:var(--gold);gap:10px}
+.promo .tag{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink)}
+.promo-title{display:flex;flex-direction:column;text-decoration:none;color:inherit}
+.promo-title b{font-family:var(--f-display);font-size:28px;line-height:1.05;text-transform:uppercase}
+.promo-goal{display:flex;flex-direction:column;gap:6px}
+.promo-goal .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.promo-goal .bar span{display:block;height:100%;background:var(--gold)}
+.promo .stack{display:flex}
+.promo .stack > *{margin-right:-6px;border:2px solid var(--surface,#fff);border-radius:50%}
+.promo-actions{display:flex;gap:8px}
+.promo-actions .btn{flex:1}
