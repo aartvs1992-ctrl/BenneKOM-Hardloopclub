@@ -249,6 +249,17 @@ function Members({ list, call }) {
   return (
     <section className="section">
       <h2>Leden ({list.length})</h2>
+      {(() => {
+        const seen = {}; let dups = 0;
+        for (const m of list) { const k = m.email.toLowerCase(); if (!k) continue; if (seen[k]) dups++; else seen[k] = true; }
+        return dups > 0 && (
+          <div className="panel callout">
+            <b>{dups} dubbele aanmelding{dups === 1 ? '' : 'en'}</b>
+            <p className="small" style={{ margin: 0 }}>Leden met hetzelfde e-mailadres. Samenvoegen houdt het oudste profiel en zet aanmeldingen, shirts en singlet-claims daarop over.</p>
+            <button className="btn btn-gold" onClick={() => call('mergeDuplicates', {}, 'Dubbele leden samengevoegd')}>Samenvoegen</button>
+          </div>
+        );
+      })()}
       <p className="small muted">{list.some((m) => m.last_seen) ? `${week} leden waren de afgelopen week actief.` : 'Laatst actief wordt bijgehouden zodra 017_leden.sql in Supabase is gedraaid.'}</p>
       <input className="input" placeholder="Zoek op naam of e-mail" value={q} onChange={(e) => setQ(e.target.value)} />
       <div className="list">
