@@ -41,18 +41,34 @@ export default function Shirt() {
         </div>
       </div>
 
-      <Link className="panel join-card" href="/singlet">
-        <span style={{ minWidth: 0 }}><b>Nieuw: de BenneKOM race singlet</b><br /><span className="small muted">Beperkte oplage van 25 stuks. Claim de jouwe.</span></span>
-        <span className="chev">›</span>
-      </Link>
-
       <div className="panel callout">
         <b>We bestellen alleen in grotere aantallen</b>
         <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling. De prijzen zijn indicatief.</p>
         {data.shirtCount > 0 && <span className="small muted">Er zijn nu {data.shirtCount} shirts aangevinkt.</span>}
       </div>
 
-      {SHIRTS.map((s) => <ShirtRow key={s.id} s={s} />)}
+      {SHIRTS.filter((s) => s.id !== 'singlet').map((s) => <ShirtRow key={s.id} s={s} />)}
+
+      <h2>Singlet</h2>
+      <p>De clubsinglet van Bioracer, in hetzelfde navy camo met gele boord als het clubshirt. Ideaal voor warme dagen en wedstrijden.</p>
+      <div className="shirt-photos">
+        <figure>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/club/singlet-bioracer.jpg" alt="BenneKOM clubsinglet van Bioracer" style={{ objectFit: 'contain', background: '#fff' }} />
+          <figcaption>Het model</figcaption>
+        </figure>
+        <figure>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/club/singlet-wilco.jpg" alt="Wilco in de BenneKOM clubsinglet" />
+          <figcaption>Wilco in de singlet</figcaption>
+        </figure>
+      </div>
+      {SHIRTS.filter((s) => s.id === 'singlet').map((s) => <ShirtRow key={s.id} s={s} />)}
+
+      <Link className="panel join-card" href="/singlet">
+        <span style={{ minWidth: 0 }}><b>Nog hogere kwaliteit? Kies dan voor de race singlet</b><br /><span className="small muted">Met gelaserde naden en onder de 100 gram. Beperkte oplage van 25 stuks.</span></span>
+        <span className="chev">›</span>
+      </Link>
 
       <p className="note">Wil je weten wanneer de bestelling geplaatst wordt? Zet de <Link href="/meldingen">melding voor de bestelronde</Link> aan.</p>
     </>

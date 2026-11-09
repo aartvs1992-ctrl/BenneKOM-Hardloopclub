@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useApp } from '@/components/AppProvider';
-import { TYPE_LABEL, fmt } from '@/lib/content';
+import { TYPE_LABEL, fmt, SHIRTS } from '@/lib/content';
 import { Avatar } from '@/components/ui';
 
 const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false, url: '' };
@@ -200,15 +200,15 @@ export default function Beheer() {
         {d.shirts?.length ? (
           <>
             <div className="panel small">
-              {['kort', 'lang'].map((it) => {
+              {SHIRTS.map((x) => x.id).map((it) => {
                 const rows = d.shirts.filter((r) => r.item === it);
                 const per = {}; rows.forEach((r) => { per[r.size] = (per[r.size] || 0) + (r.qty || 1); });
                 const tot = rows.reduce((n, r) => n + (r.qty || 1), 0);
-                return <span key={it}><b>{it === 'kort' ? 'Korte mouw' : 'Lange mouw'}: {tot}</b>{tot > 0 && ' · ' + Object.entries(per).map(([s, n]) => `${s} ${n}`).join(', ')}</span>;
+                return <span key={it}><b>{SHIRTS.find((x) => x.id === it)?.name}: {tot}</b>{tot > 0 && ' · ' + Object.entries(per).map(([s, n]) => `${s} ${n}`).join(', ')}</span>;
               })}
             </div>
             <div className="list">{d.shirts.map((r) => (
-              <div key={r.device_id + r.item} className="row" style={{ gridTemplateColumns: '1fr', cursor: 'default' }}><span><span className="t">{r.name || 'onbekend'}</span><br /><span className="s">{r.item === 'kort' ? 'Korte mouw' : 'Lange mouw'} · maat {r.size} · {r.qty || 1}×</span></span></div>
+              <div key={r.device_id + r.item} className="row" style={{ gridTemplateColumns: '1fr', cursor: 'default' }}><span><span className="t">{r.name || 'onbekend'}</span><br /><span className="s">{SHIRTS.find((x) => x.id === r.item)?.name || r.item} · maat {r.size} · {r.qty || 1}×</span></span></div>
             ))}</div>
           </>
         ) : <p className="muted">Nog niemand heeft een shirt aangevinkt.</p>}

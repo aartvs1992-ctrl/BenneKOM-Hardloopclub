@@ -1,7 +1,7 @@
 // Alle acties van leden. Geen account nodig: een apparaat-id + naam, net als op de website.
 import { after } from 'next/server';
 import { all, find, insert, upsert, remove, claimSinglet } from '@/lib/db';
-import { SINGLET } from '@/lib/content';
+import { SINGLET, SHIRTS } from '@/lib/content';
 import { buildState } from '@/lib/state';
 import { withTrainings } from '@/lib/club';
 import { sendPush as pushNow } from '@/lib/push';
@@ -93,7 +93,7 @@ export async function POST(req) {
       }
       case 'shirt': {
         // interesse voor een clubshirt: aanvinken (met maat en aantal) of weer uitvinken
-        const item = ['kort', 'lang'].includes(b.item) ? b.item : null;
+        const item = SHIRTS.some((s) => s.id === b.item) ? b.item : null;
         if (!item) return bad('Kies een shirt.');
         if (b.on === false) { await remove('shirt_interest', { device_id: device, item }); break; }
         const size = ['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(b.size) ? b.size : null;
