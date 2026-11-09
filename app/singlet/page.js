@@ -36,6 +36,24 @@ export default function Singlet() {
         <img src={SINGLET.image} alt="Ontwerp van de BenneKOM race singlet, voor- en achterkant" />
       </div>
 
+      <h2>Waarom deze singlet</h2>
+      <div className="panel singlet-feature">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/club/singlet-naden.jpg" alt="Close-up van een gelaserde boord bij de schouder" />
+        <div style={{ minWidth: 0 }}>
+          <b>Gelaserde naden</b>
+          <p className="small">Geen gestikte zomen bij de hals en armsgaten: de randen zijn met een laser gesneden en verlijmd. Plat, soepel en niets dat schuurt, ook niet na 42 km.</p>
+          <span className="small muted">Voorbeeld van de afwerking</span>
+        </div>
+      </div>
+      <div className="panel singlet-feature">
+        <span className="singlet-weight" aria-hidden="true">&lt;100<small>gram</small></span>
+        <div style={{ minWidth: 0 }}>
+          <b>Je voelt hem niet</b>
+          <p className="small">Onder de 100 gram. Zo licht dat je vergeet dat je hem aanhebt, en hij plakt niet als je zweet.</p>
+        </div>
+      </div>
+
       <div className="panel callout">
         <b>Beperkte oplage: {total} stuks</b>
         <p>Op is op. Claim je singlet in jouw maat; daarna krijg je een betaalverzoek van {euro(SINGLET.price)}. Eén singlet per lid.</p>
