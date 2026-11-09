@@ -56,6 +56,7 @@ export default function Singlet() {
 
       <div className="panel callout">
         <b>Eerste batch: {total} stuks</b>
+        <p className="small" style={{ margin: 0 }}>Verdeeld over de maten: {Object.entries(SINGLET.stock).map(([z, n]) => `${n}× ${z}`).join(', ')}.</p>
         <p>Op is op. Claim je singlet in jouw maat, één per lid. Je betaalt pas als de singlets geleverd zijn en je de jouwe in handen hebt: dan krijg je een betaalverzoek van {euro(SINGLET.price)}.</p>
         <p className="small"><b>Pasvorm:</b> valt normaal, dus kies je gewone maat.</p>
         <p className="small muted">Dit is de eerste batch. Is er meer interesse, dan volgen er zeker nieuwe batches.</p>
