@@ -1,6 +1,7 @@
 // Alle acties van leden. Geen account nodig: een apparaat-id + naam, net als op de website.
 import { after } from 'next/server';
-import { all, find, insert, upsert, remove } from '@/lib/db';
+import { all, find, insert, upsert, remove, claimSinglet } from '@/lib/db';
+import { SINGLET } from '@/lib/content';
 import { buildState } from '@/lib/state';
 import { withTrainings } from '@/lib/club';
 import { sendPush as pushNow } from '@/lib/push';
@@ -102,6 +103,23 @@ export async function POST(req) {
         await upsert('shirt_interest', { device_id: device, item, size, qty, name, updated_at: new Date().toISOString() }, ['device_id', 'item']);
         break;
       }
+      case 'claimSinglet': {
+        // race singlet: beperkte voorraad, één per lid
+        if (!prof) return bad('Meld je eerst aan om een singlet te claimen.');
+        const size = Object.keys(SINGLET.stock).includes(b.size) ? b.size : null;
+        if (!size) return bad('Kies je maat.');
+        const r = await claimSinglet(SINGLET.batch, device, name, size, SINGLET.stock[size]);
+        if (r === 'op') return bad(`Maat ${size} is helaas net op.`);
+        if (r === 'al') return bad('Je hebt al een singlet geclaimd.');
+        break;
+      }
+      case 'unclaimSinglet': {
+        const mine = await find('singlet_claims', { batch: SINGLET.batch, device_id: device });
+        if (!mine.length) break;
+        if (mine[0].status !== 'geclaimd') return bad('Je singlet is al overhandigd. Neem contact op met Aart.');
+        await remove('singlet_claims', { batch: SINGLET.batch, device_id: device });
+        break;
+      }
       case 'planRun': {
         if (!prof) return bad('Meld je eerst aan om een loopje te plannen.');
         const r = b.run || {};
@@ -159,6 +177,7 @@ export async function POST(req) {
     return Response.json(await buildState(device));
   } catch (e) {
     if (/events_type_check|violates check/.test(String(e.message))) return bad('Samen lopen is nog niet ingesteld: draai updates.sql in Supabase.', 500);
+    if (/singlet_claims|claim_singlet/.test(String(e.message))) return bad('Singlets claimen is nog niet ingesteld: draai 019_singlets.sql in Supabase.', 500);
     if (/shirt_interest/.test(String(e.message))) return bad('Shirtbestellingen zijn nog niet ingesteld: draai updates.sql in Supabase.', 500);
     return Response.json({ error: 'Opslaan lukte niet. Probeer het nog eens.' }, { status: 500 });
   }

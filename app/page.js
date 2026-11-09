@@ -7,6 +7,7 @@ import { CLUB, CLUB_PHOTOS } from '@/lib/club';
 import { usePhotos } from '@/lib/usePhotos';
 import InstallBanner from '@/components/InstallBanner';
 import { workoutFor } from '@/lib/workouts';
+import { SINGLET } from '@/lib/content';
 
 export default function Home() {
   const { data, local } = useApp();
@@ -28,6 +29,8 @@ export default function Home() {
       <ErrorNote />
       <InstallBanner />
       {next && <NextTraining e={next} img={heroImg} />}
+
+      <SingletDrop s={data.singlet} />
 
       <section className="section">
         <div className="section-head"><h2>Ook samen lopen</h2><Link className="link" href="/agenda#samenloop">{runs.length ? 'Alles ›' : 'Plan een loopje ›'}</Link></div>
@@ -116,5 +119,28 @@ function NextTraining({ e, img }) {
       </div>
       <span className="slogan">Samen=LEUKER</span>
     </section>
+  );
+}
+
+// Aankondiging race singlet: zichtbaar zolang er voorraad is, of als je er zelf een hebt geclaimd
+function SingletDrop({ s }) {
+  if (!s?.ready) return null;
+  const total = Object.values(SINGLET.stock).reduce((a, b) => a + b, 0);
+  const rest = Object.values(s.left || {}).reduce((a, b) => a + b, 0);
+  if (s.mine?.status === 'betaald' || (!s.mine && rest === 0)) return null;
+  return (
+    <Link className="panel singlet-drop" href="/singlet">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/club/singlet-thumb.jpg" alt="" />
+      <span style={{ minWidth: 0 }}>
+        <span className="tag">{s.mine ? 'Jouw singlet' : 'Nieuw · eerste batch'}</span>
+        <b>BenneKOM race singlet</b>
+        <span className="small muted">{s.mine
+          ? `Geclaimd in maat ${s.mine.size}. Je hoort wanneer hij binnen is.`
+          : `Gelaserde naden, onder de 100 gram. Nog ${rest} van de ${total}: claim de jouwe.`}</span>
+        {!s.mine && <span className="bar"><span style={{ width: `${(rest / total) * 100}%` }} /></span>}
+      </span>
+      <span className="chev">›</span>
+    </Link>
   );
 }

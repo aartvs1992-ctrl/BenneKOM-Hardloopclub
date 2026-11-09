@@ -465,3 +465,23 @@ a.media-item:hover{border-color:var(--gold)}
 .video-box video{max-width:100%;max-height:100%;background:#000}
 
 .login-switch{align-self:stretch;margin-bottom:6px}
+
+/* race singlet */
+.singlet-stock{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.singlet-stock .stock{display:flex;flex-direction:column;gap:4px;padding:10px;border:1px solid var(--line);border-radius:10px}
+.singlet-stock .stock b{font-size:18px}
+.singlet-stock .stock.out{opacity:.5}
+.singlet-stock .bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.singlet-stock .bar span{display:block;height:100%;background:var(--gold)}
+.size:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+.singlet-feature{flex-direction:row;align-items:center;gap:14px}
+.singlet-feature p{margin:4px 0}
+.singlet-feature img{width:96px;height:128px;object-fit:cover;border-radius:10px;flex:none}
+.singlet-weight{width:96px;height:96px;flex:none;border-radius:50%;background:var(--navy);color:var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:24px;line-height:1}
+.singlet-weight small{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-top:4px;color:#fff}
+.singlet-drop{flex-direction:row;align-items:center;gap:14px;border-color:var(--gold);text-decoration:none;color:inherit}
+.singlet-drop img{width:84px;height:84px;border-radius:12px;object-fit:contain;flex:none;background:#fff;padding:4px;box-sizing:border-box}
+.singlet-drop > span{display:flex;flex-direction:column;gap:3px}
+.singlet-drop .tag{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.singlet-drop .bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:4px}
+.singlet-drop .bar span{display:block;height:100%;background:var(--gold)}

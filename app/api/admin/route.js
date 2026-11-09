@@ -1,5 +1,6 @@
 // Beheer: events, nieuws, voorstellen en handmatige pushmeldingen. Beveiligd met ADMIN_PASSWORD.
-import { all, insert, upsert, remove, usingSupabase, deleteFile, putFile, fileUrl } from '@/lib/db';
+import { all, insert, upsert, update, remove, usingSupabase, deleteFile, putFile, fileUrl } from '@/lib/db';
+import { SINGLET } from '@/lib/content';
 import { listPhotos } from '@/lib/photos';
 import { withTrainings } from '@/lib/club';
 import { sendPush, pushReady } from '@/lib/push';
@@ -135,6 +136,15 @@ export async function POST(req) {
         await remove('profiles', { device_id: p.device_id });
         break;
       }
+      case 'singletStatus': {
+        const status = ['geclaimd', 'betaald', 'opgehaald'].includes(b.status) ? b.status : null;
+        if (!status) return Response.json({ error: 'Onbekende status.' }, { status: 400 });
+        await update('singlet_claims', { id: clean(b.id, 64) }, { status });
+        break;
+      }
+      case 'removeSinglet':
+        await remove('singlet_claims', { id: clean(b.id, 64) });
+        break;
       case 'push': {
         if (!clean(b.title)) return Response.json({ error: 'Geef de melding een titel.' }, { status: 400 });
         const r = await sendPush(b.pref || 'events', { title: clean(b.title, 80), body: clean(b.body, 200), url: b.url || '/' });
@@ -153,6 +163,7 @@ export async function POST(req) {
       subscribers: subs.length,
       media: await all('media').catch(() => []),
       shirts: await all('shirt_interest').catch(() => []),
+      singlets: { ...SINGLET, claims: (await all('singlet_claims').catch(() => [])).filter((r) => r.batch === SINGLET.batch).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))) },
       partners: (await all('partners').catch(() => [])).sort((a, b) => (a.sort || 0) - (b.sort || 0)),
       members: (await all('profiles').catch(() => [])).map((p) => ({
         device: p.device_id, name: [p.first_name, p.last_name].filter(Boolean).join(' '), email: p.email || '',

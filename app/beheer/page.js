@@ -193,6 +193,8 @@ export default function Beheer() {
         ))}</div>
       </section>
 
+      <Singlets s={d.singlets} call={call} />
+
       <section className="section">
         <h2>Clubshirts: interesse</h2>
         {d.shirts?.length ? (
@@ -331,5 +333,30 @@ function Details({ ev, setEv, upload }) {
       <div className="field"><label htmlFor="dt-hb">Over deze persoon</label><textarea className="input" rows={3} id="dt-hb" value={host.bio || ''} onChange={(e) => setHost('bio', e.target.value)} /></div>
       <ImagePick id="dt-hp" label="Foto van de gastspreker" value={host.photo} onChange={(v) => setHost('photo', v)} upload={upload} />
     </fieldset>
+  );
+}
+
+function Singlets({ s, call }) {
+  if (!s) return null;
+  const claims = s.claims || [];
+  const per = Object.fromEntries(Object.keys(s.stock).map((z) => [z, claims.filter((r) => r.size === z).length]));
+  const paid = claims.filter((r) => r.status === 'betaald').length;
+  return (
+    <section className="section">
+      <h2>Race singlets: claims</h2>
+      <div className="panel small">
+        <span><b>{claims.length} van {Object.values(s.stock).reduce((a, b) => a + b, 0)} geclaimd</b> · {Object.entries(s.stock).map(([z, n]) => `${z} ${per[z]}/${n}`).join(', ')}</span>
+        <span>{paid} betaald · nog te ontvangen: € {(claims.length - paid) * s.price}</span>
+      </div>
+      {claims.length ? <div className="list">{claims.map((r) => (
+        <div key={r.id} className="row" style={{ gridTemplateColumns: '1fr auto auto', cursor: 'default', gap: 8 }}>
+          <span><span className="t">{r.name}</span><br /><span className="s">maat {r.size} · {String(r.created_at).slice(0, 10)}</span></span>
+          <select className="input" value={r.status} onChange={(e) => call('singletStatus', { id: r.id, status: e.target.value }, 'Bijgewerkt')}>
+            <option value="geclaimd">Geclaimd</option><option value="opgehaald">Overhandigd</option><option value="betaald">Betaald</option>
+          </select>
+          <DeleteButton onConfirm={() => call('removeSinglet', { id: r.id }, 'Claim verwijderd')} />
+        </div>
+      ))}</div> : <p className="muted">Nog niemand heeft een singlet geclaimd.</p>}
+    </section>
   );
 }
