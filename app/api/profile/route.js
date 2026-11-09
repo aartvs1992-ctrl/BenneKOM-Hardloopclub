@@ -59,7 +59,7 @@ export async function POST(req) {
       const existing = (await all('profiles')).find((p) => (p.email || '').toLowerCase() === email);
       const first = clean(b.first_name, 40);
       if (!existing && !first) return bad(b.login ? 'Dit e-mailadres kennen we nog niet. Meld je aan met je naam.' : 'Vul je voornaam in.');
-      if (!mailReady) return Response.json({ skip: true }); // bevestiging staat (nog) uit
+      if (!mailReady) return Response.json({ skip: true, existing: Boolean(existing) }); // bevestiging staat (nog) uit
       const { code, token } = makeCode({ email, first, last: clean(b.last_name, 60), device });
       try { await sendCodeMail(email, code, existing?.first_name || first, new URL(req.url).origin); }
       catch (e) { console.error(e); return bad('De mail kon niet worden verstuurd. Probeer het later nog eens.', 502); }
@@ -91,6 +91,13 @@ export async function POST(req) {
     }
 
     if (b.action !== 'save') return bad('Onbekende actie.');
+    // Zonder mailbevestiging (bijv. een preview): bestaat dit e-mailadres al, dan inloggen op dat profiel
+    // in plaats van een tweede lid aan te maken.
+    if (!current && !mailReady) {
+      const mail = clean(b.email, 120).toLowerCase();
+      const existing = mail && (await all('profiles')).find((p) => (p.email || '').toLowerCase() === mail);
+      if (existing) return Response.json({ device: existing.device_id, ...own(existing) });
+    }
     const first = clean(b.first_name, 40);
     if (!first) return bad('Vul je voornaam in.');
     const email = clean(b.email, 120).toLowerCase();

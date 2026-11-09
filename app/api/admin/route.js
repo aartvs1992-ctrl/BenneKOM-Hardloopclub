@@ -136,6 +136,49 @@ export async function POST(req) {
         await remove('profiles', { device_id: p.device_id });
         break;
       }
+      case 'mergeDuplicates': {
+        // Meerdere profielen met hetzelfde e-mailadres: het oudste houden, de rest samenvoegen en verwijderen
+        const profs = await all('profiles');
+        const byMail = {};
+        for (const p of profs) { const m = (p.email || '').toLowerCase(); if (m) (byMail[m] ||= []).push(p); }
+        const parts = await all('participants').catch(() => []);
+        const shirts = await all('shirt_interest').catch(() => []);
+        const claims = await all('singlet_claims').catch(() => []);
+        let merged = 0;
+        for (const group of Object.values(byMail)) {
+          if (group.length < 2) continue;
+          group.sort((a, b) => String(a.created_at || a.updated_at).localeCompare(String(b.created_at || b.updated_at)));
+          const keep = group[0];
+          for (const dup of group.slice(1)) {
+            for (const r of parts.filter((x) => x.device_id === dup.device_id)) {
+              if (!parts.some((x) => x.device_id === keep.device_id && x.event_id === r.event_id)) {
+                await upsert('participants', { ...r, device_id: keep.device_id }, ['event_id', 'device_id']).catch(() => {});
+                parts.push({ ...r, device_id: keep.device_id });
+              }
+            }
+            for (const r of shirts.filter((x) => x.device_id === dup.device_id)) {
+              if (!shirts.some((x) => x.device_id === keep.device_id && x.item === r.item)) {
+                await upsert('shirt_interest', { ...r, device_id: keep.device_id }, ['device_id', 'item']).catch(() => {});
+                shirts.push({ ...r, device_id: keep.device_id });
+              }
+            }
+            for (const r of claims.filter((x) => x.device_id === dup.device_id)) {
+              if (!claims.some((x) => x.device_id === keep.device_id && x.batch === r.batch)) {
+                await update('singlet_claims', { id: r.id }, { device_id: keep.device_id }).catch(() => {});
+                claims.push({ ...r, device_id: keep.device_id });
+              }
+            }
+            await remove('participants', { device_id: dup.device_id }).catch(() => {});
+            await remove('shirt_interest', { device_id: dup.device_id }).catch(() => {});
+            await remove('singlet_claims', { device_id: dup.device_id }).catch(() => {});
+            if (dup.photo_path && dup.photo_path !== keep.photo_path) await deleteFile(dup.photo_path).catch(() => {});
+            await remove('profiles', { device_id: dup.device_id });
+            merged++;
+          }
+        }
+        b.added = merged;
+        break;
+      }
       case 'singletStatus': {
         const status = ['geclaimd', 'betaald', 'opgehaald'].includes(b.status) ? b.status : null;
         if (!status) return Response.json({ error: 'Onbekende status.' }, { status: 400 });
