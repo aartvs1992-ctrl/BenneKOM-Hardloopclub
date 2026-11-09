@@ -43,7 +43,7 @@ export default function Shirt() {
 
       <div className="panel callout">
         <b>We bestellen alleen in grotere aantallen</b>
-        <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling. De prijzen zijn indicatief.</p>
+        <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling.</p>
         {data.shirtCount > 0 && <span className="small muted">Er zijn nu {data.shirtCount} shirts aangevinkt.</span>}
       </div>
 
@@ -102,7 +102,7 @@ function ShirtRow({ s }) {
           else setOpen(false);
         }} />
         <span style={{ minWidth: 0 }}><b>{s.name}</b><br /><span className="small muted">{s.note}</span></span>
-        <span style={{ textAlign: 'right' }}><span className="num" style={{ fontWeight: 700 }}>± {euro(s.price)}</span><br /><span className="small muted">indicatief</span></span>
+        <span style={{ textAlign: 'right' }}><span className="num" style={{ fontWeight: 700 }}>{euro(s.price)}</span></span>
       </label>
       {(data.shirtPeople?.[s.id] || []).length > 0 && (
         <div className="shirt-people">
