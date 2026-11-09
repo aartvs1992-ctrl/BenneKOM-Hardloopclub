@@ -60,7 +60,7 @@ export default function Shirt() {
           <b>Race singlet</b>
           <span className="small muted">Gelaserde naden en onder de 100 gram. Beperkte oplage van 25 stuks.</span>
           <span className="num price">{euro(55)}</span>
-          <Link className="btn btn-gold" href="/singlet">Claim de jouwe ›</Link>
+          <Link className="btn btn-gold" href="/singlet">Claimen ›</Link>
         </div>
       </div>
       <figure className="singlet-worn">
