@@ -128,7 +128,6 @@ function NextTraining({ e, img }) {
       </div>
       <div className="btn-row">
         <AttendButton e={e} going={going} act={act} local={local} />
-        <a className="btn btn-line" href={CLUB.strava} target="_blank" rel="noopener noreferrer">Strava</a>
       </div>
       <span className="slogan">Samen=LEUKER</span>
     </section>

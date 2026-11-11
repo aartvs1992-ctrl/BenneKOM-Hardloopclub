@@ -499,3 +499,24 @@ a.media-item:hover{border-color:var(--gold)}
 .promo .stack > *{margin-right:-6px;border:2px solid var(--surface,#fff);border-radius:50%}
 .promo-actions{display:flex;gap:8px}
 .promo-actions .btn{flex:1}
+
+/* berichten */
+.top .dm-link{margin-left:auto;position:relative;display:flex;color:var(--on-navy);padding:4px}
+.top .dm-link svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.top .dm-link + .me-link{margin-left:6px}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--gold);color:#071E3E;font-size:11px;font-weight:800}
+.top .dm-link .badge{position:absolute;top:-3px;right:-6px;border:2px solid var(--navy)}
+.dm-row{grid-template-columns:44px 1fr auto!important}
+.dm-row .dm-last{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.dm-row.unread .t,.dm-row.unread .dm-last{font-weight:800;color:var(--ink)}
+.dm-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.dm-pick{display:flex;flex-direction:column;gap:10px}
+.dm{display:flex;flex-direction:column;gap:12px;min-height:calc(100dvh - 200px)}
+.dm-head{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;cursor:pointer;color:inherit;font-size:17px;text-align:left}
+.dm-msgs{flex:1;display:flex;flex-direction:column;gap:6px}
+.bubble{align-self:flex-start;max-width:80%;background:var(--surface);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:8px 12px;display:flex;flex-direction:column;gap:2px;white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble.mine{align-self:flex-end;background:var(--navy);color:var(--on-navy);border-color:var(--navy);border-radius:16px 16px 4px 16px}
+.bubble time{font-size:11px;opacity:.6;align-self:flex-end}
+.dm-form{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:6px 0}
+.dm-form textarea{resize:none;min-height:46px;max-height:140px;field-sizing:content}
+.dm-form .btn{padding:0;width:46px;flex:0 0 46px}

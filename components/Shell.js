@@ -43,6 +43,12 @@ export default function Shell({ children }) {
             <button className="back" aria-label="Terug" onClick={() => (history.length > 1 ? router.back() : router.push('/'))}>‹</button>
           )}
           <Link className="brand" href="/">Benne<b>KOM</b></Link>
+          {me && (
+            <Link className="dm-link" href="/berichten" aria-label={data.unread ? `Berichten, ${data.unread} ongelezen` : 'Berichten'}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z" /></svg>
+              {data.unread > 0 && <span className="badge">{data.unread > 9 ? '9+' : data.unread}</span>}
+            </Link>
+          )}
           <Link className="me-link" href="/profiel" aria-label={me ? 'Mijn profiel' : 'Profiel aanmaken'}>
             {me ? <><span>{me.first}</span><Avatar name={me.name} src={me.avatar} size={32} /></> : <span className="sub" style={{ marginLeft: 0 }}>Profiel aanmaken ›</span>}
           </Link>

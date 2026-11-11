@@ -136,6 +136,7 @@ export function MemberSheet({ p, onClose }) {
         {answers.length
           ? <dl className="qa">{answers.map(([q, a]) => <div key={q}><dt>{q}</dt><dd>{a}</dd></div>)}</dl>
           : <p className="muted" style={{ textAlign: 'center' }}>{p.me ? 'Vul de vragen in bij je profiel, dan leren anderen je kennen.' : 'Nog geen antwoorden ingevuld.'}</p>}
+        {p.dm && <Link className="btn btn-gold" href={'/berichten/' + p.dm}>Stuur {(p.name || '').split(' ')[0]} een bericht</Link>}
         <button className="btn btn-line" onClick={onClose}>Sluiten</button>
       </div>
     </div>
