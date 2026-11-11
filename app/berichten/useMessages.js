@@ -3,9 +3,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 
 // Berichten ophalen (en elke paar seconden verversen zolang de pagina open is)
+// Laatst geladen berichten per gesprek, zodat terugkeren meteen iets toont
+const cache = {};
+
 export function useMessages(withId, every = 0) {
   const { local, refresh, toast } = useApp();
-  const [v, setV] = useState(null);
+  const key = withId || '';
+  const [v, setVRaw] = useState(() => cache[key] || null);
+  const setV = useCallback((x) => { cache[key] = x; setVRaw(x); }, [key]);
   const [err, setErr] = useState('');
   const load = useCallback(async () => {
     if (!local?.device) return;
@@ -15,9 +20,9 @@ export function useMessages(withId, every = 0) {
       if (!r.ok) { setErr(j.error || 'Laden lukte niet.'); return; }
       setErr(''); setV(j);
     } catch { setErr('Geen verbinding.'); }
-  }, [local?.device, withId]);
+  }, [local?.device, withId, setV]);
 
-  useEffect(() => { load().then(() => refresh()); }, [load, refresh]);
+  useEffect(() => { load().then(() => { if (withId) refresh(); }); }, [load, refresh, withId]);
   useEffect(() => {
     if (!every) return;
     const t = setInterval(() => { if (document.visibilityState === 'visible') load(); }, every);
@@ -31,7 +36,7 @@ export function useMessages(withId, every = 0) {
       if (!r.ok) { toast(j.error || 'Dat lukte niet.'); return false; }
       setV(j); refresh(); return true;
     } catch { toast('Geen verbinding. Probeer het zo nog eens.'); return false; }
-  }, [local?.device, withId, toast, refresh]);
+  }, [local?.device, withId, toast, refresh, setV]);
 
   return { v, err, post, load };
 }
