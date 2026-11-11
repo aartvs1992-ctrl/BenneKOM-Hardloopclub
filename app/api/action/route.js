@@ -1,6 +1,6 @@
 // Alle acties van leden. Geen account nodig: een apparaat-id + naam, net als op de website.
 import { after } from 'next/server';
-import { all, find, insert, upsert, remove, claimSinglet } from '@/lib/db';
+import { all, find, insert, update, upsert, remove, claimSinglet } from '@/lib/db';
 import { SINGLET, SHIRTS } from '@/lib/content';
 import { buildState } from '@/lib/state';
 import { withTrainings } from '@/lib/club';
@@ -91,6 +91,21 @@ export async function POST(req) {
         await remove('challenge_results', { id: r.id });
         break;
       }
+      case 'paidReport': {
+        // lid geeft aan dat hij via de betaallink heeft betaald; Aart bevestigt in Beheer
+        const at = b.undo ? null : new Date().toISOString();
+        if (b.what === 'singlet') {
+          const mine = await find('singlet_claims', { batch: SINGLET.batch, device_id: device });
+          if (!mine.length) return bad('Je hebt geen singlet geclaimd.');
+          await update('singlet_claims', { id: mine[0].id }, { paid_reported_at: at });
+        } else {
+          const item = clean(b.item, 20);
+          const mine = await find('shirt_interest', { device_id: device, item });
+          if (!mine.length) return bad('Dit shirt staat niet op jouw lijst.');
+          await update('shirt_interest', { device_id: device, item }, { paid_reported_at: at });
+        }
+        break;
+      }
       case 'shirt': {
         // interesse voor een clubshirt: aanvinken (met maat en aantal) of weer uitvinken
         const item = SHIRTS.some((s) => s.id === b.item) ? b.item : null;
@@ -177,6 +192,7 @@ export async function POST(req) {
     return Response.json(await buildState(device));
   } catch (e) {
     if (/events_type_check|violates check/.test(String(e.message))) return bad('Samen lopen is nog niet ingesteld: draai updates.sql in Supabase.', 500);
+    if (/paid_reported_at|paid/.test(String(e.message)) && /column/.test(String(e.message))) return bad('Betalen is nog niet ingesteld: draai 021_betalen.sql in Supabase.', 500);
     if (/singlet_claims|claim_singlet/.test(String(e.message))) return bad('Singlets claimen is nog niet ingesteld: draai 019_singlets.sql in Supabase.', 500);
     if (/shirt_interest/.test(String(e.message))) return bad('Shirtbestellingen zijn nog niet ingesteld: draai updates.sql in Supabase.', 500);
     return Response.json({ error: 'Opslaan lukte niet. Probeer het nog eens.' }, { status: 500 });

@@ -278,3 +278,8 @@ create index if not exists messages_to_idx on messages (to_device, created_at);
 create index if not exists messages_from_idx on messages (from_device, created_at);
 alter table dm_settings enable row level security;
 alter table messages enable row level security;
+
+-- ===== 021_betalen =====
+alter table singlet_claims add column if not exists paid_reported_at timestamptz;
+alter table shirt_interest add column if not exists paid_reported_at timestamptz;
+alter table shirt_interest add column if not exists paid boolean not null default false;

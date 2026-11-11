@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useApp } from '@/components/AppProvider';
-import { TYPE_LABEL, fmt, SHIRTS } from '@/lib/content';
+import { TYPE_LABEL, fmt, SHIRTS, euro } from '@/lib/content';
 import { Avatar } from '@/components/ui';
 
 const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false, url: '' };
@@ -208,7 +208,10 @@ export default function Beheer() {
               })}
             </div>
             <div className="list">{d.shirts.map((r) => (
-              <div key={r.device_id + r.item} className="row" style={{ gridTemplateColumns: '1fr', cursor: 'default' }}><span><span className="t">{r.name || 'onbekend'}</span><br /><span className="s">{SHIRTS.find((x) => x.id === r.item)?.name || r.item} · maat {r.size} · {r.qty || 1}×</span></span></div>
+              <div key={r.device_id + r.item} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default', gap: 8 }}>
+                <span><span className="t">{r.name || 'onbekend'}</span><br /><span className="s">{SHIRTS.find((x) => x.id === r.item)?.name || r.item} · maat {r.size} · {r.qty || 1}× · {euro((SHIRTS.find((x) => x.id === r.item)?.price || 0) * (r.qty || 1))}{!r.paid && r.paid_reported_at ? ' · meldt: betaald, check bunq' : ''}</span></span>
+                <label className="small" style={{ display: 'flex', gap: 6, alignItems: 'center' }}><input type="checkbox" checked={Boolean(r.paid)} onChange={(e) => call('shirtPaid', { device: r.device_id, item: r.item, paid: e.target.checked }, e.target.checked ? 'Op betaald gezet' : 'Niet betaald')} />Betaald</label>
+              </div>
             ))}</div>
           </>
         ) : <p className="muted">Nog niemand heeft een shirt aangevinkt.</p>}
@@ -361,7 +364,7 @@ function Singlets({ s, call }) {
       </div>
       {claims.length ? <div className="list">{claims.map((r) => (
         <div key={r.id} className="row" style={{ gridTemplateColumns: '1fr auto auto', cursor: 'default', gap: 8 }}>
-          <span><span className="t">{r.name}</span><br /><span className="s">maat {r.size} · {String(r.created_at).slice(0, 10)}</span></span>
+          <span><span className="t">{r.name}</span><br /><span className="s">maat {r.size} · {String(r.created_at).slice(0, 10)}{r.status !== 'betaald' && r.paid_reported_at ? ' · meldt: betaald, check bunq' : ''}</span></span>
           <select className="input" value={r.status} onChange={(e) => call('singletStatus', { id: r.id, status: e.target.value }, 'Bijgewerkt')}>
             <option value="geclaimd">Geclaimd</option><option value="opgehaald">Overhandigd</option><option value="betaald">Betaald</option>
           </select>

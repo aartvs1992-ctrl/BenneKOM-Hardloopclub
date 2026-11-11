@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, People } from '@/components/ui';
 import { SINGLET, euro } from '@/lib/content';
+import PayBox from '@/components/PayBox';
 
-const STATUS = { geclaimd: 'Geclaimd · je hoort wanneer hij binnen is; betalen doe je pas bij overhandiging', opgehaald: 'Overhandigd · het betaalverzoek komt eraan', betaald: 'Betaald · veel plezier ermee!' };
+const STATUS = { geclaimd: 'Geclaimd · je hoort wanneer hij binnen is', opgehaald: 'Overhandigd · veel plezier ermee!', betaald: 'Betaald · veel plezier ermee!' };
 
 export default function Singlet() {
   const { data, act } = useApp();
@@ -57,7 +58,7 @@ export default function Singlet() {
       <div className="panel callout">
         <b>Eerste batch: {total} stuks</b>
         <p className="small" style={{ margin: 0 }}>Verdeeld over de maten: {Object.entries(SINGLET.stock).map(([z, n]) => `${n}× ${z}`).join(', ')}.</p>
-        <p>Op is op. Claim je singlet in jouw maat, één per lid. Je betaalt pas als de singlets geleverd zijn en je de jouwe in handen hebt: dan krijg je een betaalverzoek van {euro(SINGLET.price)}.</p>
+        <p>Op is op. Claim je singlet in jouw maat, één per lid. Betalen ({euro(SINGLET.price)}) doe je hier in de app met iDEAL: meteen na het claimen of als je hem in handen hebt.</p>
         <p className="small"><b>Pasvorm:</b> valt normaal, dus kies je gewone maat.</p>
         <p className="small muted">Dit is de eerste batch. Is er meer interesse, dan volgen er zeker nieuwe batches.</p>
         <div className="singlet-stock">
@@ -78,7 +79,9 @@ export default function Singlet() {
         <div className="panel shirt-row on">
           <b>✓ Jouw singlet: maat {mine.size}</b>
           <span className="small muted">{STATUS[mine.status] || mine.status}</span>
-          {mine.status === 'geclaimd' && (
+          <PayBox amount={SINGLET.price} desc={`Race singlet ${mine.size} ${data.me?.name || ''}`} paid={mine.status === 'betaald'} reported={mine.paidReported}
+            report={{ what: 'singlet' }} note={mine.status === 'geclaimd' ? 'Je mag nu al betalen, of als je hem in handen hebt.' : 'Je singlet is overhandigd. Rond hier je betaling af.'} />
+          {mine.status === 'geclaimd' && !mine.paidReported && (
             <button className="btn" onClick={async () => { if (confirm('Weet je zeker dat je je claim wilt annuleren? Je singlet gaat dan naar een ander.')) await act('unclaimSinglet', {}, 'Claim geannuleerd'); }}>Claim annuleren</button>
           )}
         </div>

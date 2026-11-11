@@ -520,3 +520,8 @@ a.media-item:hover{border-color:var(--gold)}
 .dm-form{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:6px 0}
 .dm-form textarea{resize:none;min-height:46px;max-height:140px;field-sizing:content}
 .dm-form .btn{padding:0;width:46px;flex:0 0 46px}
+
+/* betalen */
+.paybox{display:flex;flex-direction:column;gap:8px;padding-top:4px}
+.paybox .btn{width:100%;text-align:center}
+.link-btn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;align-self:flex-start}

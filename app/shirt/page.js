@@ -3,7 +3,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, People } from '@/components/ui';
-import { SHIRTS, SIZES, euro } from '@/lib/content';
+import { SHIRTS, SIZES, euro, PAY } from '@/lib/content';
+import PayBox from '@/components/PayBox';
 
 export default function Shirt() {
   const { data } = useApp();
@@ -43,7 +44,7 @@ export default function Shirt() {
 
       <div className="panel callout">
         <b>We bestellen alleen in grotere aantallen</b>
-        <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling.</p>
+        <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. {PAY.shirts ? 'De bestelronde loopt: vink je shirt aan met je maat en betaal meteen hier in de app met iDEAL. Betaald = besteld.' : 'Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling.'}</p>
         {data.shirtCount > 0 && <span className="small muted">Er zijn nu {data.shirtCount} shirts aangevinkt.</span>}
       </div>
 
@@ -124,6 +125,10 @@ function ShirtRow({ s }) {
             {mine ? (mine.size === size && mine.qty === qty ? '✓ Aangevinkt' : 'Wijziging opslaan') : 'Ik wil deze'}
           </button>
           {mine && <span className="small muted">Je staat op de lijst: maat {mine.size}, {mine.qty}×.</span>}
+          {mine && PAY.shirts && (
+            <PayBox amount={s.price * mine.qty} desc={`${s.name} ${mine.size} ${mine.qty}x ${data.me?.name || local.name || ''}`} paid={mine.paid} reported={mine.paidReported}
+              report={{ what: 'shirt', item: s.id }} note="De bestelling gaat de deur uit: betaal hier om je shirt vast te leggen." />
+          )}
         </div>
       )}
     </div>

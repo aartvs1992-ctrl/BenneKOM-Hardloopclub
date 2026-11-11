@@ -185,6 +185,9 @@ export async function POST(req) {
         await update('singlet_claims', { id: clean(b.id, 64) }, { status });
         break;
       }
+      case 'shirtPaid':
+        await update('shirt_interest', { device_id: clean(b.device, 64), item: clean(b.item, 20) }, { paid: Boolean(b.paid) });
+        break;
       case 'removeSinglet':
         await remove('singlet_claims', { id: clean(b.id, 64) });
         break;
