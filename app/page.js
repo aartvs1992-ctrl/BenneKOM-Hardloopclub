@@ -30,8 +30,6 @@ export default function Home() {
       <InstallBanner />
       {next && <NextTraining e={next} img={heroImg} />}
 
-      <PromoEvent data={data} />
-
       <SingletDrop s={data.singlet} />
 
       <section className="section">
@@ -102,16 +100,29 @@ function NextTraining({ e, img }) {
   const p = dparts(e.date);
   const going = Boolean(data.mine[e.id]);
   const n = data.counts[e.id] || 0;
+  // Een special die de dinsdagtraining vervangt (bv. de Pasta Run): toon naam en uitleg in de hero
+  const special = e.type !== 'training';
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Amsterdam' });
+  const promo = PROMO && PROMO.event === e.id;
+  const open = promo && today <= PROMO.until;
   return (
     <section className={'hero photo' + (img ? '' : ' has-video')} style={img ? { backgroundImage: `url("${img}")` } : undefined}>
       {!img && (
         <video className="hero-video" src="/media/backyard-montage.mp4" poster="/media/backyard-montage.jpg"
           autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
       )}
-      <span className="eyebrow">{e.kind === 'interval' ? 'Intervaltraining' : e.kind === 'duurloop' ? 'Duurloop' : 'Volgende clubtraining'} · {rel(e.date)}</span>
-      <h1>{p.W} {p.d} {p.m}</h1>
-      <div className="meta"><span className="num">{e.time}</span><span>{e.place}</span></div>
-      {workoutFor(e.date) && <Link className="hero-wo" href={'/event/' + e.id}><span className="num">{workoutFor(e.date).title}</span> ›</Link>}
+      <span className="eyebrow">{special ? 'Vervangt de clubtraining' : e.kind === 'interval' ? 'Intervaltraining' : e.kind === 'duurloop' ? 'Duurloop' : 'Volgende clubtraining'} · {rel(e.date)}</span>
+      <h1>{special ? e.title : `${p.W} ${p.d} ${p.m}`}</h1>
+      <div className="meta">{special && <span>{p.W} {p.d} {p.m}</span>}<span className="num">{e.time}</span><span>{e.place}</span></div>
+      {special && e.description && <p className="small" style={{ margin: 0, opacity: .9 }}>{e.description}</p>}
+      {special && <Link className="hero-wo" href={'/event/' + e.id}>Meer info ›</Link>}
+      {promo && (
+        <div className="promo-goal">
+          <span className="bar"><span style={{ width: `${Math.min(100, (n / PROMO.goal) * 100)}%` }} /></span>
+          <span className="small"><b className="num">{n} van {PROMO.goal}</b> {n >= PROMO.goal ? 'aanmeldingen: hij gaat door 🍝' : open ? `· aanmelden t/m ${PROMO.deadline}, bij ${PROMO.goal} gaat hij door` : 'aanmeldingen'}</span>
+        </div>
+      )}
+      {!special && workoutFor(e.date) && <Link className="hero-wo" href={'/event/' + e.id}><span className="num">{workoutFor(e.date).title}</span> ›</Link>}
       <div className="count">{n > 0 ? <><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></> : <span>Wees de eerste die zich aanmeldt</span>}
         {n > 0 && <span className="stack">{(data.names[e.id] || []).slice(0, 7).map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={30} />)}</span>}
       </div>
@@ -144,38 +155,5 @@ function SingletDrop({ s }) {
       </span>
       <span className="chev">›</span>
     </Link>
-  );
-}
-
-// Promotie van een evenement met een minimum aantal deelnemers (zie PROMO in lib/content.js)
-function PromoEvent({ data }) {
-  const { act } = useApp();
-  if (!PROMO) return null;
-  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Amsterdam' });
-  const e = data.events.find((x) => x.id === PROMO.event);
-  if (!e || today > PROMO.until) return null;
-  const n = data.counts[e.id] || 0;
-  const going = !!data.mine[e.id];
-  const short = Math.max(0, PROMO.goal - n);
-  const d = new Date(e.date + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
-  return (
-    <section className="panel promo">
-      <span className="tag">{short ? `Doe je mee? Aanmelden t/m ${PROMO.deadline}` : 'Hij gaat door!'}</span>
-      <Link href={`/event/${e.id}`} className="promo-title"><b>{e.title}</b><span className="small muted">{d} · {e.time}</span></Link>
-      <p className="small" style={{ margin: 0 }}>{e.description}{e.details?.cost ? ' ' + e.details.cost.split('.')[0] + '.' : ''}</p>
-      <div className="promo-goal">
-        <span className="bar"><span style={{ width: `${Math.min(100, (n / PROMO.goal) * 100)}%` }} /></span>
-        <span className="small"><b>{n} van {PROMO.goal}</b> {short ? `· bij ${PROMO.goal} aanmeldingen gaat hij door` : 'aanmeldingen 🍝'}</span>
-      </div>
-      {(data.names[e.id] || []).length > 0 && <span className="stack">{data.names[e.id].slice(0, 10).map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={28} />)}</span>}
-      {going ? (
-        <span className="small"><b>✓ Jij bent erbij.</b> {short ? `Nog ${short} nodig: neem een clubgenoot mee!` : 'Tot dinsdag!'}</span>
-      ) : (
-        <div className="promo-actions">
-          <button className="btn btn-gold" onClick={() => act('participate', { eventId: e.id, on: true }, 'Gaaf, je bent erbij!')}>Ik ben erbij</button>
-          <Link className="btn btn-line" href={`/event/${e.id}`}>Meer info</Link>
-        </div>
-      )}
-    </section>
   );
 }
