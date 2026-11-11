@@ -22,15 +22,29 @@ export default function Fysio() {
         </div>
       </div>
 
-      {(f.phone || f.email || f.url) ? (
-        <div className="panel">
-          <h3>Contact</h3>
-          {f.practice && <div><span className="plbl">Praktijk</span><p>{f.practice}{f.address && <><br /><span className="small muted">{f.address}</span></>}{f.practicePhone && <><br /><span className="small muted">Praktijk: {f.practicePhone}</span></>}</p></div>}
-          {f.phone && <div><span className="plbl">Telefoon David</span><p className="num" style={{ userSelect: 'all' }}>{f.phone}</p><a className="btn btn-gold btn-sm" href={'tel:' + tel}>Bellen</a></div>}
-          {f.email && <div><span className="plbl">E-mail</span><p style={{ userSelect: 'all' }}>{f.email}</p></div>}
-          {f.url && <a className="link" href={f.url} target="_blank" rel="noopener noreferrer">Website van de praktijk ↗</a>}
-        </div>
-      ) : <p className="note">Contactgegevens volgen.</p>}
+      <div className="panel">
+        <h3>Contact</h3>
+        {f.phone && <div><span className="plbl">Telefoon David</span><p className="num" style={{ userSelect: 'all' }}>{f.phone}</p><a className="btn btn-gold btn-sm" href={'tel:' + tel}>Bellen</a></div>}
+        {f.email && <div><span className="plbl">E-mail</span><p style={{ userSelect: 'all' }}>{f.email}</p></div>}
+      </div>
+
+      {(f.locations || []).length > 0 && (
+        <section className="section">
+          <h2>Hier vind je David</h2>
+          {f.locations.map((l) => (
+            <div className="panel" key={l.name}>
+              <span className="eyebrow">{l.days}</span>
+              <b className="host-name">{l.name}</b>
+              <p className="small muted">
+                {l.address}
+                {l.phone && <><br />Tel. <a href={'tel:' + l.phone.replace(/[^\d+]/g, '')}>{l.phone}</a></>}
+                {l.email && <><br /><a href={'mailto:' + l.email}>{l.email}</a></>}
+              </p>
+              {l.url && <a className="link" href={l.url} target="_blank" rel="noopener noreferrer">Website ↗</a>}
+            </div>
+          ))}
+        </section>
+      )}
 
       {f.action && (
         <figure className="zone-photo">
