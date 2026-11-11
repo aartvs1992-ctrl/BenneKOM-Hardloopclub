@@ -18,8 +18,8 @@ export default function Berichten() {
       <h1>Berichten</h1>
       <div className="panel setrow" style={{ flexDirection: 'row' }}>
         <span><b>Berichten ontvangen</b><br /><span className="small muted">{v.open
-          ? 'Clubgenoten die dit ook aan hebben staan, kunnen je een bericht sturen.'
-          : 'Staat uit. Zet je dit aan, dan kun je clubgenoten berichten en zij jou. Alleen leden die het zelf aanzetten doen mee.'}</span></span>
+          ? 'Clubgenoten kunnen je een bericht sturen. Liever niet? Zet het hier uit.'
+          : 'Staat uit: niemand kan je een bericht sturen. Zet het aan om clubgenoten te berichten en berichten te ontvangen.'}</span></span>
         <Switch id="dm-open" checked={v.open} onChange={(on) => post({ action: 'open', on })} label="Berichten ontvangen" />
       </div>
 

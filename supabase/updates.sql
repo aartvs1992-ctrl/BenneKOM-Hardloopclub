@@ -263,7 +263,7 @@ revoke execute on function claim_singlet(text, text, text, text, int) from publi
 -- ===== 020_berichten =====
 create table if not exists dm_settings (
   device_id text primary key,
-  open boolean not null default false,
+  open boolean not null default true,
   updated_at timestamptz default now()
 );
 create table if not exists messages (

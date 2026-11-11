@@ -2,7 +2,7 @@
 -- Plak dit in Supabase → SQL Editor → New query → Run. Veilig om vaker te draaien.
 create table if not exists dm_settings (
   device_id text primary key,
-  open boolean not null default false,   -- staat standaard uit: een lid kiest zelf of hij berichten wil ontvangen
+  open boolean not null default true,    -- staat standaard aan; open = false betekent: lid heeft het zelf uitgezet
   updated_at timestamptz default now()
 );
 
