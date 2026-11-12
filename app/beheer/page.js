@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { TYPE_LABEL, fmt, SHIRTS, euro } from '@/lib/content';
 import { Avatar } from '@/components/ui';
+import { DEFAULT_DETAILS } from '@/lib/seed';
 
 const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false, url: '' };
 
@@ -195,6 +196,8 @@ export default function Beheer() {
 
       <Singlets s={d.singlets} call={call} />
 
+      <Meals d={d} call={call} />
+
       <section className="section">
         <h2>Clubshirts: interesse</h2>
         {d.shirts?.length ? (
@@ -373,4 +376,34 @@ function Singlets({ s, call }) {
       ))}</div> : <p className="muted">Nog niemand heeft een singlet geclaimd.</p>}
     </section>
   );
+}
+
+// Etentjes (bv. Pasta Run): wie wat eet, waar we rekening mee moeten houden en wie betaald heeft
+function Meals({ d, call }) {
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Amsterdam' });
+  const evs = d.events.filter((e) => (e.details?.meals || DEFAULT_DETAILS[e.id]?.meals) && e.date >= today);
+  if (!evs.length) return null;
+  return evs.map((e) => {
+    const meals = e.details?.meals || DEFAULT_DETAILS[e.id].meals;
+    const price = e.details?.price || DEFAULT_DETAILS[e.id]?.price || 0;
+    const rows = d.participants.filter((p) => p.event_id === e.id).sort((a, b) => a.name.localeCompare(b.name));
+    const paid = rows.filter((r) => r.paid).length;
+    const diets = rows.filter((r) => r.diet);
+    return (
+      <section className="section" key={e.id}>
+        <h2>{e.title}: keuzes en betalingen</h2>
+        <div className="panel small">
+          <span><b>{rows.length} ingeschreven</b> · {meals.map((m) => `${rows.filter((r) => r.meal === m).length}× ${m}`).join(' · ')}{rows.some((r) => !r.meal) ? ` · ${rows.filter((r) => !r.meal).length}× nog geen keuze` : ''}</span>
+          <span>{paid} betaald · nog te ontvangen: {euro((rows.length - paid) * price)}</span>
+          {diets.length > 0 && <span><b>Voor de keuken:</b> {diets.map((r) => `${r.name} (${r.meal || '?'}): ${r.diet}`).join(' · ')}</span>}
+        </div>
+        <div className="list">{rows.map((r) => (
+          <div key={r.device_id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default', gap: 8 }}>
+            <span><span className="t">{r.name}</span><br /><span className="s">{r.meal || 'nog geen keuze'}{r.diet ? ' · ' + r.diet : ''}{!r.paid && r.paid_reported_at ? ' · meldt: betaald, check bunq' : ''}</span></span>
+            <label className="small" style={{ display: 'flex', gap: 6, alignItems: 'center' }}><input type="checkbox" checked={Boolean(r.paid)} onChange={(ev) => call('participantPaid', { eventId: e.id, device: r.device_id, paid: ev.target.checked }, ev.target.checked ? 'Op betaald gezet' : 'Niet betaald')} />Betaald</label>
+          </div>
+        ))}</div>
+      </section>
+    );
+  });
 }

@@ -525,3 +525,9 @@ a.media-item:hover{border-color:var(--gold)}
 .paybox{display:flex;flex-direction:column;gap:8px;padding-top:4px}
 .paybox .btn{width:100%;text-align:center}
 .link-btn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;align-self:flex-start}
+
+/* gerecht kiezen bij een etentje (Pasta Run) */
+.meal-pick{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.meal-opt{flex:1 1 120px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border:1.5px solid var(--line, rgba(0,0,0,.15));border-radius:12px;font-weight:600;cursor:pointer}
+.meal-opt input{accent-color:var(--gold, #c9a227)}
+.meal-opt.on{border-color:var(--gold, #c9a227);background:rgba(201,162,39,.10)}

@@ -9,6 +9,8 @@ import { CHALLENGE_EASY } from '@/lib/challenge';
 import { Gallery } from '@/components/Gallery';
 import { Workout } from '@/components/Workout';
 import { workoutFor } from '@/lib/workouts';
+import PayBox from '@/components/PayBox';
+import { euro } from '@/lib/content';
 
 const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
 
@@ -136,7 +138,7 @@ export default function EventPage() {
       {(isTraining || isRun) && <Attend e={e} />}
       {e.type === 'wedstrijd' && <RaceAttend e={e} />}
       {isRun && e.own && <CancelRun e={e} />}
-      {e.registration && <Register e={e} />}
+      {e.registration && (dt.meals ? <MealRegister e={e} /> : <Register e={e} />)}
       {e.carpool && <Carpool e={e} />}
     </>
   );
@@ -216,6 +218,82 @@ function Register({ e }) {
         </form>
       )}
       <p className="note">{data.me ? 'Je naam en profielfoto zijn zichtbaar voor andere leden.' : <>Geen profiel nodig. Met een <Link href="/profiel">profiel</Link> zien anderen ook je foto.</>}</p>
+    </div>
+  );
+}
+
+// Inschrijven voor een etentje (bv. de Pasta Run): gerecht kiezen, allergieën doorgeven en betalen.
+function MealRegister({ e }) {
+  const { data, local, updateLocal, act } = useApp();
+  const dt = e.details || {};
+  const reg = data.reg?.[e.id];
+  const mine = Boolean(data.mine[e.id]);
+  const n = data.counts[e.id] || 0;
+  const full = e.capacity && n >= e.capacity && !mine;
+  const [name, setName] = useState(local.name);
+  const [meal, setMeal] = useState(reg?.meal || '');
+  const [diet, setDiet] = useState(reg?.diet || '');
+  const [edit, setEdit] = useState(false);
+  const who = data.me?.name || local.name || name;
+  const showForm = !mine || !reg?.meal || edit;
+
+  async function save(ev) {
+    ev.preventDefault();
+    if (!meal) return;
+    const nm = (data.me?.name || name || '').trim();
+    if (!nm) return;
+    if (!local.name && !data.me) updateLocal({ name: nm });
+    const ok = await act('participate', { eventId: e.id, on: true, name: nm, meal, diet: diet.trim() }, mine ? 'Je keuze is aangepast' : 'Ingeschreven! Rond nu de betaling af.');
+    if (ok) setEdit(false);
+  }
+
+  return (
+    <div className="panel">
+      <div className="section-head"><h3>Inschrijven</h3><span className="num small muted">{n}{e.capacity ? ' / ' + e.capacity : ''} ingeschreven</span></div>
+      <People list={data.names[e.id]} />
+      {full ? <p>Dit evenement zit vol.</p> : showForm ? (
+        <form className="section" onSubmit={save}>
+          {mine && !reg?.meal && <p className="small"><b>Je staat op de lijst.</b> Geef nog even door welke pasta je wilt en of we ergens rekening mee moeten houden.</p>}
+          {!data.me && !mine && (
+            <div className="field"><label htmlFor="reg-name">Jouw naam</label><input className="input" id="reg-name" value={name} onChange={(ev) => setName(ev.target.value)} placeholder="Voornaam en achternaam" autoComplete="name" required /></div>
+          )}
+          <div className="field">
+            <span className="lbl-like"><b>Jouw pasta</b></span>
+            <div className="meal-pick">
+              {dt.meals.map((m) => (
+                <label key={m} className={'meal-opt' + (meal === m ? ' on' : '')}>
+                  <input type="radio" name="meal" value={m} checked={meal === m} onChange={() => setMeal(m)} required />{m}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="field">
+            <label htmlFor="reg-diet">Allergieën of iets waar we rekening mee moeten houden?</label>
+            <textarea className="input" id="reg-diet" rows={2} maxLength={300} value={diet} onChange={(ev) => setDiet(ev.target.value)} placeholder="Bijvoorbeeld: notenallergie, glutenvrij, geen lactose. Leeg laten als er niets is." />
+          </div>
+          <div className="btn-row">
+            <button className="btn btn-gold" type="submit" disabled={!meal}>{mine ? 'Keuze opslaan' : data.me ? `Inschrijven als ${data.me.first}` : 'Inschrijven'}</button>
+            {edit && <button className="btn btn-line" type="button" onClick={() => { setEdit(false); setMeal(reg?.meal || ''); setDiet(reg?.diet || ''); }}>Annuleren</button>}
+          </div>
+        </form>
+      ) : (
+        <div className="section" style={{ gap: 6 }}>
+          <span><b>Jouw pasta:</b> {reg.meal}</span>
+          <span className="small">{reg.diet ? <><b>Rekening mee houden:</b> {reg.diet}</> : <span className="muted">Geen allergieën doorgegeven</span>}</span>
+          <button className="link-btn small" onClick={() => setEdit(true)}>Keuze of allergieën wijzigen</button>
+        </div>
+      )}
+      {mine && reg?.meal && dt.price > 0 && (
+        <PayBox amount={dt.price} desc={`${e.title} ${who}`} paid={reg.paid} reported={reg.paidReported}
+          report={{ what: 'event', eventId: e.id }} note={`Betaal ${euro(dt.price)} via de link, dan staat je plek vast.`} />
+      )}
+      {mine && (
+        <button className="link-btn small" onClick={() => {
+          if ((reg?.paid || reg?.paidReported) && !confirm('Je hebt al betaald. Toch uitschrijven? Laat het Aart even weten voor je geld.')) return;
+          act('participate', { eventId: e.id, on: false }, 'Uitgeschreven');
+        }}>Uitschrijven</button>
+      )}
+      <p className="note">Je naam en profielfoto zijn zichtbaar voor andere leden. Je pastakeuze en allergieën ziet alleen de organisatie.</p>
     </div>
   );
 }

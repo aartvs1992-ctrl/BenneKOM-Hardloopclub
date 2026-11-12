@@ -3,6 +3,7 @@ import { after } from 'next/server';
 import { all, find, insert, update, upsert, remove, claimSinglet } from '@/lib/db';
 import { SINGLET, SHIRTS } from '@/lib/content';
 import { buildState } from '@/lib/state';
+import { DEFAULT_DETAILS } from '@/lib/seed';
 import { withTrainings } from '@/lib/club';
 import { sendPush as pushNow } from '@/lib/push';
 
@@ -36,7 +37,15 @@ export async function POST(req) {
           const here = await find('participants', { event_id: ev.id });
           if (ev.capacity && here.filter((p) => p.device_id !== device).length >= ev.capacity) return bad('Dit evenement zit vol.');
           const already = here.some((p) => p.device_id === device);
-          await upsert('participants', { event_id: ev.id, device_id: device, name }, ['event_id', 'device_id']);
+          const row = { event_id: ev.id, device_id: device, name };
+          // etentje (bv. Pasta Run): gerecht en allergieën meesturen; zonder keuze (snelle aanmelding) vult het lid die later in
+          const meals = ev.details?.meals || DEFAULT_DETAILS[ev.id]?.meals;
+          if (meals && b.meal !== undefined) {
+            if (!meals.includes(b.meal)) return bad('Kies je pasta.');
+            row.meal = b.meal;
+            row.diet = clean(b.diet, 300);
+          }
+          await upsert('participants', row, ['event_id', 'device_id']);
           // Melding aan de clubgenoten, niet bij gewone trainingen (dat zou te veel meldingen geven)
           if (!already && ev.type === 'samenloop' && ev.details?.by && ev.details.by !== device) {
             sendPush('signups', { title: `${name.split(' ')[0]} loopt mee`, body: `${ev.title}, ${ev.date.split('-').reverse().join('-')} om ${ev.time}`, url: '/event/' + ev.id }, null, ev.details.by);
@@ -94,7 +103,11 @@ export async function POST(req) {
       case 'paidReport': {
         // lid geeft aan dat hij via de betaallink heeft betaald; Aart bevestigt in Beheer
         const at = b.undo ? null : new Date().toISOString();
-        if (b.what === 'singlet') {
+        if (b.what === 'event') {
+          const mine = await find('participants', { event_id: clean(b.eventId), device_id: device });
+          if (!mine.length) return bad('Je bent niet ingeschreven.');
+          await update('participants', { event_id: clean(b.eventId), device_id: device }, { paid_reported_at: at });
+        } else if (b.what === 'singlet') {
           const mine = await find('singlet_claims', { batch: SINGLET.batch, device_id: device });
           if (!mine.length) return bad('Je hebt geen singlet geclaimd.');
           await update('singlet_claims', { id: mine[0].id }, { paid_reported_at: at });
@@ -192,6 +205,7 @@ export async function POST(req) {
     return Response.json(await buildState(device));
   } catch (e) {
     if (/events_type_check|violates check/.test(String(e.message))) return bad('Samen lopen is nog niet ingesteld: draai updates.sql in Supabase.', 500);
+    if (/(meal|diet|paid)/.test(String(e.message)) && /participants/.test(String(e.message))) return bad('Pastakeuze en betalen zijn nog niet ingesteld: draai 022_pasta_keuze.sql in Supabase.', 500);
     if (/paid_reported_at|paid/.test(String(e.message)) && /column/.test(String(e.message))) return bad('Betalen is nog niet ingesteld: draai 021_betalen.sql in Supabase.', 500);
     if (/singlet_claims|claim_singlet/.test(String(e.message))) return bad('Singlets claimen is nog niet ingesteld: draai 019_singlets.sql in Supabase.', 500);
     if (/shirt_interest/.test(String(e.message))) return bad('Shirtbestellingen zijn nog niet ingesteld: draai updates.sql in Supabase.', 500);

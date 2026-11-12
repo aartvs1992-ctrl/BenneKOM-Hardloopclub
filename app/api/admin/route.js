@@ -185,6 +185,9 @@ export async function POST(req) {
         await update('singlet_claims', { id: clean(b.id, 64) }, { status });
         break;
       }
+      case 'participantPaid':
+        await update('participants', { event_id: clean(b.eventId, 80), device_id: clean(b.device, 80) }, { paid: Boolean(b.paid) });
+        break;
       case 'shirtPaid':
         await update('shirt_interest', { device_id: clean(b.device, 64), item: clean(b.item, 20) }, { paid: Boolean(b.paid) });
         break;

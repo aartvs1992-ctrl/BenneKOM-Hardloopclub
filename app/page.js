@@ -115,7 +115,11 @@ function NextTraining({ e, img }) {
       <h1>{special ? e.title : `${p.W} ${p.d} ${p.m}`}</h1>
       <div className="meta">{special && <span>{p.W} {p.d} {p.m}</span>}<span className="num">{e.time}</span><span>{e.place}</span></div>
       {special && e.description && <p className="small" style={{ margin: 0, opacity: .9 }}>{e.description}</p>}
-      {special && <Link className="hero-wo" href={'/event/' + e.id}>Meer info ›</Link>}
+      {special && (going && e.details?.meals && !data.reg?.[e.id]?.meal
+        ? <Link className="hero-wo" href={'/event/' + e.id}><b>Kies je pasta en betaal ›</b></Link>
+        : going && e.details?.price && !data.reg?.[e.id]?.paid && !data.reg?.[e.id]?.paidReported
+          ? <Link className="hero-wo" href={'/event/' + e.id}><b>Nog betalen ›</b></Link>
+          : <Link className="hero-wo" href={'/event/' + e.id}>Meer info ›</Link>)}
       {promo && (
         <div className="promo-goal">
           <span className="bar"><span style={{ width: `${Math.min(100, (n / PROMO.goal) * 100)}%` }} /></span>
