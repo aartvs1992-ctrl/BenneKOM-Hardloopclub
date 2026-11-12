@@ -9,7 +9,7 @@ import { sendPush as pushNow } from '@/lib/push';
 // Meldingen pas versturen nadat het antwoord terug is, zodat de knop meteen reageert
 const sendPush = (...args) => { after(() => pushNow(...args).catch(() => {})); };
 import { profileMap } from '@/lib/profiles';
-import { mealOptions, saveParticipant, clearMeal } from '@/lib/meals';
+import { mealOptions, saveParticipant, clearMeal, eventPrice } from '@/lib/meals';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,7 +100,12 @@ export async function POST(req) {
       case 'paidReport': {
         // lid geeft aan dat hij via de betaallink heeft betaald; Aart bevestigt in Beheer
         const at = b.undo ? null : new Date().toISOString();
-        if (b.what === 'singlet') {
+        if (b.what === 'event') {
+          const evId = clean(b.eventId, 80);
+          const mine = await find('participants', { event_id: evId, device_id: device });
+          if (!mine.length) return bad('Je staat niet ingeschreven voor dit evenement.');
+          await update('participants', { event_id: evId, device_id: device }, { paid_reported_at: at });
+        } else if (b.what === 'singlet') {
           const mine = await find('singlet_claims', { batch: SINGLET.batch, device_id: device });
           if (!mine.length) return bad('Je hebt geen singlet geclaimd.');
           await update('singlet_claims', { id: mine[0].id }, { paid_reported_at: at });
@@ -198,7 +203,7 @@ export async function POST(req) {
     return Response.json(await buildState(device));
   } catch (e) {
     if (/events_type_check|violates check/.test(String(e.message))) return bad('Samen lopen is nog niet ingesteld: draai updates.sql in Supabase.', 500);
-    if (/paid_reported_at|paid/.test(String(e.message)) && /column/.test(String(e.message))) return bad('Betalen is nog niet ingesteld: draai 021_betalen.sql in Supabase.', 500);
+    if (/paid_reported_at|paid/.test(String(e.message)) && /column/.test(String(e.message))) return bad(`Betalen is nog niet ingesteld: draai ${b.what === 'event' ? '023_betalen_events.sql' : '021_betalen.sql'} in Supabase.`, 500);
     if (/singlet_claims|claim_singlet/.test(String(e.message))) return bad('Singlets claimen is nog niet ingesteld: draai 019_singlets.sql in Supabase.', 500);
     if (/shirt_interest/.test(String(e.message))) return bad('Shirtbestellingen zijn nog niet ingesteld: draai updates.sql in Supabase.', 500);
     return Response.json({ error: 'Opslaan lukte niet. Probeer het nog eens.' }, { status: 500 });

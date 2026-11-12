@@ -7,6 +7,7 @@ import { Loading, ErrorNote, useReady, AttendButton, People, Avatar } from '@/co
 import { dparts, rel, daysTo, TYPE_LABEL } from '@/lib/content';
 import { CHALLENGE_EASY } from '@/lib/challenge';
 import { Gallery } from '@/components/Gallery';
+import PayBox from '@/components/PayBox';
 import { Workout } from '@/components/Workout';
 import { workoutFor } from '@/lib/workouts';
 
@@ -193,6 +194,8 @@ function Register({ e }) {
   const mine = data.mine[e.id];
   const my = data.myMeal?.[e.id];
   const opts = e.details?.meals || [];
+  const price = Number(e.details?.price || 0);
+  const pay = data.myPay?.[e.id];
   const [meal, setMeal] = useState(my?.meal || '');
   const [note, setNote] = useState(my?.note || '');
   const [editing, setEditing] = useState(false);
@@ -237,6 +240,13 @@ function Register({ e }) {
             <div className="setrow">
               <span>Jouw keuze: <b>{my.meal}</b>{my.note ? <span className="muted"> · {my.note}</span> : null}</span>
               <button className="btn btn-line btn-sm" onClick={() => { setMeal(my.meal); setNote(my.note); setEditing(true); }}>Wijzigen</button>
+            </div>
+          )}
+          {price > 0 && (
+            <div className="section" style={{ gap: 6 }}>
+              <span className="plbl">Betalen</span>
+              <PayBox amount={price} desc={`${e.title} ${mine}`} paid={pay?.paid} reported={pay?.reported}
+                report={{ what: 'event', eventId: e.id }} note="Betaal vooraf via iDEAL, dan is het meteen geregeld." />
             </div>
           )}
           <button className="btn btn-line" onClick={() => act('participate', { eventId: e.id, on: false }, 'Uitgeschreven')}>Uitschrijven</button>

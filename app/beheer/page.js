@@ -89,26 +89,28 @@ export default function Beheer() {
 
       {(d.meals || []).filter((m) => m.date >= new Date(Date.now() - 864e5).toISOString().slice(0, 10)).map((m) => (
         <section className="section" key={'meal-' + m.id}>
-          <h2>Pastakeuzes · {m.title}</h2>
+          <h2>{m.options.length ? 'Pastakeuzes' : 'Inschrijvingen'} · {m.title}</h2>
           <div className="panel">
             <p className="small"><b>{m.people.length} ingeschreven</b>{' · '}
               {[...m.options, ''].map((o) => {
                 const k = m.people.filter((p) => p.meal === o).length;
                 return k ? `${k}× ${o || 'nog geen keuze'}` : null;
               }).filter(Boolean).join(' · ')}</p>
+            {m.price > 0 && <p className="small"><b>Betaald: {m.people.filter((p) => p.paid).length} van {m.people.length}</b>
+              {m.people.some((p) => p.reported && !p.paid) ? ` · ${m.people.filter((p) => p.reported && !p.paid).length} gemeld, nog checken` : ''}</p>}
             {m.options.map((o) => {
               const ps = m.people.filter((p) => p.meal === o);
               return ps.length ? (
                 <div key={o} className="section" style={{ gap: 4 }}>
                   <b className="small">{o} ({ps.length})</b>
-                  {ps.map((p) => <div key={p.name} className="small">{p.name}{p.note ? <span className="muted"> · {p.note}</span> : null}</div>)}
+                  {ps.map((p) => <PersonRow key={p.device} m={m} p={p} call={call} />)}
                 </div>
               ) : null;
             })}
             {m.people.some((p) => !p.meal) && (
               <div className="section" style={{ gap: 4 }}>
                 <b className="small">Nog geen keuze ({m.people.filter((p) => !p.meal).length})</b>
-                <div className="small muted">{m.people.filter((p) => !p.meal).map((p) => p.name).join(', ')}</div>
+                {m.people.filter((p) => !p.meal).map((p) => <PersonRow key={p.device} m={m} p={p} call={call} />)}
               </div>
             )}
             <button type="button" className="btn btn-line btn-sm" onClick={() => {
@@ -408,5 +410,20 @@ function Singlets({ s, call }) {
         </div>
       ))}</div> : <p className="muted">Nog niemand heeft een singlet geclaimd.</p>}
     </section>
+  );
+}
+
+// Eén deelnemer in het Pasta Run-overzicht: naam, opmerking en (als er betaald wordt) betaald-vinkje
+function PersonRow({ m, p, call }) {
+  return (
+    <div className="setrow small">
+      <span>{p.name}{p.note ? <span className="muted"> · {p.note}</span> : null}
+        {m.price > 0 && !p.paid && p.reported ? <span style={{ color: 'var(--gold-ink, #8a6d00)' }}> · meldt betaald</span> : null}</span>
+      {m.price > 0 && (
+        <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <input type="checkbox" checked={p.paid} onChange={(e) => call('eventPaid', { eventId: m.id, device: p.device, paid: e.target.checked }, e.target.checked ? 'Op betaald gezet' : 'Niet betaald')} />Betaald
+        </label>
+      )}
+    </div>
   );
 }

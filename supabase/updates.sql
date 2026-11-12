@@ -287,3 +287,7 @@ alter table shirt_interest add column if not exists paid boolean not null defaul
 -- ===== 022_maaltijdkeuze =====
 alter table participants add column if not exists meal text;
 alter table participants add column if not exists meal_note text;
+
+-- ===== 023_betalen_events =====
+alter table participants add column if not exists paid_reported_at timestamptz;
+alter table participants add column if not exists paid boolean not null default false;

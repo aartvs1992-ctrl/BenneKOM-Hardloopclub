@@ -2,7 +2,7 @@
 import { all, insert, upsert, update, remove, usingSupabase, deleteFile, putFile, fileUrl } from '@/lib/db';
 import { SINGLET } from '@/lib/content';
 import { listPhotos } from '@/lib/photos';
-import { mealOptions, mealOf } from '@/lib/meals';
+import { mealOptions, mealOf, eventPrice } from '@/lib/meals';
 import { withTrainings } from '@/lib/club';
 import { sendPush, pushReady } from '@/lib/push';
 
@@ -186,6 +186,9 @@ export async function POST(req) {
         await update('singlet_claims', { id: clean(b.id, 64) }, { status });
         break;
       }
+      case 'eventPaid':
+        await update('participants', { event_id: clean(b.eventId, 80), device_id: clean(b.device, 80) }, { paid: Boolean(b.paid) });
+        break;
       case 'shirtPaid':
         await update('shirt_interest', { device_id: clean(b.device, 64), item: clean(b.item, 20) }, { paid: Boolean(b.paid) });
         break;
@@ -208,10 +211,10 @@ export async function POST(req) {
       news: news.sort((a, b) => String(b.published_at).localeCompare(String(a.published_at))),
       suggestions, participants, results, photos,
       // maaltijdkeuzes per event (bv. Pasta Run), om door te geven aan het restaurant
-      meals: events.filter((e) => mealOptions(e).length).map((e) => ({
-        id: e.id, title: e.title, date: e.date, options: mealOptions(e),
+      meals: events.filter((e) => mealOptions(e).length || eventPrice(e)).map((e) => ({
+        id: e.id, title: e.title, date: e.date, options: mealOptions(e), price: eventPrice(e),
         people: participants.filter((p) => p.event_id === e.id)
-          .map((p) => ({ name: p.name, ...(mealOf(p, e) || { meal: '', note: '' }) }))
+          .map((p) => ({ name: p.name, device: p.device_id, paid: Boolean(p.paid), reported: Boolean(p.paid_reported_at), ...(mealOf(p, e) || { meal: '', note: '' }) }))
           .sort((a, b) => a.name.localeCompare(b.name)),
       })),
       subscribers: subs.length,
