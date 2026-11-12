@@ -87,6 +87,42 @@ export default function Beheer() {
         </div>
       </section>
 
+      {(d.meals || []).filter((m) => m.date >= new Date(Date.now() - 864e5).toISOString().slice(0, 10)).map((m) => (
+        <section className="section" key={'meal-' + m.id}>
+          <h2>Pastakeuzes · {m.title}</h2>
+          <div className="panel">
+            <p className="small"><b>{m.people.length} ingeschreven</b>{' · '}
+              {[...m.options, ''].map((o) => {
+                const k = m.people.filter((p) => p.meal === o).length;
+                return k ? `${k}× ${o || 'nog geen keuze'}` : null;
+              }).filter(Boolean).join(' · ')}</p>
+            {m.options.map((o) => {
+              const ps = m.people.filter((p) => p.meal === o);
+              return ps.length ? (
+                <div key={o} className="section" style={{ gap: 4 }}>
+                  <b className="small">{o} ({ps.length})</b>
+                  {ps.map((p) => <div key={p.name} className="small">{p.name}{p.note ? <span className="muted"> · {p.note}</span> : null}</div>)}
+                </div>
+              ) : null;
+            })}
+            {m.people.some((p) => !p.meal) && (
+              <div className="section" style={{ gap: 4 }}>
+                <b className="small">Nog geen keuze ({m.people.filter((p) => !p.meal).length})</b>
+                <div className="small muted">{m.people.filter((p) => !p.meal).map((p) => p.name).join(', ')}</div>
+              </div>
+            )}
+            <button type="button" className="btn btn-line btn-sm" onClick={() => {
+              const txt = m.title + '\n' + m.options.map((o) => {
+                const ps = m.people.filter((p) => p.meal === o);
+                return `${o} (${ps.length})` + ps.filter((p) => p.note).map((p) => `\n- ${p.name}: ${p.note}`).join('');
+              }).join('\n');
+              navigator.clipboard?.writeText(txt);
+              toast('Gekopieerd, plak het in WhatsApp of een mail');
+            }}>Kopieer voor Zicht</button>
+          </div>
+        </section>
+      ))}
+
       <section className="section">
         <h2>Aanmeldingen toevoegen</h2>
         <p className="small muted">Neem namen over van bijvoorbeeld een Strava-event. Eén naam per regel. Dubbele namen worden overgeslagen.</p>

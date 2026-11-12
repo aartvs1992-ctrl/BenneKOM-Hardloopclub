@@ -2,6 +2,7 @@
 import { all, insert, upsert, update, remove, usingSupabase, deleteFile, putFile, fileUrl } from '@/lib/db';
 import { SINGLET } from '@/lib/content';
 import { listPhotos } from '@/lib/photos';
+import { mealOptions, mealOf } from '@/lib/meals';
 import { withTrainings } from '@/lib/club';
 import { sendPush, pushReady } from '@/lib/push';
 
@@ -206,6 +207,13 @@ export async function POST(req) {
       events: events.sort((a, b) => a.date.localeCompare(b.date)),
       news: news.sort((a, b) => String(b.published_at).localeCompare(String(a.published_at))),
       suggestions, participants, results, photos,
+      // maaltijdkeuzes per event (bv. Pasta Run), om door te geven aan het restaurant
+      meals: events.filter((e) => mealOptions(e).length).map((e) => ({
+        id: e.id, title: e.title, date: e.date, options: mealOptions(e),
+        people: participants.filter((p) => p.event_id === e.id)
+          .map((p) => ({ name: p.name, ...(mealOf(p, e) || { meal: '', note: '' }) }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      })),
       subscribers: subs.length,
       media: await all('media').catch(() => []),
       shirts: await all('shirt_interest').catch(() => []),

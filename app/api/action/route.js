@@ -9,6 +9,7 @@ import { sendPush as pushNow } from '@/lib/push';
 // Meldingen pas versturen nadat het antwoord terug is, zodat de knop meteen reageert
 const sendPush = (...args) => { after(() => pushNow(...args).catch(() => {})); };
 import { profileMap } from '@/lib/profiles';
+import { mealOptions, saveParticipant, clearMeal } from '@/lib/meals';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,7 +37,11 @@ export async function POST(req) {
           const here = await find('participants', { event_id: ev.id });
           if (ev.capacity && here.filter((p) => p.device_id !== device).length >= ev.capacity) return bad('Dit evenement zit vol.');
           const already = here.some((p) => p.device_id === device);
-          await upsert('participants', { event_id: ev.id, device_id: device, name }, ['event_id', 'device_id']);
+          // Maaltijdkeuze (bv. Pasta Run): verplicht kiezen als het event keuzes heeft, opmerking optioneel
+          const opts = mealOptions(ev);
+          const meal = opts.find((o) => o.toLowerCase() === clean(b.meal, 20).toLowerCase()) || '';
+          if (opts.length && !meal) return bad('Kies ' + opts.map((o) => o.toLowerCase()).join(', ').replace(/, ([^,]*)$/, ' of $1') + '.');
+          await saveParticipant(ev, device, name, meal, clean(b.mealNote, 160));
           // Melding aan de clubgenoten, niet bij gewone trainingen (dat zou te veel meldingen geven)
           if (!already && ev.type === 'samenloop' && ev.details?.by && ev.details.by !== device) {
             sendPush('signups', { title: `${name.split(' ')[0]} loopt mee`, body: `${ev.title}, ${ev.date.split('-').reverse().join('-')} om ${ev.time}`, url: '/event/' + ev.id }, null, ev.details.by);
@@ -47,6 +52,7 @@ export async function POST(req) {
           }
         } else {
           await remove('participants', { event_id: ev.id, device_id: device });
+          await clearMeal(ev.id, device);
         }
         break;
       }

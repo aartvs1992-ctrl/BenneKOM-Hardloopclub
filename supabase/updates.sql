@@ -283,3 +283,7 @@ alter table messages enable row level security;
 alter table singlet_claims add column if not exists paid_reported_at timestamptz;
 alter table shirt_interest add column if not exists paid_reported_at timestamptz;
 alter table shirt_interest add column if not exists paid boolean not null default false;
+
+-- ===== 022_maaltijdkeuze =====
+alter table participants add column if not exists meal text;
+alter table participants add column if not exists meal_note text;

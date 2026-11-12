@@ -191,31 +191,88 @@ function Register({ e }) {
   const { data, local, updateLocal, act } = useApp();
   const [name, setName] = useState(local.name);
   const mine = data.mine[e.id];
+  const my = data.myMeal?.[e.id];
+  const opts = e.details?.meals || [];
+  const [meal, setMeal] = useState(my?.meal || '');
+  const [note, setNote] = useState(my?.note || '');
+  const [editing, setEditing] = useState(false);
   const n = data.counts[e.id] || 0;
   const full = e.capacity && n >= e.capacity && !mine;
+  const needsMeal = opts.length > 0;
+  const askMeal = needsMeal && (!mine || editing || !my);
+
+  const submit = async (nm) => {
+    if (needsMeal && !meal) return;
+    const ok = await act('participate', { eventId: e.id, on: true, name: nm || mine || local.name, meal, mealNote: note.trim() },
+      mine ? 'Je keuze is aangepast' : 'Ingeschreven' + (nm ? ': ' + nm : '!'));
+    if (ok) setEditing(false);
+  };
+
+  const mealFields = askMeal && (
+    <div className="section" style={{ gap: 10 }}>
+      <div className="field">
+        <span className="plbl">Kies je pasta</span>
+        <div className="chips" role="radiogroup" aria-label="Kies je pasta">
+          {opts.map((o) => (
+            <button key={o} type="button" role="radio" aria-checked={meal === o}
+              className={'chip' + (meal === o ? ' on' : '')} onClick={() => setMeal(o)}>{o}</button>
+          ))}
+        </div>
+      </div>
+      <div className="field">
+        <label htmlFor="reg-note">Opmerking bij je keuze <span className="muted">(optioneel)</span></label>
+        <input className="input" id="reg-note" value={note} maxLength={160} onChange={(ev) => setNote(ev.target.value)}
+          placeholder={meal ? `Bijv. ${meal.toLowerCase()}, zonder zout` : 'Bijv. zonder zout, glutenvrij, geen noten'} />
+      </div>
+    </div>
+  );
+
   return (
     <div className="panel">
       <div className="section-head"><h3>Inschrijven</h3><span className="num small muted">{n}{e.capacity ? ' / ' + e.capacity : ''} ingeschreven</span></div>
       <People list={data.names[e.id]} />
-      {mine ? (
-        <button className="btn btn-line" onClick={() => act('participate', { eventId: e.id, on: false }, 'Uitgeschreven')}>Uitschrijven</button>
+      {mine && !askMeal ? (
+        <>
+          {my && (
+            <div className="setrow">
+              <span>Jouw keuze: <b>{my.meal}</b>{my.note ? <span className="muted"> · {my.note}</span> : null}</span>
+              <button className="btn btn-line btn-sm" onClick={() => { setMeal(my.meal); setNote(my.note); setEditing(true); }}>Wijzigen</button>
+            </div>
+          )}
+          <button className="btn btn-line" onClick={() => act('participate', { eventId: e.id, on: false }, 'Uitgeschreven')}>Uitschrijven</button>
+        </>
+      ) : mine ? (
+        <>
+          {!my && <p className="small"><b>Je staat op de lijst.</b> Geef nog even door welke pasta je wilt.</p>}
+          {mealFields}
+          <div className="btn-row">
+            <button className="btn btn-gold" disabled={!meal} onClick={() => submit()}>Keuze opslaan</button>
+            {editing ? <button className="btn btn-line" onClick={() => setEditing(false)}>Annuleren</button>
+              : <button className="btn btn-line" onClick={() => act('participate', { eventId: e.id, on: false }, 'Uitgeschreven')}>Uitschrijven</button>}
+          </div>
+        </>
       ) : full ? <p>Dit evenement zit vol.</p> : data.me ? (
-        <button className="btn btn-gold" onClick={() => act('participate', { eventId: e.id, on: true }, 'Ingeschreven!')}>
-          <Avatar name={data.me.name} src={data.me.avatar} size={26} /> Inschrijven als {data.me.first}
-        </button>
+        <>
+          {mealFields}
+          <button className="btn btn-gold" disabled={needsMeal && !meal} onClick={() => submit()}>
+            <Avatar name={data.me.name} src={data.me.avatar} size={26} /> Inschrijven als {data.me.first}
+          </button>
+          {needsMeal && !meal && <p className="note">Kies eerst je pasta.</p>}
+        </>
       ) : (
         <form className="section" onSubmit={async (ev) => {
           ev.preventDefault();
           const nm = name.trim();
-          if (!nm) return;
+          if (!nm || (needsMeal && !meal)) return;
           if (!local.name) updateLocal({ name: nm });
-          await act('participate', { eventId: e.id, on: true, name: nm }, 'Ingeschreven: ' + nm);
+          await submit(nm);
         }}>
           <div className="field"><label htmlFor="reg-name">Jouw naam</label><input className="input" id="reg-name" value={name} onChange={(ev) => setName(ev.target.value)} placeholder="Voornaam en achternaam" autoComplete="name" required /></div>
-          <button className="btn btn-gold" type="submit">Inschrijven</button>
+          {mealFields}
+          <button className="btn btn-gold" type="submit" disabled={needsMeal && !meal}>Inschrijven</button>
         </form>
       )}
-      <p className="note">{data.me ? 'Je naam en profielfoto zijn zichtbaar voor andere leden.' : <>Geen profiel nodig. Met een <Link href="/profiel">profiel</Link> zien anderen ook je foto.</>}</p>
+      <p className="note">{data.me ? 'Je naam en profielfoto zijn zichtbaar voor andere leden.' : <>Geen profiel nodig. Met een <Link href="/profiel">profiel</Link> zien anderen ook je foto.</>}{needsMeal ? ' Je pastakeuze ziet alleen de organisatie.' : ''}</p>
     </div>
   );
 }
