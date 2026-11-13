@@ -111,6 +111,20 @@ export default function Beheer() {
               <div className="section" style={{ gap: 4 }}>
                 <b className="small">Nog geen keuze ({m.people.filter((p) => !p.meal).length})</b>
                 {m.people.filter((p) => !p.meal).map((p) => <PersonRow key={p.device} m={m} p={p} call={call} />)}
+                {m.options.length > 0 && (
+                  <button type="button" className="btn btn-gold btn-sm" style={{ alignSelf: 'flex-start', marginTop: 4 }} onClick={async () => {
+                    const n = m.people.filter((p) => !p.meal).length;
+                    if (!confirm(`Herinnering sturen naar ${n} ${n === 1 ? 'persoon' : 'mensen'} die nog geen keuze hebben gemaakt?`)) return;
+                    const j = await call('remindMeal', { eventId: m.id });
+                    const r = j?.reminded;
+                    if (!r) return;
+                    const parts = [];
+                    if (r.pushed.length) parts.push(`${r.pushed.length} via pushmelding`);
+                    if (r.mailed.length) parts.push(`${r.mailed.length} via mail`);
+                    toast(parts.length ? `Herinnering verstuurd: ${parts.join(', ')}` : 'Niemand kon automatisch bereikt worden');
+                    if (r.none.length) alert(`Deze mensen hebben geen meldingen aan en geen bekend mailadres. Stuur ze even een appje:\n\n${r.none.join('\n')}`);
+                  }}>Stuur herinnering om te kiezen</button>
+                )}
               </div>
             )}
             <button type="button" className="btn btn-line btn-sm" onClick={() => {

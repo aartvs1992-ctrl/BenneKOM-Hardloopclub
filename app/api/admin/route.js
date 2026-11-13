@@ -4,7 +4,8 @@ import { SINGLET } from '@/lib/content';
 import { listPhotos } from '@/lib/photos';
 import { mealOptions, mealOf, eventPrice } from '@/lib/meals';
 import { withTrainings } from '@/lib/club';
-import { sendPush, pushReady } from '@/lib/push';
+import { sendPush, sendPushToDevices, pushReady } from '@/lib/push';
+import { mailReady, sendClubMail } from '@/lib/mailcode';
 
 export const dynamic = 'force-dynamic';
 
@@ -195,6 +196,44 @@ export async function POST(req) {
       case 'removeSinglet':
         await remove('singlet_claims', { id: clean(b.id, 64) });
         break;
+      case 'remindMeal': {
+        // Herinnering naar iedereen die is ingeschreven maar nog geen gerecht heeft gekozen.
+        // Eerst een pushmelding; wie die niet krijgt (geen meldingen aan) krijgt een mail.
+        const [evRow] = (await all('events')).filter((x) => x.id === clean(b.eventId, 80));
+        if (!evRow) return Response.json({ error: 'Dit evenement bestaat niet (meer).' }, { status: 404 });
+        const opts = mealOptions(evRow);
+        if (!opts.length) return Response.json({ error: 'Bij dit evenement valt niets te kiezen.' }, { status: 400 });
+        const open = (await all('participants')).filter((p) => p.event_id === evRow.id && !mealOf(p, evRow));
+        const inApp = open.filter((p) => !String(p.device_id).startsWith('beheer-'));
+        const date = evRow.date.split('-').reverse().join('-');
+        const url = '/event/' + evRow.id;
+        const keuze = opts.length > 1 ? opts.slice(0, -1).join(', ') + ' of ' + opts[opts.length - 1] : opts[0];
+        const { reached, skipped } = await sendPushToDevices(inApp.map((p) => p.device_id), {
+          title: `Kies je pasta voor de ${evRow.title}`,
+          body: `Je staat op de lijst voor ${date}. Geef in de app je keuze door (${keuze.toLowerCase()}), dan weet de keuken waar ze aan toe is.`,
+          url,
+        });
+        const profs = Object.fromEntries((await all('profiles').catch(() => [])).map((p) => [p.device_id, p]));
+        const mailed = [], none = [];
+        for (const p of inApp.filter((x) => !reached.has(x.device_id))) {
+          const prof = profs[p.device_id];
+          if (mailReady && prof?.email) {
+            try {
+              await sendClubMail(prof.email, {
+                subject: `Kies je pasta voor de ${evRow.title}`,
+                first: prof.first_name,
+                lines: [`Leuk dat je meedoet met de ${evRow.title} op ${date}! Je hebt alleen nog niet doorgegeven wat je wilt eten: ${keuze.toLowerCase()}.`, 'Wil je dat even in de app doen? Daar kun je ook allergieën doorgeven en betalen.'],
+                button: 'Kies je pasta', url, origin: new URL(req.url).origin,
+              });
+              mailed.push(p.name);
+              continue;
+            } catch { /* valt terug op 'niet bereikt' */ }
+          }
+          none.push(p.name);
+        }
+        none.push(...open.filter((p) => String(p.device_id).startsWith('beheer-')).map((p) => p.name));
+        return Response.json({ reminded: { total: open.length, pushed: inApp.filter((p) => reached.has(p.device_id)).map((p) => p.name), mailed, none, skipped } });
+      }
       case 'push': {
         if (!clean(b.title)) return Response.json({ error: 'Geef de melding een titel.' }, { status: 400 });
         const r = await sendPush(b.pref || 'events', { title: clean(b.title, 80), body: clean(b.body, 200), url: b.url || '/' });
