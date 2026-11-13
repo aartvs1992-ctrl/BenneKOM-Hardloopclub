@@ -4,6 +4,7 @@ import { mailKey } from '@/lib/email';
 import { useApp } from '@/components/AppProvider';
 import { TYPE_LABEL, fmt, SHIRTS, euro } from '@/lib/content';
 import { Avatar } from '@/components/ui';
+import { BADGES, BADGE } from '@/lib/badges';
 
 const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false, url: '' };
 
@@ -271,6 +272,7 @@ export default function Beheer() {
       </section>
 
       <Members list={d.members || []} call={call} />
+      <BadgeAwards members={d.members || []} awards={d.badgeAwards || []} call={call} />
 
       <section className="section">
         <h2>Voorstellen van leden</h2>
@@ -440,5 +442,42 @@ function PersonRow({ m, p, call }) {
         </label>
       )}
     </div>
+  );
+}
+
+// Badges toekennen die Strava niet kan zien (Haas) of aan leden zonder Strava (bv. Backyard Run)
+function BadgeAwards({ members, awards, call }) {
+  const [badge, setBadge] = useState('haas');
+  const [device, setDevice] = useState('');
+  const name = (dev) => members.find((m) => m.device === dev)?.name || 'Onbekend lid';
+  return (
+    <section className="section">
+      <h2>Badges toekennen</h2>
+      <p className="small muted">Voor badges die Strava niet ziet, zoals Haas, of voor leden zonder Strava die er wel waren. Badges van trainingen en events komen verder vanzelf.</p>
+      <form className="panel" onSubmit={(e) => { e.preventDefault(); call('awardBadge', { badge, device }, `${BADGE[badge].name} toegekend aan ${name(device)}`); }}>
+        <div className="grid2">
+          <div className="field"><label htmlFor="ba-badge">Badge</label>
+            <select className="input" id="ba-badge" value={badge} onChange={(e) => setBadge(e.target.value)}>
+              {BADGES.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select></div>
+          <div className="field"><label htmlFor="ba-member">Lid</label>
+            <select className="input" id="ba-member" value={device} onChange={(e) => setDevice(e.target.value)} required>
+              <option value="">Kies…</option>
+              {[...members].sort((a, b) => a.name.localeCompare(b.name)).map((m) => <option key={m.device} value={m.device}>{m.name}</option>)}
+            </select></div>
+        </div>
+        <button className="btn btn-gold" type="submit" disabled={!device}>Toekennen</button>
+      </form>
+      {awards.length > 0 && (
+        <div className="list">
+          {awards.map((a) => (
+            <div key={a.device + a.badge} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}>
+              <span><span className="t">{BADGE[a.badge]?.name || a.badge} · {name(a.device)}</span><br /><span className="s">{a.date}</span></span>
+              <button className="btn btn-line btn-sm" onClick={() => call('revokeBadge', { badge: a.badge, device: a.device }, 'Badge ingetrokken')}>Intrekken</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

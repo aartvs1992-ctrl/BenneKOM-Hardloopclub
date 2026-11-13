@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from './AppProvider';
 import { Avatar } from './ui';
 import Welcome from './Welcome';
+import { BadgeWatcher } from './BadgeUnlock';
 
 // Pagina's die ook zonder aanmelding open zijn
 const OPEN = ['/beheer'];
@@ -55,6 +56,7 @@ export default function Shell({ children }) {
         </div>
       </header>
       <main className="wrap"><div className="view">{children}</div></main>
+      {me && <BadgeWatcher />}
       <nav className="tabbar" aria-label="Hoofdmenu">
         <div className="in">
           {TABS.map(([href, label, icon]) => (

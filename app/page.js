@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
-import { EventRow, Loading, ErrorNote, useReady, AttendButton, Avatar, People } from '@/components/ui';
+import { EventRow, Loading, ErrorNote, useReady, AttendButton, AttendWithCheckin, Avatar, People } from '@/components/ui';
 import { dparts, rel } from '@/lib/content';
 import { CLUB, CLUB_PHOTOS } from '@/lib/club';
 import { usePhotos } from '@/lib/usePhotos';
@@ -127,7 +127,7 @@ function NextTraining({ e, img }) {
         {n > 0 && <span className="stack">{(data.names[e.id] || []).slice(0, 7).map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={30} />)}</span>}
       </div>
       <div className="btn-row">
-        <AttendButton e={e} going={going} act={act} local={local} />
+        <AttendWithCheckin e={e} going={going} act={act} local={local} />
       </div>
       <span className="slogan">Samen=LEUKER</span>
     </section>
