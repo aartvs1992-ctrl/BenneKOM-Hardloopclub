@@ -13,6 +13,7 @@ De app van Hardloopclub BenneKOM. Leden zetten hem op hun beginscherm en krijgen
 - **Nieuws** van de club
 - **Fotowall**: leden plaatsen foto's, geven duimpjes; beheer kan uitlichten en verwijderen
 - **Pushmeldingen**: dinsdagherinnering, nieuwe events, Challenge, carpool
+- **Badges** (`/badges`): verdien badges met dinsdagtrainingen, reeksen, de 5km Challenge en events. Telt via Strava (loopje op dinsdag rond de trainingstijd in Bennekom) of door op de dag zelf in te checken met "Ik was erbij". Alleen zichtbaar voor het lid zelf; zien hoe het eruitziet kan met `/badges?demo=1`. Draai hiervoor `supabase/025_badges.sql`. Badges en events met een badge pas je aan in `lib/badges.js`.
 - **Beheer** (`/beheer`): events, nieuws, voorstellen, tijden en meldingen versturen
 
 Gebouwd met Next.js, Supabase (database) en Vercel (hosting). Alles past binnen de gratis abonnementen.

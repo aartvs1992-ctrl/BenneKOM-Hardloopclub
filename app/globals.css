@@ -531,3 +531,48 @@ a.media-item:hover{border-color:var(--gold)}
 /* Komend / Terugkijken in de agenda */
 .when-toggle{max-width:260px}
 .when-toggle button{padding:6px 4px;font-size:13px}
+
+/* badges */
+.badge-count{white-space:nowrap;font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--gold-ink)}
+.badge-svg{display:block;flex:0 0 auto}
+.badge-bar{display:block;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.badge-bar i{display:block;height:100%;border-radius:999px;background:var(--gold)}
+.badge-next{display:flex;flex-direction:row;align-items:center;gap:14px;text-align:left;cursor:pointer;width:100%;font:inherit;color:inherit}
+.badge-next-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.badge-next-body b{font-family:var(--f-display);font-size:22px;text-transform:uppercase;line-height:1}
+.badge-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 8px}
+.badge-cell{display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:0;padding:4px 0;cursor:pointer;font:inherit;color:var(--ink)}
+.badge-cell span{font-size:13px;font-weight:600;text-align:center;line-height:1.25}
+.badge-cell.locked span{color:var(--muted);font-weight:500}
+.tues{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.tues li{display:flex;flex-direction:column;align-items:center;gap:4px}
+.tues .dot{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--navy)}
+.tues li.on .dot{background:var(--gold);border-color:var(--gold)}
+.tues .d{font-size:11px;color:var(--muted);font-family:var(--f-mono)}
+.tier-chip{display:inline-flex;align-items:center;gap:8px;align-self:center;padding:5px 12px;border-radius:999px;background:var(--navy);color:var(--c);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tier-chip i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.badge-sheet{align-items:center;text-align:center}
+.badge-sheet h2{font-size:36px;font-style:italic;font-weight:800}
+.how ul{margin:10px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.how summary{cursor:pointer}
+.unlock-bg{align-items:center;background:rgba(3,10,22,.82)}
+.unlock{width:min(420px,calc(100% - 32px));background:#071E3E;color:#F4F1E6;border-radius:24px;padding:28px 22px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;animation:unlock-in .45s cubic-bezier(.2,.9,.3,1.2)}
+.unlock-eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#E2B74A}
+.unlock-title{font-size:42px;font-style:italic;font-weight:800;text-transform:uppercase;line-height:.95}
+.unlock-text{color:#C9D2E2;font-size:15px}
+.unlock-glow{display:flex;align-items:center;justify-content:center;padding:18px;border-radius:50%}
+.unlock .unlock-glow{animation:unlock-pop .7s .15s both cubic-bezier(.2,.9,.3,1.3)}
+.unlock-glow.tier-legend{background:radial-gradient(circle,rgba(255,227,140,.28) 0%,rgba(255,227,140,0) 65%)}
+.unlock-glow.tier-episch{background:radial-gradient(circle,rgba(205,168,255,.26) 0%,rgba(205,168,255,0) 65%)}
+.unlock-glow.tier-zilver{background:radial-gradient(circle,rgba(220,235,240,.22) 0%,rgba(220,235,240,0) 65%)}
+.unlock-glow.tier-brons{background:radial-gradient(circle,rgba(237,187,144,.22) 0%,rgba(237,187,144,0) 65%)}
+.unlock-more{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
+.unlock-actions{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:6px}
+.unlock .btn-line{border-color:rgba(244,241,230,.3);color:#F4F1E6}
+.unlock .tier-chip{background:rgba(255,255,255,.08)}
+@keyframes unlock-in{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes unlock-pop{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.unlock,.unlock .unlock-glow{animation:none}}
+.profile-badges{display:flex;flex-direction:column;gap:12px;text-decoration:none;color:inherit}
+.profile-badges .row-badges{display:flex;gap:6px;align-items:center}
+.checkin{display:flex;flex-direction:column;gap:6px}

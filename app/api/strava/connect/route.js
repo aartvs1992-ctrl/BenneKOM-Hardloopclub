@@ -8,5 +8,7 @@ export async function GET(req) {
   const device = (url.searchParams.get('device') || '').slice(0, 64);
   if (!stravaReady) return Response.redirect(new URL('/challenge?strava=uit&why=' + encodeURIComponent('STRAVA_CLIENT_ID of STRAVA_CLIENT_SECRET ontbreekt in Vercel (of er is nog niet opnieuw gedeployd).'), url.origin));
   if (!device) return Response.redirect(new URL('/challenge?strava=fout', url.origin));
-  return Response.redirect(authorizeUrl(url.origin, device));
+  // na het koppelen terug naar de pagina waar je vandaan kwam (5km Challenge of badges)
+  const next = url.searchParams.get('next') === 'badges' ? '~badges' : '';
+  return Response.redirect(authorizeUrl(url.origin, device + next));
 }
