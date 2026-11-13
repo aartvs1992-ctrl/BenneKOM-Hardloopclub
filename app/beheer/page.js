@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { mailKey } from '@/lib/email';
 import { useApp } from '@/components/AppProvider';
 import { TYPE_LABEL, fmt, SHIRTS, euro } from '@/lib/content';
 import { Avatar } from '@/components/ui';
@@ -306,7 +307,7 @@ function Members({ list, call }) {
       <h2>Leden ({list.length})</h2>
       {(() => {
         const seen = {}; let dups = 0;
-        for (const m of list) { const k = m.email.toLowerCase(); if (!k) continue; if (seen[k]) dups++; else seen[k] = true; }
+        for (const m of list) { const k = mailKey(m.email); if (!k) continue; if (seen[k]) dups++; else seen[k] = true; }
         return dups > 0 && (
           <div className="panel callout">
             <b>{dups} dubbele aanmelding{dups === 1 ? '' : 'en'}</b>

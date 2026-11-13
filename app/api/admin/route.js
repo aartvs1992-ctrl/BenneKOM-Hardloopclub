@@ -1,5 +1,6 @@
 // Beheer: events, nieuws, voorstellen en handmatige pushmeldingen. Beveiligd met ADMIN_PASSWORD.
 import { all, insert, upsert, update, remove, usingSupabase, deleteFile, putFile, fileUrl } from '@/lib/db';
+import { mailKey } from '@/lib/email';
 import { SINGLET, dparts } from '@/lib/content';
 import { listPhotos } from '@/lib/photos';
 import { mealOptions, mealOf, eventPrice } from '@/lib/meals';
@@ -143,7 +144,7 @@ export async function POST(req) {
         // Meerdere profielen met hetzelfde e-mailadres: het oudste houden, de rest samenvoegen en verwijderen
         const profs = await all('profiles');
         const byMail = {};
-        for (const p of profs) { const m = (p.email || '').toLowerCase(); if (m) (byMail[m] ||= []).push(p); }
+        for (const p of profs) { const m = p.email ? mailKey(p.email) : ''; if (m) (byMail[m] ||= []).push(p); }
         const parts = await all('participants').catch(() => []);
         const shirts = await all('shirt_interest').catch(() => []);
         const claims = await all('singlet_claims').catch(() => []);

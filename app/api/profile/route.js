@@ -4,6 +4,7 @@ import { all, upsert, remove, putFile, deleteFile, fileUrl } from '@/lib/db';
 import { displayName } from '@/lib/profiles';
 import { mailReady, makeCode, checkCode, sendCodeMail } from '@/lib/mailcode';
 import { clearSessionCookie } from '@/lib/session';
+import { findByEmail } from '@/lib/email';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -56,7 +57,7 @@ export async function POST(req) {
     if (b.action === 'sendCode') {
       const email = clean(b.email, 120).toLowerCase();
       if (!EMAIL.test(email)) return bad('Vul een geldig e-mailadres in.');
-      const existing = (await all('profiles')).find((p) => (p.email || '').toLowerCase() === email);
+      const existing = findByEmail(await all('profiles'), email);
       const first = clean(b.first_name, 40);
       if (!existing && !first) return bad(b.login ? 'Dit e-mailadres kennen we nog niet. Meld je aan met je naam.' : 'Vul je voornaam in.');
       if (!mailReady) return Response.json({ skip: true, existing: Boolean(existing) }); // bevestiging staat (nog) uit
@@ -71,7 +72,7 @@ export async function POST(req) {
       const r = checkCode(b.token, b.code);
       if (r.error) return bad(r.error);
       const { email, first, last } = r.payload;
-      const existing = (await all('profiles')).find((p) => (p.email || '').toLowerCase() === email);
+      const existing = findByEmail(await all('profiles'), email);
       if (existing) return Response.json({ device: existing.device_id, ...own(existing) });
       const row = {
         device_id: device, first_name: first, last_name: last || '', email,
@@ -95,7 +96,7 @@ export async function POST(req) {
     // in plaats van een tweede lid aan te maken.
     if (!current && !mailReady) {
       const mail = clean(b.email, 120).toLowerCase();
-      const existing = mail && (await all('profiles')).find((p) => (p.email || '').toLowerCase() === mail);
+      const existing = mail && findByEmail(await all('profiles'), mail);
       if (existing) return Response.json({ device: existing.device_id, ...own(existing) });
     }
     const first = clean(b.first_name, 40);
@@ -104,6 +105,10 @@ export async function POST(req) {
     if (!current && mailReady) return bad('Bevestig eerst je e-mailadres met de code.');
     if (!current && !EMAIL.test(email)) return bad('Vul een geldig e-mailadres in.');
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad('Dit e-mailadres klopt niet.');
+    if (current && email) {
+      const other = findByEmail(await all('profiles'), email);
+      if (other && other.device_id !== device) return bad('Dit e-mailadres hoort al bij een ander profiel. Log daarmee in, dan kom je op dat account.');
+    }
     const row = {
       device_id: device,
       first_name: first,
