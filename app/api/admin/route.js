@@ -1,9 +1,10 @@
 // Beheer: events, nieuws, voorstellen en handmatige pushmeldingen. Beveiligd met ADMIN_PASSWORD.
 import { all, insert, upsert, update, remove, usingSupabase, deleteFile, putFile, fileUrl } from '@/lib/db';
-import { SINGLET } from '@/lib/content';
+import { SINGLET, dparts } from '@/lib/content';
 import { listPhotos } from '@/lib/photos';
 import { mealOptions, mealOf, eventPrice } from '@/lib/meals';
 import { withTrainings } from '@/lib/club';
+import { DEFAULT_DETAILS } from '@/lib/seed';
 import { sendPush, sendPushToDevices, pushReady } from '@/lib/push';
 import { mailReady, sendClubMail } from '@/lib/mailcode';
 
@@ -206,10 +207,13 @@ export async function POST(req) {
         const open = (await all('participants')).filter((p) => p.event_id === evRow.id && !mealOf(p, evRow));
         const inApp = open.filter((p) => !String(p.device_id).startsWith('beheer-'));
         const date = evRow.date.split('-').reverse().join('-');
+        const naam = /pasta/i.test(evRow.title) ? 'Pasta Run' : evRow.title;
+        const dp = dparts(evRow.date);
+        const det = { ...(DEFAULT_DETAILS[evRow.id] || {}), ...(evRow.details || {}) };
         const url = '/event/' + evRow.id;
         const keuze = opts.length > 1 ? opts.slice(0, -1).join(', ') + ' of ' + opts[opts.length - 1] : opts[0];
         const { reached, skipped } = await sendPushToDevices(inApp.map((p) => p.device_id), {
-          title: `Kies je pasta voor de ${evRow.title}`,
+          title: `Kies je pasta voor de ${naam}`,
           body: `Je staat op de lijst voor ${date}. Geef in de app je keuze door (${keuze.toLowerCase()}), dan weet de keuken waar ze aan toe is.`,
           url,
         });
@@ -220,10 +224,12 @@ export async function POST(req) {
           if (mailReady && prof?.email) {
             try {
               await sendClubMail(prof.email, {
-                subject: `Kies je pasta voor de ${evRow.title}`,
+                subject: `Kies je pasta voor de ${naam}`,
                 first: prof.first_name,
-                lines: [`Leuk dat je meedoet met de ${evRow.title} op ${date}! Je hebt alleen nog niet doorgegeven wat je wilt eten: ${keuze.toLowerCase()}.`, 'Wil je dat even in de app doen? Daar kun je ook allergieën doorgeven en betalen.'],
-                button: 'Kies je pasta', url, origin: new URL(req.url).origin,
+                lines: [`Leuk dat je meedoet met de ${naam}! Je hebt alleen nog niet doorgegeven wat je wilt eten.`, 'Kies even in de app. Daar kun je ook allergieën doorgeven en betalen, dan weet de keuken waar ze aan toe is.'],
+                event: { image: det.image, tag: 'Special', when: `${dp.W} ${dp.d} ${dp.m}`, title: naam, chips: opts,
+                  facts: [['Datum', `${dp.w} ${dp.d} ${dp.m}`], ['Tijd', evRow.time || 'volgt'], ['Plaats', (evRow.place || '').split(',')[0]]] },
+                button: 'Kies je pasta', signoff: `Tot ${dp.W.toLowerCase()}!`, url, origin: new URL(req.url).origin,
               });
               mailed.push(p.name);
               continue;
