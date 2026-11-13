@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/components/AppProvider';
 import { Loading, Avatar, MemberSheet } from '@/components/ui';
 import AvatarCropper from '@/components/AvatarCropper';
-import BadgesPanel from '@/components/BadgesPanel';
 
 export default function Profiel() {
   const { local, updateLocal, refresh, toast } = useApp();
@@ -112,8 +111,6 @@ export default function Profiel() {
       {prof && !prof.avatar && !prof.song && !prof.best_run && !prof.work && !prof.fun_fact && (
         <p className="note"><b>Maak je profiel af.</b> Met een foto en een paar leuke antwoorden herkennen anderen je bij de training. Alles is optioneel.</p>
       )}
-
-      {prof && !cropFile && <BadgesPanel />}
 
       {cropFile && (
         <section className="panel">

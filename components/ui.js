@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useApp } from './AppProvider';
 import { dparts, TYPE_LABEL } from '@/lib/content';
-import Checkin from './Checkin';
 
 export function Loading() {
   return (<><div className="skeleton" /><div className="skeleton" style={{ minHeight: 200 }} /></>);
@@ -67,11 +66,6 @@ export function AttendButton({ e, going, act, local, long }) {
       }}
     >{label}</button>
   );
-}
-
-// Aanmelden + (op de dag zelf) inchecken voor de badges
-export function AttendWithCheckin(props) {
-  return <><AttendButton {...props} /><Checkin e={props.e} going={props.going} /></>;
 }
 
 // Foto bovenaan een pagina met de titel erop

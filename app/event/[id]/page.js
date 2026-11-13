@@ -3,8 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useApp } from '@/components/AppProvider';
-import { Loading, ErrorNote, useReady, AttendButton, AttendWithCheckin, People, Avatar } from '@/components/ui';
-import Checkin from '@/components/Checkin';
+import { Loading, ErrorNote, useReady, AttendButton, People, Avatar } from '@/components/ui';
 import { dparts, rel, daysTo, TYPE_LABEL } from '@/lib/content';
 import { CHALLENGE_EASY } from '@/lib/challenge';
 import { Gallery } from '@/components/Gallery';
@@ -170,7 +169,7 @@ function Attend({ e }) {
   return (
     <div className="panel">
       <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></div>
-      <AttendWithCheckin e={e} going={Boolean(data.mine[e.id])} act={act} local={local} long />
+      <AttendButton e={e} going={Boolean(data.mine[e.id])} act={act} local={local} long />
       <People list={data.names[e.id]} />
       <p className="note">Zo weten we vooraf hoeveel lopers er komen en zien anderen wie er meeloopt.</p>
     </div>
@@ -270,7 +269,6 @@ function Register({ e }) {
                 report={{ what: 'event', eventId: e.id }} note="Betaal vooraf via iDEAL, dan is het meteen geregeld." />
             </div>
           )}
-          <Checkin e={e} going />
           <button className="btn btn-line" onClick={() => act('participate', { eventId: e.id, on: false }, 'Uitgeschreven')}>Uitschrijven</button>
         </>
       ) : mine ? (

@@ -5,7 +5,6 @@ import { SINGLET, dparts } from '@/lib/content';
 import { listPhotos } from '@/lib/photos';
 import { mealOptions, mealOf, eventPrice } from '@/lib/meals';
 import { withTrainings } from '@/lib/club';
-import { BADGE } from '@/lib/badges';
 import { DEFAULT_DETAILS } from '@/lib/seed';
 import { sendPush, sendPushToDevices, pushReady } from '@/lib/push';
 import { mailReady, sendClubMail } from '@/lib/mailcode';
@@ -119,17 +118,6 @@ export async function POST(req) {
         break;
       case 'deleteMedia':
         await remove('media', { id: b.id });
-        break;
-      case 'awardBadge': {
-        // badge toekennen die Strava niet kan zien (Haas, Founding Member) of voor wie geen Strava heeft (bv. Backyard Run)
-        const badge = BADGE[clean(b.badge, 40)];
-        const device = clean(b.device, 64);
-        if (!badge || !device) return Response.json({ error: 'Kies een lid en een badge.' }, { status: 400 });
-        await upsert('badge_log', { device_id: device, key: 'award:' + badge.id, date: new Date().toISOString().slice(0, 10), source: 'beheer', activity_id: null }, ['device_id', 'key']);
-        break;
-      }
-      case 'revokeBadge':
-        await remove('badge_log', { device_id: clean(b.device, 64), key: 'award:' + clean(b.badge, 40) });
         break;
       case 'deleteResult':
         await remove('challenge_results', { id: b.id });
@@ -285,7 +273,6 @@ export async function POST(req) {
         avatar: p.photo_path ? fileUrl(p.photo_path) : null, joined: p.created_at, last_seen: p.last_seen || null,
         going: participants.filter((x) => x.device_id === p.device_id).length,
       })).sort((a, b) => String(b.joined).localeCompare(String(a.joined))),
-      badgeAwards: (await all('badge_log').catch(() => [])).filter((r) => r.source === 'beheer').map((r) => ({ device: r.device_id, badge: r.key.slice(6), date: r.date })),
       upcoming: withTrainings(events).map((e) => ({ id: e.id, title: e.title, date: e.date, type: e.type })),
       added: b.added,
       status: { database: usingSupabase, push: pushReady },
