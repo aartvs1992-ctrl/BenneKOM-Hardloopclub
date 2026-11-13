@@ -20,9 +20,13 @@ export async function POST(req) {
   if (b.action === 'sync') {
     try {
       const r = await scanStrava(device, { force: Boolean(b.force) });
-      if (r.more) note = 'Je oudere loopjes worden nog doorzocht. Kom straks nog eens kijken.';
+      if (r.more) note = `${r.checked} loopjes doorzocht. Er zijn er nog meer: kom straks nog eens kijken.`;
+      else if (b.force && r.checked != null) note = `${r.checked} activiteiten doorzocht, ${r.found} nieuwe trainingen of events gevonden.`;
+      else if (b.force && r.skipped) note = r.skipped === 'geen koppeling' ? 'Strava is niet gekoppeld op dit account.' : null;
     } catch (e) {
-      note = /badge_log/.test(e.message) ? 'De badges-tabel ontbreekt nog in de database.' : 'Strava was even niet bereikbaar. Je ziet je laatst bekende badges.';
+      note = e.db ? e.message
+        : e.soft ? e.message
+        : 'Strava was even niet bereikbaar. Je ziet je laatst bekende badges. (' + String(e.message || e).slice(0, 120) + ')';
     }
   } else if (b.action === 'checkin') {
     try { await checkin(device, String(b.eventId || '').slice(0, 80)); }
