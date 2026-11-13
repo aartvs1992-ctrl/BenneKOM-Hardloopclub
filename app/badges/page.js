@@ -59,7 +59,7 @@ export default function Badges() {
             <span className="eyebrow">Volgende badge</span>
             <b>{next.name}</b>
             <span className="badge-bar"><i style={{ width: `${Math.round((next.have / next.need) * 100)}%` }} /></span>
-            <span className="small muted">{next.have} van {next.need} · nog {next.need - next.have} te gaan</span>
+            <span className="small muted">{next.have} van {next.need}{next.unit ? ' ' + next.unit : ''} · nog {next.need - next.have} te gaan</span>
           </span>
         </button>
       )}
@@ -139,7 +139,7 @@ function BadgeSheet({ b, tuesdays, onClose }) {
           : b.need > 1 && b.have != null
             ? <div className="section" style={{ gap: 6, width: '100%' }}>
                 <span className="badge-bar"><i style={{ width: `${Math.round((b.have / b.need) * 100)}%` }} /></span>
-                <span className="small muted">{b.have} van {b.need}</span>
+                <span className="small muted">{b.have} van {b.need}{b.unit ? ' ' + b.unit : ''}</span>
               </div>
             : <p className="small muted">Nog niet behaald.</p>}
         {b.id === 'ijzeren-reeks' && tuesdays && (
