@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Badge from './Badge';
 import { useBadges } from '@/lib/useBadges';
-import { BADGES, nextBadge } from '@/lib/badges';
+import { nextBadge } from '@/lib/badges';
 
 export default function BadgesPanel() {
   const { state } = useBadges();
@@ -14,7 +14,7 @@ export default function BadgesPanel() {
     <Link className="panel profile-badges" href="/badges">
       <div className="section-head">
         <h3>Mijn badges</h3>
-        <span className="badge-count num" style={{ fontSize: 20 }}>{earned.length} / {BADGES.length}</span>
+        <span className="badge-count num" style={{ fontSize: 20 }}>{earned.length} / {state.badges.length}</span>
       </div>
       {earned.length
         ? <div className="row-badges">{earned.slice(0, 5).map((b) => <Badge key={b.id} b={b} size={58} />)}</div>

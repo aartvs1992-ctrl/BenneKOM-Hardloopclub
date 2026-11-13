@@ -6,7 +6,7 @@ import { Loading } from '@/components/ui';
 import Badge from '@/components/Badge';
 import { UnlockSheet } from '@/components/BadgeUnlock';
 import { useBadges } from '@/lib/useBadges';
-import { BADGES, CATEGORIES, TIERS, nextBadge } from '@/lib/badges';
+import { CATEGORIES, TIERS, nextBadge } from '@/lib/badges';
 
 const MONTHS = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 const dayLabel = (iso, long) => {
@@ -45,7 +45,7 @@ export default function Badges() {
     <>
       <div className="section-head">
         <h1>Mijn badges</h1>
-        <span className="badge-count num">{earned.length} / {BADGES.length}</span>
+        <span className="badge-count num">{earned.length} / {list.length}</span>
       </div>
       {state.demo && <p className="note"><b>Voorbeeld.</b> Zo ziet het eruit met een paar maanden trainingen en de Backyard Run. <button className="link" onClick={() => setUnlock(earned.slice(0, 3))}>Bekijk het unlock-moment ›</button></p>}
       {msg && <p className={msg.startsWith('Strava gekoppeld') ? 'note' : 'err'}>{msg}</p>}
