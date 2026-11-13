@@ -36,8 +36,9 @@ export function EventRow({ e, noTag }) {
             : e.type === 'samenloop'
             ? <>{e.time} · {(e.place || '').split(',')[0]}<br /><span className="run-tags"><span>{e.distances}</span><span>{e.details?.pace}</span></span> door {e.organizer?.name?.split(' ')[0]}</>
             : <>{e.time ? e.time + ' · ' : ''}{(e.place || '').split(',')[0]}</>}
-          {going ? <b style={{ color: 'var(--ok)' }}> · {e.type === 'wedstrijd' ? (n > 1 ? `jij + ${n - 1} doen mee` : 'je doet mee') : 'je bent erbij'}</b> : n > 0 ? ` · ${n} ${e.type === 'training' || e.type === 'samenloop' ? (n === 1 ? 'loper' : 'lopers') : e.type === 'wedstrijd' ? (n === 1 ? 'doet mee' : 'doen mee') : 'aangemeld'}` : null}
-          {rides > 0 ? ` · ${rides} ${rides === 1 ? 'rit' : 'ritten'}` : null}
+          {e.past ? (n > 0 ? <>{' · '}{going ? <b style={{ color: 'var(--ok)' }}>{n > 1 ? `jij + ${n - 1} ${n - 1 === 1 ? 'ander' : 'anderen'} waren erbij` : 'jij was erbij'}</b> : `${n} ${e.type === 'wedstrijd' ? (n === 1 ? 'BenneKOM\'er deed mee' : 'BenneKOM\'ers deden mee') : n === 1 ? 'loper was erbij' : 'lopers waren erbij'}`}</> : null)
+            : going ? <b style={{ color: 'var(--ok)' }}> · {e.type === 'wedstrijd' ? (n > 1 ? `jij + ${n - 1} doen mee` : 'je doet mee') : 'je bent erbij'}</b> : n > 0 ? ` · ${n} ${e.type === 'training' || e.type === 'samenloop' ? (n === 1 ? 'loper' : 'lopers') : e.type === 'wedstrijd' ? (n === 1 ? 'doet mee' : 'doen mee') : 'aangemeld'}` : null}
+          {rides > 0 && !e.past ? ` · ${rides} ${rides === 1 ? 'rit' : 'ritten'}` : null}
         </span>
       </span>
       <span className="chev">›</span>

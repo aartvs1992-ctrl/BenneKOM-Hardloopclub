@@ -20,8 +20,13 @@ export default function Agenda() {
   const [sg, setSg] = useState({ title: '', date: '', place: '' });
   const [plan, setPlan] = useState(false);
   const [run, setRun] = useState(EMPTY_RUN);
+  const [back, setBack] = useState(false); // terugkijken: afgelopen trainingen en events
   useEffect(() => {
-    const fromHash = () => { const h = location.hash.slice(1); if (TABS.some(([k]) => k === h)) setTab(h); };
+    const fromHash = () => {
+      const [h, w] = location.hash.slice(1).split('-');
+      if (TABS.some(([k]) => k === h)) setTab(h);
+      setBack(w === 'terug');
+    };
     fromHash();
     window.addEventListener('hashchange', fromHash);
     return () => window.removeEventListener('hashchange', fromHash);
@@ -29,7 +34,10 @@ export default function Agenda() {
   if (!useReady()) return <Loading />;
 
   const inTab = (e) => (tab === 'special' ? e.type === 'special' || e.type === 'challenge' : e.type === tab);
-  const list = data.events.filter(inTab).filter((e) => tab !== 'wedstrijd' || e.km == null || e.km <= 50);
+  const list = back
+    ? (data.past || []).filter(inTab)
+    : data.events.filter(inTab).filter((e) => tab !== 'wedstrijd' || e.km == null || e.km <= 50);
+  const setHash = (t, b) => history.replaceState(null, '', '#' + t + (b ? '-terug' : ''));
   const count = (k) => data.events.filter((e) => (k === 'special' ? e.type === 'special' || e.type === 'challenge' : e.type === k)).length;
   // per maand groeperen
   const groups = [];
@@ -48,16 +56,20 @@ export default function Agenda() {
       <ErrorNote />
       <div className="seg agenda-tabs" role="tablist" aria-label="Soort">
         {TABS.map(([k, l]) => (
-          <button key={k} role="tab" aria-selected={tab === k} aria-pressed={tab === k} onClick={() => { setTab(k); history.replaceState(null, '', '#' + k); }}>
+          <button key={k} role="tab" aria-selected={tab === k} aria-pressed={tab === k} onClick={() => { setTab(k); setHash(k, back); }}>
             {l} <span className="cnt">{count(k)}</span>
           </button>
         ))}
       </div>
-      <p className="muted small">{intro}</p>
-      {tab === 'samenloop' && (data.me
+      <div className="seg when-toggle" aria-label="Periode">
+        <button aria-pressed={!back} onClick={() => { setBack(false); setHash(tab, false); }}>Komend</button>
+        <button aria-pressed={back} onClick={() => { setBack(true); setHash(tab, true); }}>Terugkijken</button>
+      </div>
+      <p className="muted small">{back ? 'Kijk terug wie er bij de afgelopen keren was.' : intro}</p>
+      {!back && tab === 'samenloop' && (data.me
         ? <button className="btn btn-gold" onClick={() => setPlan(!plan)} aria-expanded={plan}>{plan ? 'Sluiten' : '+ Loop plannen'}</button>
         : <Link className="panel muted small" href="/profiel">Meld je aan om zelf een loopje te plannen ›</Link>)}
-      {tab === 'samenloop' && plan && (
+      {!back && tab === 'samenloop' && plan && (
         <form className="panel" onSubmit={async (ev) => {
           ev.preventDefault();
           if (await act('planRun', { run }, 'Je loopje staat in de agenda')) { setPlan(false); setRun(EMPTY_RUN); }
@@ -83,11 +95,11 @@ export default function Agenda() {
           <h3 className="month">{MONTH[+g.key.slice(5) - 1]} {g.key.slice(0, 4)}</h3>
           <div className="list">{g.items.map((e) => <EventRow key={e.id} e={e} noTag={tab !== 'special'} />)}</div>
         </section>
-      )) : <p className="panel">{tab === 'samenloop' ? 'Nog geen loopjes gepland. Zin om zondag samen te lopen? Plan de eerste!' : 'Niets gepland in deze categorie.'}</p>}
+      )) : <p className="panel">{back ? 'Hier verschijnen afgelopen keren zodra er lopers aangemeld waren.' : tab === 'samenloop' ? 'Nog geen loopjes gepland. Zin om zondag samen te lopen? Plan de eerste!' : 'Niets gepland in deze categorie.'}</p>}
 
-      {tab === 'wedstrijd' && <p className="small muted">Bron: hardloopkalenders van Nederland. Controleer datum en inschrijven altijd bij de organisatie.</p>}
-      {tab === 'wedstrijd' && <button className="btn btn-line" onClick={() => setOpen(!open)}>+ Mis je een wedstrijd? Stel hem voor</button>}
-      {open && tab === 'wedstrijd' && (
+      {!back && tab === 'wedstrijd' && <p className="small muted">Bron: hardloopkalenders van Nederland. Controleer datum en inschrijven altijd bij de organisatie.</p>}
+      {!back && tab === 'wedstrijd' && <button className="btn btn-line" onClick={() => setOpen(!open)}>+ Mis je een wedstrijd? Stel hem voor</button>}
+      {!back && open && tab === 'wedstrijd' && (
         <form className="panel" onSubmit={async (ev) => {
           ev.preventDefault();
           if (await act('suggest', sg, 'Bedankt! Je voorstel staat bij de organisatie.')) { setOpen(false); setSg({ title: '', date: '', place: '' }); }

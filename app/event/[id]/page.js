@@ -17,7 +17,7 @@ export default function EventPage() {
   const { id } = useParams();
   const { data } = useApp();
   if (!useReady()) return <Loading />;
-  const e = data.events.find((x) => x.id === id);
+  const e = data.events.find((x) => x.id === id) || data.past?.find((x) => x.id === id);
   if (!e) return (<><h1>Niet gevonden</h1><p>Dit evenement is voorbij of verwijderd.</p><Link className="link" href="/agenda">Naar de agenda ›</Link></>);
 
   const p = dparts(e.date);
@@ -53,7 +53,7 @@ export default function EventPage() {
         {isRun ? <p><b>Afstand en tempo:</b> {e.distances} · {dt.pace}</p> : e.distances && <p><b>Afstanden:</b> {e.distances}</p>}
         {isRun && e.organizer && <div className="organizer"><Avatar name={e.organizer.name} src={e.organizer.avatar} size={32} /><span className="small">Georganiseerd door <b>{e.organizer.name}</b></span></div>}
         {isRun && dt.route && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={dt.route} target="_blank" rel="noopener noreferrer">Bekijk de route ↗</a>}
-        {dt.deadline && <Deadline iso={dt.deadline} />}
+        {dt.deadline && !e.past && <Deadline iso={dt.deadline} />}
         {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km} km van Bennekom (hemelsbreed)</p>}
         {e.type === 'wedstrijd' && e.about && (
           <div className="race-about">
@@ -134,12 +134,32 @@ export default function EventPage() {
       )}
 
       {isTraining && workoutFor(e.date) && <Workout w={workoutFor(e.date)} />}
-      {(isTraining || isRun) && <Attend e={e} />}
-      {e.type === 'wedstrijd' && <RaceAttend e={e} />}
-      {isRun && e.own && <CancelRun e={e} />}
-      {e.registration && <Register e={e} />}
-      {e.carpool && <Carpool e={e} />}
+      {e.past ? <WasThere e={e} /> : (
+        <>
+          {(isTraining || isRun) && <Attend e={e} />}
+          {e.type === 'wedstrijd' && <RaceAttend e={e} />}
+          {isRun && e.own && <CancelRun e={e} />}
+          {e.registration && <Register e={e} />}
+          {e.carpool && <Carpool e={e} />}
+        </>
+      )}
     </>
+  );
+}
+
+// Afgelopen training of event: terugkijken wie er was
+function WasThere({ e }) {
+  const { data } = useApp();
+  const n = data.counts[e.id] || 0;
+  const was = Boolean(data.mine[e.id]);
+  return (
+    <div className="panel">
+      <div className="count"><span className="n num">{n}</span><span>{e.type === 'wedstrijd' ? (n === 1 ? 'BenneKOM\'er deed mee' : 'BenneKOM\'ers deden mee') : n === 1 ? 'loper was erbij' : 'lopers waren erbij'}</span></div>
+      {was && <p className="small"><b style={{ color: 'var(--ok)' }}>✓ Jij was erbij</b></p>}
+      <People list={data.names[e.id]} />
+      <p className="note">Op basis van de aanmeldingen in de app.</p>
+      <Link className="link" href={'/agenda#' + (e.type === 'challenge' ? 'special' : e.type) + '-terug'}>Meer terugkijken ›</Link>
+    </div>
   );
 }
 
