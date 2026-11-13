@@ -291,3 +291,8 @@ alter table participants add column if not exists meal_note text;
 -- ===== 023_betalen_events =====
 alter table participants add column if not exists paid_reported_at timestamptz;
 alter table participants add column if not exists paid boolean not null default false;
+
+-- ===== 024_thrive =====
+insert into partners (name, about, benefit, code, how, url, sort)
+select 'Thrive', 'Belgisch alcoholvrij sportbier met 10 gram proteïne per blikje, ontwikkeld met de KU Leuven. Ideaal na de training of wedstrijd. Ook hun nieuwe electrolyte soda’s met 0 gram suiker.', '10% korting in de webshop', 'BenneKOM10', 'Vul de code in bij het afrekenen op thrivebeer.com.', 'https://www.thrivebeer.com/', 3
+where not exists (select 1 from partners where lower(name) = 'thrive');

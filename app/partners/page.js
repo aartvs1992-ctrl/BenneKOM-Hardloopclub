@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { Loading, useReady, PhotoHeader } from '@/components/ui';
+import { partnerBanner } from '@/lib/partners';
 
 export default function Partners() {
   const { data } = useApp();
@@ -23,8 +24,12 @@ function PartnerCard({ p }) {
     try { await navigator.clipboard.writeText(p.code); setCopied(true); toast('Code gekopieerd'); setTimeout(() => setCopied(false), 2000); }
     catch { const r = document.createRange(); r.selectNodeContents(e.currentTarget.previousSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
   }
+  const banner = partnerBanner(p.name);
   return (
     <section className="panel partner">
+      {banner && (p.url
+        ? <a className="partner-banner" href={p.url} target="_blank" rel="noopener noreferrer"><img src={banner.src} alt={banner.alt} width={banner.w} height={banner.h} loading="lazy" /></a>
+        : <div className="partner-banner"><img src={banner.src} alt={banner.alt} width={banner.w} height={banner.h} loading="lazy" /></div>)}
       <h2>{p.name}</h2>
       {p.about && <p>{p.about}</p>}
       {p.benefit && <p className="benefit">{p.benefit}</p>}
