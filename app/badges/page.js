@@ -70,7 +70,7 @@ export default function Badges() {
           {state.tuesdays.map((t) => (
             <li key={t.date} className={t.went ? 'on' : ''} title={`${dayLabel(t.date)} · ${t.kind}${t.went ? '' : ' · niet geteld'}`}>
               <span className="dot">{t.went ? (state.sources['training-' + t.date] === 'checkin' ? '✓' : '') : ''}</span>
-              <span className="d">{t.date.slice(8).replace(/^0/, '')}</span>
+              <span className="d">{+t.date.slice(8)}<br />{MONTHS[+t.date.slice(5, 7) - 1]}</span>
             </li>
           ))}
         </ol>
@@ -144,7 +144,7 @@ function BadgeSheet({ b, tuesdays, onClose }) {
             : <p className="small muted">Nog niet behaald.</p>}
         {b.id === 'ijzeren-reeks' && tuesdays && (
           <ol className="tues">
-            {tuesdays.map((x) => <li key={x.date} className={x.went ? 'on' : ''}><span className="dot" /><span className="d">{x.date.slice(8).replace(/^0/, '')}</span></li>)}
+            {tuesdays.map((x) => <li key={x.date} className={x.went ? 'on' : ''}><span className="dot" /><span className="d">{+x.date.slice(8)}<br />{MONTHS[+x.date.slice(5, 7) - 1]}</span></li>)}
           </ol>
         )}
         <button className="btn btn-line" onClick={onClose}>Sluiten</button>

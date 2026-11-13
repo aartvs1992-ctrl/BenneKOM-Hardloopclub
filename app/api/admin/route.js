@@ -128,6 +128,16 @@ export async function POST(req) {
         await upsert('badge_log', { device_id: device, key: 'award:' + badge.id, date: new Date().toISOString().slice(0, 10), source: 'beheer', activity_id: null }, ['device_id', 'key']);
         break;
       }
+      case 'awardTraining': {
+        // een dinsdagtraining laten meetellen die Strava niet als groepsloop herkende
+        const date = clean(b.date, 10), device = clean(b.device, 64);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || new Date(date + 'T12:00:00Z').getUTCDay() !== 2 || !device) return Response.json({ error: 'Kies een lid en een dinsdag.' }, { status: 400 });
+        await upsert('badge_log', { device_id: device, key: 'training-' + date, date, source: 'beheer', activity_id: null }, ['device_id', 'key']);
+        break;
+      }
+      case 'revokeTraining':
+        await remove('badge_log', { device_id: clean(b.device, 64), key: 'training-' + clean(b.date, 10), source: 'beheer' });
+        break;
       case 'revokeBadge':
         await remove('badge_log', { device_id: clean(b.device, 64), key: 'award:' + clean(b.badge, 40) });
         break;
@@ -285,7 +295,8 @@ export async function POST(req) {
         avatar: p.photo_path ? fileUrl(p.photo_path) : null, joined: p.created_at, last_seen: p.last_seen || null,
         going: participants.filter((x) => x.device_id === p.device_id).length,
       })).sort((a, b) => String(b.joined).localeCompare(String(a.joined))),
-      badgeAwards: (await all('badge_log').catch(() => [])).filter((r) => r.source === 'beheer').map((r) => ({ device: r.device_id, badge: r.key.slice(6), date: r.date })),
+      badgeAwards: (await all('badge_log').catch(() => [])).filter((r) => r.source === 'beheer' && r.key.startsWith('award:')).map((r) => ({ device: r.device_id, badge: r.key.slice(6), date: r.date })),
+      trainingAwards: (await all('badge_log').catch(() => [])).filter((r) => r.source === 'beheer' && r.key.startsWith('training-')).map((r) => ({ device: r.device_id, date: r.key.slice(9) })),
       upcoming: withTrainings(events).map((e) => ({ id: e.id, title: e.title, date: e.date, type: e.type })),
       added: b.added,
       status: { database: usingSupabase, push: pushReady },

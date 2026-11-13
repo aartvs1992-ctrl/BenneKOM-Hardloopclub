@@ -273,6 +273,7 @@ export default function Beheer() {
 
       <Members list={d.members || []} call={call} />
       <BadgeAwards members={d.members || []} awards={d.badgeAwards || []} call={call} />
+      <TrainingAwards members={d.members || []} awards={d.trainingAwards || []} call={call} />
 
       <section className="section">
         <h2>Voorstellen van leden</h2>
@@ -474,6 +475,41 @@ function BadgeAwards({ members, awards, call }) {
             <div key={a.device + a.badge} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}>
               <span><span className="t">{BADGE[a.badge]?.name || a.badge} · {name(a.device)}</span><br /><span className="s">{a.date}</span></span>
               <button className="btn btn-line btn-sm" onClick={() => call('revokeBadge', { badge: a.badge, device: a.device }, 'Badge ingetrokken')}>Intrekken</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// Een dinsdag laten meetellen die Strava niet als groepsloop herkende (bijv. weinig lopers met Strava die avond)
+function TrainingAwards({ members, awards, call }) {
+  const [date, setDate] = useState('');
+  const [device, setDevice] = useState('');
+  const name = (dev) => members.find((m) => m.device === dev)?.name || 'Onbekend lid';
+  return (
+    <section className="section">
+      <h2>Dinsdag laten meetellen</h2>
+      <p className="small muted">Was iemand er wel, maar herkende Strava het loopje niet als groepsloop? Zet die dinsdag hier voor dat lid. Het lid tikt daarna op Nu bijwerken.</p>
+      <form className="panel" onSubmit={(e) => { e.preventDefault(); call('awardTraining', { date, device }, `Dinsdag ${date} telt mee voor ${name(device)}`); }}>
+        <div className="grid2">
+          <div className="field"><label htmlFor="ta-date">Dinsdag</label>
+            <input className="input" type="date" id="ta-date" value={date} onChange={(e) => setDate(e.target.value)} required /></div>
+          <div className="field"><label htmlFor="ta-member">Lid</label>
+            <select className="input" id="ta-member" value={device} onChange={(e) => setDevice(e.target.value)} required>
+              <option value="">Kies…</option>
+              {[...members].sort((a, b) => a.name.localeCompare(b.name)).map((m) => <option key={m.device} value={m.device}>{m.name}</option>)}
+            </select></div>
+        </div>
+        <button className="btn btn-gold" type="submit" disabled={!device || !date}>Laten meetellen</button>
+      </form>
+      {awards.length > 0 && (
+        <div className="list">
+          {awards.sort((a, b) => b.date.localeCompare(a.date)).map((a) => (
+            <div key={a.device + a.date} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}>
+              <span className="t">{a.date} · {name(a.device)}</span>
+              <button className="btn btn-line btn-sm" onClick={() => call('revokeTraining', { date: a.date, device: a.device }, 'Weggehaald')}>Weghalen</button>
             </div>
           ))}
         </div>

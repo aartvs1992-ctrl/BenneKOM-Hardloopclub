@@ -548,7 +548,7 @@ a.media-item:hover{border-color:var(--gold)}
 .tues li{display:flex;flex-direction:column;align-items:center;gap:4px}
 .tues .dot{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--navy)}
 .tues li.on .dot{background:var(--gold);border-color:var(--gold)}
-.tues .d{font-size:11px;color:var(--muted);font-family:var(--f-mono)}
+.tues .d{font-size:10.5px;line-height:1.2;text-align:center;color:var(--muted);font-family:var(--f-mono)}
 .tier-chip{display:inline-flex;align-items:center;gap:8px;align-self:center;padding:5px 12px;border-radius:999px;background:var(--navy);color:var(--c);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .tier-chip i{width:9px;height:9px;border-radius:50%;background:var(--c)}
 .badge-sheet{align-items:center;text-align:center}
