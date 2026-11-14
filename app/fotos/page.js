@@ -99,6 +99,14 @@ export default function Fotos() {
   const [filter, setFilter] = useState('all');
   const [progress, setProgress] = useState(null);
   const input = useRef(null);
+  // Via de racedag-kaart: /fotos?album=Zevenheuvelenloop&datum=2026-11-15 vult de wedstrijd alvast in
+  const [preset, setPreset] = useState(null);
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    const album = (q.get('album') || '').trim().slice(0, 60);
+    const datum = /^\d{4}-\d{2}-\d{2}$/.test(q.get('datum') || '') ? q.get('datum') : '';
+    if (album) setPreset({ album, date: datum && datum <= todayISO() ? datum : todayISO() });
+  }, []);
 
   const wall = useMemo(() => {
     if (!photos) return [];
@@ -129,7 +137,7 @@ export default function Fotos() {
     e.target.value = '';
     if (!file) return;
     if (!local.name) { location.href = '/profiel?terug=1'; return; }
-    const base = { caption: '', moment: '', other: '', date: todayISO() };
+    const base = preset ? { caption: '', moment: 'other', other: preset.album, date: preset.date } : { caption: '', moment: '', other: '', date: todayISO() };
     if (file.type.startsWith('video/')) {
       if (file.size > MAX_VIDEO_MB * 1024 * 1024) { toast(`Deze video is te groot (max. ${MAX_VIDEO_MB} MB). Kies een kortere video.`); return; }
       try {
@@ -180,7 +188,13 @@ export default function Fotos() {
       <PhotoHeader src="/club/de-hele-groep.jpg" title="Foto's" sub={`${wall.length} foto's van de club. Deel ook jouw mooiste moment.`} pos="center 45%" />
 
       <input ref={input} type="file" accept="image/*,video/*" hidden onChange={pick} id="photo-input" />
-      {!draft && <button className="btn btn-gold" onClick={() => input.current.click()}>+ Foto of video plaatsen</button>}
+      {!draft && preset && (
+        <div className="panel fotos-album-hint">
+          <b>{preset.album}: deel je beelden 📸</b>
+          <span className="small muted">Stond je langs de kant of liep je mee? Plaats je gaafste foto&apos;s en filmpjes, en vertel in een paar woorden hoe het was. Ze komen samen in het album {preset.album}.</span>
+        </div>
+      )}
+      {!draft && <button className="btn btn-gold" onClick={() => input.current.click()}>{preset ? `+ Beelden van de ${preset.album} plaatsen` : '+ Foto of video plaatsen'}</button>}
 
       {draft && (
         <form className="panel" onSubmit={post}>
@@ -206,7 +220,7 @@ export default function Fotos() {
               <input className="input" id="ph-date" type="date" max={todayISO()} value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} /></div>
           )}
           <div className="field"><label htmlFor="ph-cap">Bijschrift (optioneel)</label>
-            <input className="input" id="ph-cap" maxLength={140} value={draft.caption} onChange={(e) => setDraft({ ...draft, caption: e.target.value })} placeholder="Bijv. Intervallen in de Kraats" /></div>
+            <input className="input" id="ph-cap" maxLength={140} value={draft.caption} onChange={(e) => setDraft({ ...draft, caption: e.target.value })} placeholder={preset ? 'Bijv. Wat een sfeer langs de kant!' : 'Bijv. Intervallen in de Kraats'} /></div>
           <p className="note">Plaats alleen foto&apos;s waarop iedereen het goedvindt om in de app te staan.</p>
           <div className="btn-row">
             <button className="btn btn-gold" type="submit" disabled={busy || (draft.moment === 'other' && !draft.other.trim())}>{busy ? (progress != null && progress < 100 ? `Video uploaden… ${progress}%` : 'Bezig met plaatsen…') : 'Plaatsen'}</button>

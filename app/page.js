@@ -8,6 +8,7 @@ import { usePhotos } from '@/lib/usePhotos';
 import InstallBanner from '@/components/InstallBanner';
 import { workoutFor } from '@/lib/workouts';
 import { SINGLET, PROMO } from '@/lib/content';
+import RaceDay, { pickRace } from '@/components/RaceDay';
 
 export default function Home() {
   const { data, local } = useApp();
@@ -28,6 +29,7 @@ export default function Home() {
     <>
       <ErrorNote />
       <InstallBanner />
+      <RaceDay pick={pickRace(data)} />
       {next && <NextTraining e={next} img={heroImg} />}
 
       <SingletDrop s={data.singlet} />

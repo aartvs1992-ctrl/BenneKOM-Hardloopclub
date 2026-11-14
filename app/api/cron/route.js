@@ -4,6 +4,7 @@
 import { all } from '@/lib/db';
 import { withTrainings, todayISO } from '@/lib/club';
 import { sendPush } from '@/lib/push';
+import { raceDayPushes } from '@/lib/racedayPush';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,5 +55,7 @@ export async function GET(req) {
     if (dl === tomorrow) out.push(await sendPush('deadlines', { title: `Morgen sluit de inschrijving: ${e.title}`, body: `Inschrijven kan tot en met ${day}.`, url: '/event/' + e.id }));
     else if (dl === inWeek) out.push(await sendPush('deadlines', { title: `Nog een week om in te schrijven: ${e.title}`, body: `De inschrijving sluit ${day}.`, url: '/event/' + e.id }));
   }
+  // Racedag: succes voor wie morgen loopt, en "hoe ging het?" voor wie vandaag liep
+  out.push(...await raceDayPushes('evening', { events, participants, today, tomorrow }));
   return Response.json({ today, results: out });
 }
