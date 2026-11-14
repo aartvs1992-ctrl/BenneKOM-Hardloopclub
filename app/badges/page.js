@@ -104,7 +104,7 @@ export default function Badges() {
       <details className="panel how">
         <summary><b>Hoe tellen badges?</b></summary>
         <ul className="small">
-          <li><b>Met Strava:</b> een loopje op dinsdag rond de trainingstijd, in Bennekom, telt automatisch als clubtraining. Events tellen op dezelfde manier op hun eigen dag.</li>
+          <li><b>Met Strava:</b> een loopje op dinsdag rond de trainingstijd, in Bennekom, telt automatisch als clubtraining. Specials tellen op dezelfde manier op hun eigen dag.</li>
           <li><b>Zonder Strava:</b> meld je aan met &ldquo;Ik ben erbij&rdquo; en tik op de avond zelf op &ldquo;Ik was erbij&rdquo;.</li>
           <li>Alleen aanmelden telt niet: de badge komt pas als je er echt was.</li>
           <li>Interval of duurloop haalt de app uit het trainingsschema.</li>
