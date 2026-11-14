@@ -29,20 +29,6 @@ export function pickRace(data) {
   return cands[0] ? { e: cands[0].e, phase: cands[0].phase } : null;
 }
 
-// Wisselende naam: alle lopers komen om de beurt voorbij
-function NameCycle({ names }) {
-  const list = [...new Set(names)];
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (list.length < 2) return;
-    const id = setInterval(() => setI((x) => (x + 1) % list.length), 1500);
-    return () => clearInterval(id);
-  }, [list.length]);
-  if (!list.length) return null;
-  const name = list[i % list.length];
-  return <span className="rd-name" key={name} aria-live="off">{name}</span>;
-}
-
 // Zeven (of een paar) heuvels, als achtergrond van de kaart
 function Hills({ n = 7 }) {
   const w = 400, h = 90, step = w / n;
@@ -99,8 +85,6 @@ function Card({ pick, full = false, onClose }) {
   const first = (local?.name || '').split(' ')[0];
   const when = phase === 'tomorrow' ? 'Morgen' : phase === 'today' ? 'Vandaag' : 'Net gelopen';
   const place = (e.place || '').split(',')[0];
-  // Voornamen van wie meeloopt; jijzelf eerst als je meedoet
-  const runners = [...(mine && first ? [first] : []), ...people.map((p) => (p.name || '').split(' ')[0]).filter(Boolean)];
 
   return (
     <section className={'race-day' + (full ? ' full' : '') + (t.image ? ' has-img' : '')} style={t.image ? { backgroundImage: `url("${t.image}")` } : undefined}>
@@ -109,12 +93,8 @@ function Card({ pick, full = false, onClose }) {
       <span className="eyebrow">{when} · {e.title}{phase !== 'after' && (e.time || place) ? ' · ' + [e.time, place].filter(Boolean).join(' · ') : ''}</span>
       <h2>{phase === 'after' ? 'Wat een prestatie!' : t.headline}</h2>
 
-      {phase !== 'after' && runners.length > 0 && (
-        <p className="rd-good">
-          <b>Succes{phase === 'tomorrow' ? ' morgen' : ''},{' '}
-            <NameCycle names={runners} />!</b>
-          {' '}{t.good.replace(/^Succes[^!]*!\s*/, '')}
-        </p>
+      {phase !== 'after' && mine && (
+        <p className="rd-good"><b>{first ? `Succes${phase === 'tomorrow' ? ' morgen' : ''}, ${first}!` : 'Succes!'}</b> {t.good.replace(/^Succes[^!]*!\s*/, '')}</p>
       )}
 
       {n > 0 && (

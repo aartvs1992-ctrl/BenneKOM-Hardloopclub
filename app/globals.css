@@ -609,7 +609,3 @@ a.media-item:hover{border-color:var(--gold)}
 .race-day .rd-skip{align-self:center;background:none;border:0;color:var(--on-navy);opacity:.85;font-weight:600;font-size:15px;padding:10px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 @keyframes rd-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.race-day-full{animation:none}}
-
-.race-day .rd-name{display:inline-block;color:var(--gold);animation:rd-name .45s ease-out}
-@keyframes rd-name{from{opacity:0;transform:translateY(.4em)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.race-day .rd-name{animation:none}}
