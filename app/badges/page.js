@@ -9,6 +9,7 @@ import { useBadges } from '@/lib/useBadges';
 import { CATEGORIES, TIERS, nextBadge } from '@/lib/badges';
 
 const MONTHS = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+const fullDate = (iso) => { const d = new Date(iso.slice(0, 10) + 'T12:00:00Z'); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 const dayLabel = (iso, long) => {
   if (!iso) return '';
   const d = new Date(iso.slice(0, 10) + 'T12:00:00Z');
@@ -135,7 +136,10 @@ function BadgeSheet({ b, tuesdays, onClose }) {
         <h2>{b.name}</h2>
         <p className="muted">{b.crit}</p>
         {b.earned
-          ? <p><b>Behaald</b> {b.date ? 'op ' + dayLabel(b.date, true) : ''}</p>
+          ? <>
+              <p><b>Behaald</b> {b.date ? 'op ' + dayLabel(b.date, true) : ''}</p>
+              {b.from && b.from !== b.date && <p className="small muted">Periode: {fullDate(b.from)} t/m {fullDate(b.date)}</p>}
+            </>
           : b.need > 1 && b.have != null
             ? <div className="section" style={{ gap: 6, width: '100%' }}>
                 <span className="badge-bar"><i style={{ width: `${Math.round((b.have / b.need) * 100)}%` }} /></span>
