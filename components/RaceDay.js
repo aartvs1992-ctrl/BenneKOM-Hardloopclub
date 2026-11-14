@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useApp } from './AppProvider';
 import { Avatar } from './ui';
@@ -44,9 +45,38 @@ function Hills({ n = 7 }) {
   );
 }
 
+// Eerst schermvullend (één keer per wedstrijd en fase), daarna als kaart bovenaan de normale pagina
 export default function RaceDay({ pick }) {
-  const { data, local } = useApp();
+  const key = pick ? `bk-raceday:${pick.e.id}:${pick.phase}` : '';
+  const [full, setFull] = useState(false);
+  useEffect(() => {
+    if (!key) return;
+    let seen = false;
+    try { seen = localStorage.getItem(key) === '1'; } catch {}
+    setFull(!seen);
+  }, [key]);
+  useEffect(() => {
+    if (!full) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [full]);
   if (!pick) return null;
+  const close = () => { try { localStorage.setItem(key, '1'); } catch {} setFull(false); };
+  return (
+    <>
+      {full && (
+        <div className="race-day-full" role="dialog" aria-modal="true" aria-label={pick.e.title}>
+          <Card pick={pick} full onClose={close} />
+        </div>
+      )}
+      <Card pick={pick} />
+    </>
+  );
+}
+
+function Card({ pick, full = false, onClose }) {
+  const { data, local } = useApp();
   const { e, phase } = pick;
   const t = raceDay(e);
   const n = data.counts[e.id] || 0;
@@ -57,7 +87,8 @@ export default function RaceDay({ pick }) {
   const place = (e.place || '').split(',')[0];
 
   return (
-    <section className={'race-day' + (t.image ? ' has-img' : '')} style={t.image ? { backgroundImage: `url("${t.image}")` } : undefined}>
+    <section className={'race-day' + (full ? ' full' : '') + (t.image ? ' has-img' : '')} style={t.image ? { backgroundImage: `url("${t.image}")` } : undefined}>
+      {full && <button type="button" className="rd-close" onClick={onClose} aria-label="Sluiten">×</button>}
       <Hills n={t.hills} />
       <span className="eyebrow">{when} · {e.title}{phase !== 'after' && (e.time || place) ? ' · ' + [e.time, place].filter(Boolean).join(' · ') : ''}</span>
       <h2>{phase === 'after' ? 'Wat een prestatie!' : t.headline}</h2>
@@ -80,6 +111,7 @@ export default function RaceDay({ pick }) {
         <Link className="btn btn-gold" href={shareUrl(e)}>📸 Deel je beelden</Link>
         <Link className="btn btn-line" href={'/event/' + e.id}>{phase === 'after' ? 'Wie liepen er ›' : mine ? 'Wie lopen er ›' : 'Loop jij ook? ›'}</Link>
       </div>
+      {full && <button type="button" className="rd-skip" onClick={onClose}>Verder naar de app ›</button>}
     </section>
   );
 }
