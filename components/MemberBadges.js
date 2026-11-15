@@ -1,6 +1,6 @@
 'use client';
 // Badges op het profiel van een loper: aantal, top 3 en de nieuwste, met uitklappen voor de rest.
-// Alleen als die loper dat zelf heeft aangezet (Mijn badges). Nooit loopjes, tijden of kilometers.
+// Standaard zichtbaar; een loper kan het uitzetten bij Mijn badges. Nooit loopjes, tijden of kilometers.
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Badge from './Badge';
@@ -27,7 +27,7 @@ export default function MemberBadges({ p }) {
   if (p.me) {
     const st = own.state;
     if (!st) return null;
-    if (!st.shown) return <p className="small muted" style={{ textAlign: 'center' }}>Je badges staan niet op je profiel. <Link href="/badges">Zet ze aan bij Mijn badges</Link></p>;
+    if (!st.shown) return <p className="small muted" style={{ textAlign: 'center' }}>Je badges zijn verborgen voor anderen. <Link href="/badges">Aanpassen bij Mijn badges</Link></p>;
     return <Block list={st.badges.filter((b) => b.earned)} open={open} setOpen={setOpen} />;
   }
   if (!other?.shown || !other.badges?.length) return null;

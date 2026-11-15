@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useApp } from './AppProvider';
 import Badge from './Badge';
-import { TIERS, TIER_ORDER } from '@/lib/badges';
+import { BADGES, TIERS, TIER_ORDER } from '@/lib/badges';
 import { useBadges } from '@/lib/useBadges';
 
 const SEEN = 'bennekom-badges-seen';
@@ -47,11 +47,41 @@ export function UnlockSheet({ list, onClose }) {
 }
 
 // Op de achtergrond nieuwe Strava-loopjes ophalen en nieuwe badges laten zien
+// Eenmalige uitleg bij het openen van de app: wat badges zijn en dat ze op je profiel staan (uit te zetten)
+const INTRO = 'bennekom-badges-intro';
+export function BadgeIntro({ state, setShown, onClose }) {
+  const [busy, setBusy] = useState(false);
+  const shown = state?.shown !== false;
+  const sample = ['vaste-prik', 'backyard-2026', 'onbreekbaar'].map((id) => BADGES.find((b) => b.id === id)).filter(Boolean);
+  return (
+    <div className="sheet-bg unlock-bg">
+      <div className="unlock" role="dialog" aria-modal="true" aria-label="Nieuw: badges">
+        <p className="unlock-eyebrow">Nieuw in de app</p>
+        <div className="unlock-more">{sample.map((b) => <Badge key={b.id} b={b} size={80} />)}</div>
+        <h2 className="unlock-title">Badges</h2>
+        <p className="unlock-text">Verdien badges met de dinsdagtrainingen, de 5k Challenge en specials zoals de Backyard Run. Met Strava gekoppeld tellen ook je trainingen van vroeger mee.</p>
+        <label className="intro-toggle">
+          <span><b>Laat mijn badges zien op mijn profiel</b><br /><span className="small">Clubgenoten zien je aantal en je top 3. Nooit je loopjes, tijden of kilometers. Uitzetten kan altijd, ook later bij Mijn badges.</span></span>
+          <input type="checkbox" role="switch" checked={shown} disabled={busy || !state}
+            onChange={async (e) => { setBusy(true); try { await setShown(e.target.checked); } catch {} setBusy(false); }} />
+        </label>
+        <div className="unlock-actions">
+          <Link className="btn btn-gold" href="/badges" onClick={onClose}>Bekijk mijn badges</Link>
+          <button className="btn btn-line" onClick={onClose}>Oké</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function BadgeWatcher() {
   const { local, data } = useApp();
-  const { state, sync } = useBadges();
+  const { state, sync, setShown } = useBadges();
   const [fresh, setFresh] = useState(null);
+  const [intro, setIntro] = useState(false);
   const device = local?.device;
+  useEffect(() => { try { if (!localStorage.getItem(INTRO)) setIntro(true); } catch {} }, []);
+  const closeIntro = () => { try { localStorage.setItem(INTRO, '1'); } catch {} setIntro(false); };
 
   useEffect(() => {
     if (!device || !data?.me) return;
@@ -69,5 +99,6 @@ export function BadgeWatcher() {
     writeSeen(device, [...new Set([...(seen || []), ...ids])]);
   }, [device, state]);
 
+  if (intro) return <BadgeIntro state={state} setShown={setShown} onClose={closeIntro} />;
   return fresh ? <UnlockSheet list={fresh} onClose={() => setFresh(null)} /> : null;
 }
