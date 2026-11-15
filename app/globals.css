@@ -609,3 +609,19 @@ a.media-item:hover{border-color:var(--gold)}
 .race-day .rd-skip{align-self:center;background:none;border:0;color:var(--on-navy);opacity:.85;font-weight:600;font-size:15px;padding:10px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 @keyframes rd-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.race-day-full{animation:none}}
+
+.member-badges{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:14px;width:100%}
+.mb-top{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mb-item{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.mb-name{font-size:13px;font-weight:600;line-height:1.2}
+.mb-tier{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.member-badges .link{align-self:center}
+.show-toggle{display:flex;flex-direction:row;align-items:center;gap:14px;cursor:pointer}
+.show-toggle>span{flex:1;display:flex;flex-direction:column;gap:4px}
+.show-toggle input{width:46px;height:26px;accent-color:var(--gold);flex:0 0 auto}
+
+.show-toggle input{appearance:none;-webkit-appearance:none;width:50px;height:30px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;transition:background .2s;margin:0}
+.show-toggle input::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.show-toggle input:checked{background:var(--gold)}
+.show-toggle input:checked::after{transform:translateX(20px)}
+.show-toggle input:focus-visible{outline:2px solid var(--navy);outline-offset:2px}

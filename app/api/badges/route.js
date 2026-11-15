@@ -1,5 +1,5 @@
 // Badges van één lid: alleen voor het eigen apparaat (Strava-gegevens zijn alleen voor jezelf)
-import { badgeState, scanStrava, checkin } from '@/lib/badgeScan';
+import { badgeState, scanStrava, checkin, setShown, publicBadges } from '@/lib/badgeScan';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -7,7 +7,10 @@ export const maxDuration = 30;
 const deviceOf = (v) => String(v || '').slice(0, 64);
 
 export async function GET(req) {
-  const device = deviceOf(new URL(req.url).searchParams.get('device'));
+  const q = new URL(req.url).searchParams;
+  // badges van een ander lid: alleen wat dat lid zelf zichtbaar heeft gemaakt
+  if (q.get('of')) return Response.json(await publicBadges(String(q.get('of')).slice(0, 32)));
+  const device = deviceOf(q.get('device'));
   if (!device) return Response.json({ error: 'Apparaat onbekend.' }, { status: 400 });
   return Response.json(await badgeState(device));
 }
@@ -28,6 +31,9 @@ export async function POST(req) {
         : e.soft ? e.message
         : 'Strava was even niet bereikbaar. Je ziet je laatst bekende badges. (' + String(e.message || e).slice(0, 120) + ')';
     }
+  } else if (b.action === 'visibility') {
+    try { await setShown(device, Boolean(b.on)); }
+    catch { return Response.json({ error: 'Opslaan lukte niet.' }, { status: 400 }); }
   } else if (b.action === 'checkin') {
     try { await checkin(device, String(b.eventId || '').slice(0, 80)); }
     catch (e) { return Response.json({ error: /badge_log/.test(e.message) ? 'Inchecken werkt nog niet: de badges-tabel ontbreekt in de database.' : e.message }, { status: 400 }); }

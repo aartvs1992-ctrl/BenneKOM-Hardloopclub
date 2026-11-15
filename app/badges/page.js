@@ -31,7 +31,7 @@ export default function Badges() {
     if (q.get('strava') === 'ok') setMsg('Strava gekoppeld! Je loopjes zijn doorzocht.');
     else if (q.get('strava')) setMsg('Koppelen lukte niet. ' + (q.get('why') || ''));
   }, []);
-  const { state, busy, sync } = useBadges({ demo });
+  const { state, busy, sync, setShown } = useBadges({ demo });
   const [note, setNote] = useState('');
 
   const list = state?.badges || [];
@@ -86,6 +86,17 @@ export default function Badges() {
               <p className="small muted">Geen Strava? Meld je aan met &ldquo;Ik ben erbij&rdquo; en tik op de avond zelf op &ldquo;Ik was erbij&rdquo;.</p>
             </div>}
       </section>
+
+      {!state.demo && (
+        <label className="panel show-toggle">
+          <span>
+            <b>Laat mijn badges zien op mijn profiel</b>
+            <span className="small muted">Anderen zien dan je aantal badges en je top 3. Nooit je loopjes, tijden of kilometers.</span>
+          </span>
+          <input type="checkbox" role="switch" checked={Boolean(state.shown)} disabled={busy}
+            onChange={async (e) => { try { await setShown(e.target.checked); } catch (err) { setNote(err.message); } }} />
+        </label>
+      )}
 
       <div className="chips" role="group" aria-label="Filter badges">
         {[['alles', 'Alles'], ...CATEGORIES.map(([k, t]) => [k, t.split(' ')[0]])].map(([k, t]) => (
