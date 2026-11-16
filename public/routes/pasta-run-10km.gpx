@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpx creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
  <metadata>
-  <name>Pasta Run - 10 km</name>
+  <name>Pasta Run - 10 km (9,3 km)</name>
   <author>
    <name>Aart van Steenbergen</name>
    <link href="https://www.strava.com/athletes/10337667"/>
@@ -18,7 +18,7 @@
   <type>Restaurant</type>
  </wpt>
  <trk>
-  <name>Pasta Run - 10 km</name>
+  <name>Pasta Run - 10 km (9,3 km)</name>
   <link href="https://www.strava.com/routes/3557452146356544588"/>
   <type>running</type>
   <trkseg>
@@ -345,30 +345,6 @@
    </trkpt>
    <trkpt lat="52.00262000000001" lon="5.65749">
     <ele>13.61</ele>
-   </trkpt>
-   <trkpt lat="52.002880000000005" lon="5.6573">
-    <ele>13.540000000000001</ele>
-   </trkpt>
-   <trkpt lat="52.00366250500999" lon="5.656670033067425">
-    <ele>12.92</ele>
-   </trkpt>
-   <trkpt lat="52.004445006659594" lon="5.656040044107295">
-    <ele>12.700000000000001</ele>
-   </trkpt>
-   <trkpt lat="52.00522750494861" lon="5.655410033118312">
-    <ele>12.780000000000001</ele>
-   </trkpt>
-   <trkpt lat="52.00601" lon="5.654780000000001">
-    <ele>13.040000000000001</ele>
-   </trkpt>
-   <trkpt lat="52.0052275050718" lon="5.655410033019132">
-    <ele>12.780000000000001</ele>
-   </trkpt>
-   <trkpt lat="52.00444500678278" lon="5.656040044008117">
-    <ele>12.700000000000001</ele>
-   </trkpt>
-   <trkpt lat="52.003662505133185" lon="5.65667003296825">
-    <ele>12.92</ele>
    </trkpt>
    <trkpt lat="52.002880000000005" lon="5.6573">
     <ele>13.540000000000001</ele>
