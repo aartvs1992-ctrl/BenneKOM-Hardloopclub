@@ -28,6 +28,7 @@ export default function EventPage() {
   const lines = (t) => String(t || '').split('\n').map((x) => x.trim()).filter(Boolean);
   const program = lines(dt.program).map((l) => { const m = /^(\d{1,2}[:.]\d{2})\s+(.*)$/.exec(l); return m ? [m[1].replace('.', ':'), m[2]] : ['', l]; });
   const bring = lines(dt.bring);
+  const routes = (dt.routes || []).filter((r) => r && (r.gpx || r.strava));
   return (
     <>
       <ErrorNote />
@@ -122,6 +123,8 @@ export default function EventPage() {
         </section>
       )}
 
+      {routes.length > 0 && <Routes routes={routes} />}
+
       {(bring.length > 0 || dt.cost || dt.story) && (
         <section className="section">
           <h2>Praktisch</h2>
@@ -145,6 +148,31 @@ export default function EventPage() {
         </>
       )}
     </>
+  );
+}
+
+// Routes bij een event: GPX downloaden (voor horloge of app) en/of openen in Strava.
+function Routes({ routes }) {
+  return (
+    <section className="section">
+      <h2>{routes.length === 1 ? 'De route' : 'De routes'}</h2>
+      <div className="routes">
+        {routes.map((r, i) => (
+          <div className="panel route-card" key={i}>
+            <div className="route-head">
+              <b className="route-name">{r.label}</b>
+              {r.pace && <span className="eyebrow">{r.pace}</span>}
+            </div>
+            {r.note && <p className="small">{r.note}</p>}
+            <div className="route-btns">
+              {r.gpx && <a className="btn btn-gold btn-sm" href={r.gpx} download>Download GPX</a>}
+              {r.strava && <a className="btn btn-line btn-sm" href={r.strava} target="_blank" rel="noopener noreferrer">Open in Strava ↗</a>}
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="note">Zet de GPX vooraf op je horloge, bijvoorbeeld via Garmin Connect of Strava (Routes → Importeren). Zo loop je niet verkeerd als je groepje uit elkaar valt.</p>
+    </section>
   );
 }
 
