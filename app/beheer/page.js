@@ -21,6 +21,7 @@ export default function Beheer() {
   const [par, setPar] = useState(P0);
   const [med, setMed] = useState({ outlet: '', title: '', published: '', url: '', summary: '' });
   const [push, setPush] = useState({ title: '', body: '', pref: 'events' });
+  const [cancel, setCancel] = useState(null);
 
   async function call(action, payload = {}, ok) {
     const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw, action, ...payload }) });
@@ -82,11 +83,35 @@ export default function Beheer() {
               <span style={{ minWidth: 0 }}><span className="t"><span className={'tag ' + e.type}>{TYPE_LABEL[e.type]}</span>{e.title}</span><br /><span className="s">{e.date} · {count(e.id)} aangemeld</span></span>
               <span className="btn-row" style={{ gap: 6 }}>
                 <button className="link" onClick={() => { setEv({ ...EMPTY, ...e, capacity: e.capacity ?? '', details: e.details || {} }); window.scrollTo(0, 0); }}>Bewerk</button>
+                <button className="link" onClick={() => setCancel(cancelDraft(e))}>Afgelasten</button>
                 <DeleteButton onConfirm={() => call('deleteEvent', { id: e.id }, 'Verwijderd')} />
               </span>
             </div>
           ))}
         </div>
+        {cancel && (
+          <form className="panel" onSubmit={async (x) => {
+            x.preventDefault();
+            const n = count(cancel.id);
+            if (!confirm(`${cancel.label} afgelasten en het bericht sturen naar ${n} ${n === 1 ? 'ingeschrevene' : 'ingeschrevenen'}?`)) return;
+            const j = await call('cancelEvent', cancel);
+            const r = j?.cancelled;
+            if (!r) return;
+            setCancel(null);
+            const parts = [];
+            if (r.pushed.length) parts.push(`${r.pushed.length} via pushmelding`);
+            if (r.mailed.length) parts.push(`${r.mailed.length} via mail`);
+            toast(`Afgelast${parts.length ? ` · bericht verstuurd: ${parts.join(', ')}` : ''}`);
+            if (r.none.length) alert(`Deze mensen hebben geen meldingen aan en geen bekend mailadres. Stuur ze even een appje:\n\n${r.none.join('\n')}`);
+          }}>
+            <h2>Afgelasten · {cancel.label}</h2>
+            <p className="small">{count(cancel.id)} ingeschreven. Zij krijgen dit bericht als pushmelding; wie geen meldingen aan heeft krijgt een mail. Daarna verdwijnt het evenement uit de agenda.</p>
+            <div className="field"><label htmlFor="cx-title">Titel</label><input className="input" id="cx-title" maxLength={80} value={cancel.title} onChange={(x) => setCancel({ ...cancel, title: x.target.value })} /></div>
+            <div className="field"><label htmlFor="cx-body">Pushmelding (max. 200 tekens)</label><textarea className="input" id="cx-body" maxLength={200} value={cancel.body} onChange={(x) => setCancel({ ...cancel, body: x.target.value })} /><span className="small muted">{cancel.body.length}/200</span></div>
+            <div className="field"><label htmlFor="cx-mail">Mail (lege regel = nieuwe alinea)</label><textarea className="input" id="cx-mail" rows={6} value={cancel.mail} onChange={(x) => setCancel({ ...cancel, mail: x.target.value })} /></div>
+            <div className="btn-row"><button className="btn btn-gold" type="submit">Afgelasten en bericht sturen</button><button className="btn btn-line" type="button" onClick={() => setCancel(null)}>Annuleren</button></div>
+          </form>
+        )}
       </section>
 
       {(d.meals || []).filter((m) => m.date >= new Date(Date.now() - 864e5).toISOString().slice(0, 10)).map((m) => (
@@ -516,4 +541,23 @@ function TrainingAwards({ members, awards, call }) {
       )}
     </section>
   );
+}
+
+// Voorstel voor het afgelast-bericht. Valt de Challenge samen met de Horaloop, dan wijst het bericht daarnaar.
+function cancelDraft(e) {
+  const [y, m, d] = e.date.split('-').map(Number);
+  const dag = `${['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'][new Date(y, m - 1, d).getDay()]} ${d} ${['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'][m - 1]}`;
+  const naam = e.type === 'challenge' ? '5km Challenge' : e.title;
+  const hora = e.type === 'challenge' && e.date === '2026-11-28';
+  return {
+    id: e.id,
+    label: `${e.title} (${e.date})`,
+    title: `${naam} van ${d} ${['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'][m - 1]} gaat niet door`,
+    body: hora
+      ? `Op ${dag} is de Horaloop in Ede, dus deze maand slaan we de Challenge over. Loop je mee met de Horaloop? Je rit regel je via de carpool in de app.`
+      : `De ${naam} op ${dag} gaat helaas niet door. Je inschrijving is vervallen.`,
+    mail: hora
+      ? `Je had je ingeschreven voor de BenneKOM 5km Challenge op ${dag}. Die laten we deze maand vervallen: dezelfde ochtend is de Horaloop in Ede, de loop van AV Climax om de hoek.\n\nWe zien je daar graag! Er zijn afstanden van 5, 10 en 16 km. Inschrijven doe je via horaloop.nl en in de app kun je samen met clubgenoten een carpool regelen.\n\nJe inschrijving voor de Challenge is vervallen, je hoeft verder niets te doen.`
+      : `Je had je ingeschreven voor de ${naam} op ${dag}. Die gaat helaas niet door.\n\nJe inschrijving is vervallen, je hoeft verder niets te doen.`,
+  };
 }

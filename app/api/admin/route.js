@@ -65,6 +65,36 @@ export async function POST(req) {
         await remove('events', { id: clean(b.id) });
         await remove('participants', { event_id: clean(b.id) });
         break;
+      case 'cancelEvent': {
+        // Afgelasten: iedereen die zich had ingeschreven krijgt eerst een bericht (push, anders mail),
+        // daarna verdwijnt het evenement met de inschrijvingen uit de agenda.
+        const [evRow] = (await all('events')).filter((x) => x.id === clean(b.id, 80));
+        if (!evRow) return Response.json({ error: 'Dit evenement bestaat niet (meer).' }, { status: 404 });
+        const title = clean(b.title, 80);
+        const body = clean(b.body, 200);
+        const mail = String(b.mail ?? '').split(/\n\s*\n/).map((s) => clean(s, 600)).filter(Boolean);
+        if (!title || !body) return Response.json({ error: 'Geef het bericht een titel en tekst.' }, { status: 400 });
+        const people = (await all('participants')).filter((p) => p.event_id === evRow.id);
+        const inApp = people.filter((p) => !String(p.device_id).startsWith('beheer-'));
+        const { reached, skipped } = await sendPushToDevices(inApp.map((p) => p.device_id), { title, body, url: '/agenda' });
+        const profs = Object.fromEntries((await all('profiles').catch(() => [])).map((p) => [p.device_id, p]));
+        const mailed = [], none = [];
+        for (const p of inApp.filter((x) => !reached.has(x.device_id))) {
+          const prof = profs[p.device_id];
+          if (mailReady && prof?.email) {
+            try {
+              await sendClubMail(prof.email, { subject: title, first: prof.first_name, lines: mail.length ? mail : [body], button: 'Bekijk de agenda', url: '/agenda', origin: new URL(req.url).origin });
+              mailed.push(p.name);
+              continue;
+            } catch { /* valt terug op 'niet bereikt' */ }
+          }
+          none.push(p.name);
+        }
+        none.push(...people.filter((p) => String(p.device_id).startsWith('beheer-')).map((p) => p.name));
+        await remove('events', { id: evRow.id });
+        await remove('participants', { event_id: evRow.id });
+        return Response.json({ cancelled: { total: people.length, pushed: inApp.filter((p) => reached.has(p.device_id)).map((p) => p.name), mailed, none, skipped } });
+      }
       case 'saveNews': {
         const n = b.news || {};
         if (!clean(n.title)) return Response.json({ error: 'Een bericht heeft een titel nodig.' }, { status: 400 });
