@@ -67,8 +67,12 @@ export default function Samen() {
           <div className="grid2">
             <Fact icon="👟" n={c.trainings} label={c.trainings === 1 ? 'training deze maand' : 'trainingen deze maand'} />
             <Fact icon="🙌" n={c.busiest ? c.busiest.n : '–'} label={c.busiest ? `drukste dinsdag (${day(c.busiest.date).split(' ').slice(1).join(' ')})` : 'drukste dinsdag'} />
-            <Fact icon="👋" n={c.newMembers} label={c.newMembers === 1 ? 'nieuw lid deze maand' : 'nieuwe leden deze maand'} />
-            <Fact icon="🚗" n={c.rides} label="carpools naar wedstrijden" />
+            {c.newMembers > 0 && c.newMembers < c.members
+              ? <Fact icon="👋" n={c.newMembers} label={c.newMembers === 1 ? 'nieuw lid deze maand' : 'nieuwe leden deze maand'} />
+              : <Fact icon="👋" n={c.members} label="leden in de app" />}
+            {c.rides > 0
+              ? <Fact icon="🚗" n={c.rides} label="carpools naar wedstrijden" />
+              : <Fact icon="📸" n={c.photos} label="foto's gedeeld deze maand" />}
           </div>
         </>
       )}
