@@ -639,3 +639,7 @@ a.media-item:hover{border-color:var(--gold)}
 .route-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .route-name{font-size:18px}
 .route-btns{display:flex;gap:8px;flex-wrap:wrap}
+/* Samen-pagina */
+.samen-fact{gap:2px;padding:14px}
+.samen-fact .samen-ico{font-size:20px;line-height:1}
+.samen-fact b{font-size:24px;margin-top:6px}

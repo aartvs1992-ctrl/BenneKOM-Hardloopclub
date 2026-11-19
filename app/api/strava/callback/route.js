@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req) {
   const url = new URL(req.url);
   const [stateDevice, next] = (url.searchParams.get('state') || '').split('~');
-  const page = next === 'badges' ? '/badges' : '/challenge';
+  const page = next === 'badges' ? '/badges' : next === 'samen' ? '/samen' : '/challenge';
   const back = (status, why = '') => Response.redirect(new URL(`${page}?strava=${status}${why ? '&why=' + encodeURIComponent(why.slice(0, 160)) : ''}`, url.origin));
   if (url.searchParams.get('error')) return back('geweigerd', url.searchParams.get('error'));
   const code = url.searchParams.get('code');
