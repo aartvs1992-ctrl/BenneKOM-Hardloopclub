@@ -415,7 +415,9 @@ a.media-item:hover{border-color:var(--gold)}
 .welcome-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,30,62,.55) 0%,rgba(7,30,62,.05) 35%,rgba(7,30,62,.35) 65%,var(--navy) 100%)}
 .welcome-top,.welcome-claim{position:relative;z-index:1}
 .welcome-top{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
-.welcome-top .crown{color:#E2B74A;font-size:22px;line-height:1}
+.welcome-top{padding-top:24px}
+.welcome-top .brand b{position:relative}
+.welcome-top .crown{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:2px;color:#E2B74A;font-size:22px;line-height:1}
 .welcome-top .brand{font-size:38px;color:#fff}
 .welcome-top .brand b{color:#E2B74A}
 .welcome-sub{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:#E2B74A;font-weight:700}

@@ -74,8 +74,7 @@ export default function Welcome() {
           autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
         <div className="welcome-shade" aria-hidden="true" />
         <div className="welcome-top">
-          <span className="crown" aria-hidden="true">♛</span>
-          <span className="brand">Benne<b>KOM</b></span>
+          <span className="brand">Benne<b><span className="crown" aria-hidden="true">♛</span>KOM</b></span>
           <span className="welcome-sub">hardloopclub</span>
         </div>
         <div className="welcome-claim">
