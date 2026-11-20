@@ -140,9 +140,15 @@ function KledingNote() {
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Amsterdam' });
   if (today > KLEDING.until) return null;
   return (
-    <p className="note" style={{ margin: '4px 0 0' }}>
-      Clubshirts zijn besteld (levering rond de derde week van januari), de race singlets komen rond 10 december binnen.
-      Betaal je <Link href="/shirt">shirt</Link> of <Link href="/singlet">singlet</Link> via de app 💙
-    </p>
+    <div className="note" style={{ margin: '4px 0 0', display: 'flex', gap: 10, alignItems: 'center' }}>
+      <Link href="/shirt" aria-label="Bekijk het clubshirt" style={{ flex: 'none' }}>
+        <img src="/club/shirt-thumb.webp" alt="BenneKOM clubshirt" width={56} height={56} loading="lazy"
+          style={{ display: 'block', width: 56, height: 56, objectFit: 'cover', borderRadius: 8, background: '#fff' }} />
+      </Link>
+      <span>
+        Clubshirts zijn besteld (levering rond de derde week van januari), de race singlets komen rond 10 december binnen.
+        Betaal je <Link href="/shirt">shirt</Link> of <Link href="/singlet">singlet</Link> via de app 💙
+      </span>
+    </div>
   );
 }
