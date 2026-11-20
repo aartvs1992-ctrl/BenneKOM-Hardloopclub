@@ -47,6 +47,7 @@ export default function Shirt() {
         <b>Besteld! Deze bestelronde is gesloten</b>
         <p>De shirts zijn besteld bij Bioracer en worden {SHIRT_ROUND.delivery} geleverd. Sta je op de lijst? Betaal hieronder je shirt in de app met iDEAL.</p>
         <p className="small muted" style={{ margin: 0 }}>Deze ronde gemist? Bij de volgende bestelronde kun je weer aanvinken.</p>
+        {data.shirtCount > 0 && <span className="small muted">In totaal {data.shirtCount} shirts besteld.</span>}
       </div>
       ) : (
       <div className="panel callout">
@@ -110,6 +111,12 @@ function ShirtRow({ s }) {
           <span style={{ minWidth: 0 }}><b>{s.name}</b><br /><span className="small muted">{s.note}</span></span>
           <span style={{ textAlign: 'right' }}><span className="num" style={{ fontWeight: 700 }}>{euro(s.price)}</span></span>
         </div>
+        {(data.shirtPeople?.[s.id] || []).length > 0 && (
+          <div className="shirt-people">
+            <span className="small muted">{data.shirtPeople[s.id].length} {data.shirtPeople[s.id].length === 1 ? 'loper heeft' : 'lopers hebben'} besteld</span>
+            <People list={data.shirtPeople[s.id]} />
+          </div>
+        )}
         {mine ? (
           <div className="shirt-form">
             <span className="small muted">Besteld voor jou: maat {mine.size}, {mine.qty}×.</span>
