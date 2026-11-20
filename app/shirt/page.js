@@ -127,7 +127,7 @@ function ShirtRow({ s }) {
           {mine && <span className="small muted">Je staat op de lijst: maat {mine.size}, {mine.qty}×.</span>}
           {mine && PAY.shirts && (
             <PayBox amount={s.price * mine.qty} desc={`${s.name} ${mine.size} ${mine.qty}x ${data.me?.name || local.name || ''}`} paid={mine.paid} reported={mine.paidReported}
-              report={{ what: 'shirt', item: s.id }} note="De bestelling gaat de deur uit: betaal hier om je shirt vast te leggen." />
+              report={{ what: 'shirt', item: s.id }} note="Besteld bij Bioracer, levering rond de derde week van januari. Betaal hier je shirt." />
           )}
         </div>
       )}

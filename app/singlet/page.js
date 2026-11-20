@@ -6,7 +6,7 @@ import { Loading, ErrorNote, useReady, People } from '@/components/ui';
 import { SINGLET, euro } from '@/lib/content';
 import PayBox from '@/components/PayBox';
 
-const STATUS = { geclaimd: 'Geclaimd · je hoort wanneer hij binnen is', opgehaald: 'Overhandigd · veel plezier ermee!', betaald: 'Betaald · veel plezier ermee!' };
+const STATUS = { geclaimd: 'Geclaimd · komt rond 10 december binnen', opgehaald: 'Overhandigd · veel plezier ermee!', betaald: 'Betaald · veel plezier ermee!' };
 
 export default function Singlet() {
   const { data, act } = useApp();

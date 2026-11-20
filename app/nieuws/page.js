@@ -38,7 +38,9 @@ export default function Nieuws() {
               {n.body && <p className={isOpen ? '' : 'clamp'}>{n.body}</p>}
               <span className="btn-row" style={{ gap: 14 }}>
                 {long && <button type="button" className="link link-btn" onClick={toggle} aria-expanded={isOpen}>{isOpen ? 'Minder tonen' : 'Lees meer ›'}</button>}
-                {n.url && <a className="link" href={n.url} target="_blank" rel="noopener noreferrer">{linkLabel(n.url)}</a>}
+                {n.url && (n.url.startsWith('/')
+                  ? <Link className="link" href={n.url}>{INTERNAL[n.url] || 'Bekijk ›'}</Link>
+                  : <a className="link" href={n.url} target="_blank" rel="noopener noreferrer">{linkLabel(n.url)}</a>)}
                 {n.event_id && <Link className="link" href={'/event/' + n.event_id}>Naar het evenement ›</Link>}
               </span>
             </div>
@@ -72,6 +74,9 @@ export default function Nieuws() {
 }
 
 // Tekst van de link onder een bericht, afhankelijk van waar de link naartoe gaat.
+// Links naar een pagina in de app openen gewoon in de app
+const INTERNAL = { '/shirt': 'Naar clubshirt & betalen ›', '/singlet': 'Naar de race singlet ›' };
+
 function linkLabel(url) {
   try {
     const host = new URL(url).hostname.replace(/^www\./, '');
