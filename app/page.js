@@ -7,7 +7,7 @@ import { CLUB, CLUB_PHOTOS } from '@/lib/club';
 import { usePhotos } from '@/lib/usePhotos';
 import InstallBanner from '@/components/InstallBanner';
 import { workoutFor } from '@/lib/workouts';
-import { SINGLET, PROMO } from '@/lib/content';
+import { PROMO } from '@/lib/content';
 
 export default function Home() {
   const { data, local } = useApp();
@@ -30,7 +30,7 @@ export default function Home() {
       <InstallBanner />
       {next && <NextTraining e={next} img={heroImg} />}
 
-      <SingletDrop s={data.singlet} />
+      <KledingNote />
 
       <section className="section">
         <div className="section-head"><h2>Ook samen lopen</h2><Link className="link" href="/agenda#samenloop">{runs.length ? 'Alles ›' : 'Plan een loopje ›'}</Link></div>
@@ -134,25 +134,15 @@ function NextTraining({ e, img }) {
   );
 }
 
-// Aankondiging race singlet: zichtbaar zolang er voorraad is, of als je er zelf een hebt geclaimd
-function SingletDrop({ s }) {
-  if (!s?.ready) return null;
-  const total = Object.values(SINGLET.stock).reduce((a, b) => a + b, 0);
-  const rest = Object.values(s.left || {}).reduce((a, b) => a + b, 0);
-  if (s.mine?.status === 'betaald' || (!s.mine && rest === 0)) return null;
+// Korte opmerking onder de training: kleding besteld, betalen via de app. Verdwijnt vanzelf na `until`.
+const KLEDING = { until: '2026-11-27' };
+function KledingNote() {
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Amsterdam' });
+  if (today > KLEDING.until) return null;
   return (
-    <Link className="panel singlet-drop" href="/singlet">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/club/singlet-thumb.jpg" alt="" />
-      <span style={{ minWidth: 0 }}>
-        <span className="tag">{s.mine ? 'Jouw singlet' : 'Nieuw · eerste batch'}</span>
-        <b>BenneKOM race singlet</b>
-        <span className="small muted">{s.mine
-          ? `Geclaimd in maat ${s.mine.size}. Je hoort wanneer hij binnen is.`
-          : `Gelaserde naden, onder de 100 gram. Nog ${rest} van de ${total}: claim de jouwe.`}</span>
-        {!s.mine && <span className="bar"><span style={{ width: `${(rest / total) * 100}%` }} /></span>}
-      </span>
-      <span className="chev">›</span>
-    </Link>
+    <p className="note" style={{ margin: '4px 0 0' }}>
+      Clubshirts zijn besteld (levering rond de derde week van januari), de race singlets komen rond 10 december binnen.
+      Betaal je <Link href="/shirt">shirt</Link> of <Link href="/singlet">singlet</Link> via de app 💙
+    </p>
   );
 }
