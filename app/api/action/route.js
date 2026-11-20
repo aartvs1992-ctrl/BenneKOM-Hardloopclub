@@ -3,6 +3,7 @@ import { after } from 'next/server';
 import { all, find, insert, update, upsert, remove, claimSinglet } from '@/lib/db';
 import { SINGLET, SHIRTS } from '@/lib/content';
 import { buildState } from '@/lib/state';
+import { PACK_HEADER } from '@/lib/pack';
 import { withTrainings } from '@/lib/club';
 import { sendPush as pushNow } from '@/lib/push';
 
@@ -200,7 +201,7 @@ export async function POST(req) {
       default:
         return bad('Onbekende actie.');
     }
-    return Response.json(await buildState(device));
+    return Response.json(await buildState(device, { packed: req.headers.get(PACK_HEADER) === '1' }));
   } catch (e) {
     if (/events_type_check|violates check/.test(String(e.message))) return bad('Samen lopen is nog niet ingesteld: draai updates.sql in Supabase.', 500);
     if (/paid_reported_at|paid/.test(String(e.message)) && /column/.test(String(e.message))) return bad(`Betalen is nog niet ingesteld: draai ${b.what === 'event' ? '023_betalen_events.sql' : '021_betalen.sql'} in Supabase.`, 500);

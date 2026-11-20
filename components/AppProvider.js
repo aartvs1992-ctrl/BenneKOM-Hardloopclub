@@ -2,6 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { NOTIF_TYPES } from '@/lib/content';
+import { PACK_HEADER, unpack } from '@/lib/pack';
 
 const Ctx = createContext(null);
 export const useApp = () => useContext(Ctx);
@@ -16,7 +17,7 @@ function writeLocal(v) {
 // Laatst geladen gegevens op het toestel, zodat de app meteen opent
 const LS_STATE = 'bennekom-state';
 function readState(device) {
-  try { const c = JSON.parse(localStorage.getItem(LS_STATE) || 'null'); return c?.device === device ? c.data : null; } catch { return null; }
+  try { const c = JSON.parse(localStorage.getItem(LS_STATE) || 'null'); return c?.device === device ? unpack(c.data) : null; } catch { return null; }
 }
 function writeState(device, data) {
   try { localStorage.setItem(LS_STATE, JSON.stringify({ device, data })); } catch {}
@@ -33,7 +34,8 @@ export default function AppProvider({ children }) {
   const dataRef = useRef(null);
   useEffect(() => { dataRef.current = data; }, [data]);
   const deviceRef = useRef(null);
-  const fromServer = useCallback((d) => { setData(d); if (deviceRef.current) writeState(deviceRef.current, d); }, []);
+  // compact bewaren op het toestel, uitgepakt tonen
+  const fromServer = useCallback((d) => { setData(unpack(d)); if (deviceRef.current) writeState(deviceRef.current, d); }, []);
 
   useEffect(() => {
     (async () => {
@@ -69,7 +71,7 @@ export default function AppProvider({ children }) {
   const refresh = useCallback(async () => {
     if (!local?.device) return;
     try {
-      const r = await fetch('/api/state?device=' + encodeURIComponent(local.device), { cache: 'no-store' });
+      const r = await fetch('/api/state?device=' + encodeURIComponent(local.device), { cache: 'no-store', headers: { [PACK_HEADER]: '1' } });
       if (!r.ok) throw new Error();
       fromServer(await r.json());
       setError('');
@@ -146,7 +148,7 @@ export default function AppProvider({ children }) {
     try {
       const r = await fetch('/api/action', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', [PACK_HEADER]: '1' },
         body: JSON.stringify({ action, device: local.device, name: payload.name ?? local.name, ...payload }),
       });
       const j = await r.json();
