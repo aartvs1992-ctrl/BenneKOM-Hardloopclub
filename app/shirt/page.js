@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, People } from '@/components/ui';
-import { SHIRTS, SIZES, euro, PAY } from '@/lib/content';
+import { SHIRTS, SIZES, euro, PAY, SHIRT_ROUND } from '@/lib/content';
 import PayBox from '@/components/PayBox';
 
 export default function Shirt() {
@@ -42,11 +42,19 @@ export default function Shirt() {
         </div>
       </div>
 
+      {SHIRT_ROUND.closed ? (
+      <div className="panel callout">
+        <b>Besteld! Deze bestelronde is gesloten</b>
+        <p>De shirts zijn besteld bij Bioracer en worden {SHIRT_ROUND.delivery} geleverd. Sta je op de lijst? Betaal hieronder je shirt in de app met iDEAL.</p>
+        <p className="small muted" style={{ margin: 0 }}>Deze ronde gemist? Bij de volgende bestelronde kun je weer aanvinken.</p>
+      </div>
+      ) : (
       <div className="panel callout">
         <b>We bestellen alleen in grotere aantallen</b>
         <p>De shirts worden per bestelronde gemaakt. Vink hieronder aan welk shirt je wilt, met je maat. {PAY.shirts ? 'De bestelronde loopt: vink je shirt aan met je maat en betaal meteen hier in de app met iDEAL. Betaald = besteld.' : 'Zodra er genoeg aanmeldingen zijn, plaatsen we de bestelling en hoor je hoe je betaalt en wanneer je hem krijgt. Aanvinken is nog geen bestelling.'}</p>
         {data.shirtCount > 0 && <span className="small muted">Er zijn nu {data.shirtCount} shirts aangevinkt.</span>}
       </div>
+      )}
 
       {SHIRTS.filter((s) => s.id !== 'singlet').map((s) => <ShirtRow key={s.id} s={s} />)}
 
@@ -71,7 +79,7 @@ export default function Shirt() {
         <span className="chev">›</span>
       </Link>
 
-      <p className="note">Wil je weten wanneer de bestelling geplaatst wordt? Zet de <Link href="/meldingen">melding voor de bestelronde</Link> aan.</p>
+      <p className="note">{SHIRT_ROUND.closed ? 'Wil je weten wanneer de volgende bestelronde opengaat?' : 'Wil je weten wanneer de bestelling geplaatst wordt?'} Zet de <Link href="/meldingen">melding voor de bestelronde</Link> aan.</p>
     </>
   );
 }
@@ -92,6 +100,27 @@ function ShirtRow({ s }) {
     if (!nm) return;
     if (!local.name) updateLocal({ name: nm });
     if (await act('shirt', { item: s.id, on: true, size, qty, name: nm }, mine ? 'Aangepast' : 'Aangevinkt: ' + s.name)) setOpen(false);
+  }
+
+  if (SHIRT_ROUND.closed) {
+    return (
+      <div className={'panel shirt-row' + (mine ? ' on' : '')}>
+        <div className="shirt-check" style={{ cursor: 'default' }}>
+          <span>{mine ? '✓' : ''}</span>
+          <span style={{ minWidth: 0 }}><b>{s.name}</b><br /><span className="small muted">{s.note}</span></span>
+          <span style={{ textAlign: 'right' }}><span className="num" style={{ fontWeight: 700 }}>{euro(s.price)}</span></span>
+        </div>
+        {mine ? (
+          <div className="shirt-form">
+            <span className="small muted">Besteld voor jou: maat {mine.size}, {mine.qty}×.</span>
+            {PAY.shirts && (
+              <PayBox amount={s.price * mine.qty} desc={`${s.name} ${mine.size} ${mine.qty}x ${data.me?.name || local.name || ''}`} paid={mine.paid} reported={mine.paidReported}
+                report={{ what: 'shirt', item: s.id }} note={`Besteld bij Bioracer, levering ${SHIRT_ROUND.delivery}. Betaal hier je shirt.`} />
+            )}
+          </div>
+        ) : <span className="small muted">Bestelronde gesloten.</span>}
+      </div>
+    );
   }
 
   return (
