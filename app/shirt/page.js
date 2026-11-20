@@ -76,7 +76,7 @@ export default function Shirt() {
       {SHIRTS.filter((s) => s.id === 'singlet').map((s) => <ShirtRow key={s.id} s={s} />)}
 
       <Link className="panel join-card" href="/singlet">
-        <span style={{ minWidth: 0 }}><b>Nog hogere kwaliteit? Kies dan voor de race singlet</b><br /><span className="small muted">Met gelaserde naden en onder de 100 gram. Beperkte oplage van 25 stuks.</span></span>
+        <span style={{ minWidth: 0 }}><b>Nog hogere kwaliteit? Kies dan voor de race singlet</b><br /><span className="small muted">Met gelaserde naden en onder de 100 gram. Komt rond 10 december binnen. Geclaimd? Betaal hem daar in de app met iDEAL.</span></span>
         <span className="chev">›</span>
       </Link>
 
