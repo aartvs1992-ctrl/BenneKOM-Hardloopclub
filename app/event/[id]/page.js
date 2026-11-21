@@ -57,6 +57,7 @@ export default function EventPage() {
         {isRun && dt.route && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={dt.route} target="_blank" rel="noopener noreferrer">Bekijk de route ↗</a>}
         {dt.deadline && !e.past && <Deadline iso={dt.deadline} />}
         {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km} km van Bennekom (hemelsbreed)</p>}
+        {e.type === 'wedstrijd' && e.featured && !e.past && <span className="feat">★ {e.featured}</span>}
         {e.type === 'wedstrijd' && e.about && (
           <div className="race-about">
             <h3>Over deze wedstrijd</h3>

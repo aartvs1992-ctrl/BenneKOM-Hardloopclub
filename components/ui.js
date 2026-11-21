@@ -28,9 +28,10 @@ export function EventRow({ e, noTag }) {
   const n = data?.counts?.[e.id] || 0;
   const rides = (data?.rides?.[e.id] || []).length;
   return (
-    <Link className="row" href={'/event/' + e.id}>
+    <Link className={'row' + (e.featured && !e.past ? ' featured' : '')} href={'/event/' + e.id}>
       <span className="date"><span className="d">{p.d}</span><span className="m">{p.w} {p.m}</span></span>
       <span style={{ minWidth: 0 }}>
+        {e.featured && !e.past && <span className="feat">★ {e.featured}</span>}
         <span className="t">{!noTag && <span className={'tag ' + e.type}>{TYPE_LABEL[e.type]}</span>}{e.title}</span><br />
         <span className="s">
           {e.type === 'wedstrijd'

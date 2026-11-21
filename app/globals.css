@@ -80,6 +80,10 @@ p{margin:0}
 .list{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .row{display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;padding:14px 16px;text-decoration:none;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
 .row:first-child{border-top:0}
+/* uitgelichte wedstrijden (bv. Februariloop, Horaloop): gouden accent */
+.row.featured{background:color-mix(in srgb,var(--gold) 12%,transparent);box-shadow:inset 4px 0 0 var(--gold)}
+.row.featured .date .d{color:var(--gold-ink)}
+.feat{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:2px}
 .row:hover{background:var(--soft)}
 .date{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;background:var(--soft);padding:6px 0;line-height:1}
 .date .d{font-family:var(--f-display);font-weight:800;font-size:26px}
