@@ -146,7 +146,7 @@ function KledingNote() {
           style={{ display: 'block', width: 56, height: 56, objectFit: 'cover', borderRadius: 8, background: '#fff' }} />
       </Link>
       <span>
-        Clubshirts zijn besteld (levering rond de derde week van januari), de race singlets komen rond 10 december binnen.
+        Clubshirts zijn besteld en komen rond de derde week van januari: precies op tijd om op 13 februari bij de Februariloop te schitteren. De race singlets komen rond 10 december binnen.
         Betaal je <Link href="/shirt">shirt</Link> of <Link href="/singlet">singlet</Link> via de app 💙
       </span>
     </div>
