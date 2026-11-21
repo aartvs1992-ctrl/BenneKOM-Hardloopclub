@@ -46,6 +46,7 @@ export default function EventPage() {
       )}
       <div className="section">
         <span><span className={'tag ' + e.type}>{TYPE_LABEL[e.type]}</span><span className="eyebrow">{rel(e.date)}</span></span>
+        {e.featured && !e.past && <span className="feat" style={{ marginTop: -6 }}>★ {e.featured}</span>}
         <h1>{e.title}</h1>
         <div className="readout">
           <div><span className="lbl">Datum</span><span className="big" style={{ fontSize: 16 }}>{p.w} {p.d} {p.m}</span></div>
@@ -56,8 +57,7 @@ export default function EventPage() {
         {isRun && e.organizer && <div className="organizer"><Avatar name={e.organizer.name} src={e.organizer.avatar} size={32} /><span className="small">Georganiseerd door <b>{e.organizer.name}</b></span></div>}
         {isRun && dt.route && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={dt.route} target="_blank" rel="noopener noreferrer">Bekijk de route ↗</a>}
         {dt.deadline && !e.past && <Deadline iso={dt.deadline} />}
-        {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km} km van Bennekom (hemelsbreed)</p>}
-        {e.type === 'wedstrijd' && e.featured && !e.past && <span className="feat">★ {e.featured}</span>}
+        {e.type === 'wedstrijd' && e.km != null && <p className="small muted">{e.km < 1 ? 'In Bennekom 🏠' : `${e.km} km van Bennekom (hemelsbreed)`}</p>}
         {e.type === 'wedstrijd' && e.about && (
           <div className="race-about">
             <h3>Over deze wedstrijd</h3>
@@ -66,10 +66,11 @@ export default function EventPage() {
         )}
         {e.url && (
           <a className="btn btn-gold btn-sm" style={{ alignSelf: 'flex-start' }} href={e.url} target="_blank" rel="noopener noreferrer">
-            {e.type === 'wedstrijd' ? 'Website en inschrijven ↗' : 'Info en inschrijven bij de organisatie ↗'}
+            {e.type === 'wedstrijd' ? (e.regClosed ? 'Website ↗' : 'Website en inschrijven ↗') : 'Info en inschrijven bij de organisatie ↗'}
           </a>
         )}
         {e.type === 'wedstrijd' && e.url && <span className="small muted">{hostOf(e.url)}</span>}
+        {e.type === 'wedstrijd' && e.regClosed && !e.past && <p className="small" style={{ margin: 0 }}><b>Inschrijven kan nog niet.</b> Zodra de inschrijving opengaat, vind je die op de site van de organisatie.</p>}
         {e.type === 'wedstrijd' && !e.url && <a className="link" href={'https://www.google.com/search?q=' + encodeURIComponent(e.title + ' ' + e.place + ' ' + e.date.slice(0, 4))} target="_blank" rel="noopener noreferrer">Zoek info en inschrijving ›</a>}
         {e.description && !(e.type === 'wedstrijd' && e.about) && <p className={dt.story ? 'lead' : ''} style={{ whiteSpace: 'pre-line' }}>{e.description}</p>}
         {e.type === 'wedstrijd' && e.about && <p className="small muted">Tijden en inschrijving kunnen veranderen: check altijd de site van de organisatie.</p>}
@@ -198,7 +199,7 @@ function Attend({ e }) {
   const n = data.counts[e.id] || 0;
   return (
     <div className="panel">
-      <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></div>
+      <div className="count">{n > 0 ? <><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></> : <span>Wees de eerste die zich aanmeldt</span>}</div>
       <AttendWithCheckin e={e} going={Boolean(data.mine[e.id])} act={act} local={local} long />
       <People list={data.names[e.id]} />
       <p className="note">Zo weten we vooraf hoeveel lopers er komen en zien anderen wie er meeloopt.</p>
@@ -213,7 +214,7 @@ function RaceAttend({ e }) {
   const going = Boolean(data.mine[e.id]);
   return (
     <div className="panel">
-      <div className="count"><span className="n num">{n}</span><span>{n === 1 ? 'BenneKOM\'er doet mee' : 'BenneKOM\'ers doen mee'}</span></div>
+      <div className="count">{n > 0 ? <><span className="n num">{n}</span><span>{n === 1 ? 'BenneKOM\'er doet mee' : 'BenneKOM\'ers doen mee'}</span></> : <span>Wees de eerste BenneKOM&apos;er die meedoet</span>}</div>
       <button
         className={'btn ' + (going ? 'btn-done' : 'btn-gold')}
         onClick={() => {

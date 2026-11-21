@@ -48,7 +48,7 @@ main{padding-block:18px calc(96px + env(safe-area-inset-bottom,0px))}
 /* type */
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.05}
 h1{font-size:40px;font-weight:800;text-transform:uppercase}
-h2{font-size:26px;font-weight:700;text-transform:uppercase;letter-spacing:.01em}
+h2{font-size:clamp(21px,5.8vw,26px);font-weight:700;text-transform:uppercase;letter-spacing:.01em}
 h3{font-size:20px;font-weight:700}
 p{margin:0}
 .eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -57,6 +57,7 @@ p{margin:0}
 .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .section{display:flex;flex-direction:column;gap:12px}
 .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.section-head .link{white-space:nowrap;flex:none}
 .link{font-weight:600;font-size:14px;color:var(--gold-ink);text-decoration:none;background:none;border:0;cursor:pointer;padding:0}
 
 /* hero card (next training) */
@@ -101,7 +102,7 @@ p{margin:0}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:4px;text-decoration:none;cursor:pointer;text-align:left}
 .tile:hover{border-color:var(--gold)}
-.tile .k{font-family:var(--f-display);font-weight:700;font-size:20px;text-transform:uppercase}
+.tile .k{font-family:var(--f-display);font-weight:700;font-size:clamp(15px,4.4vw,20px);text-transform:uppercase}
 .tile .v{font-size:13px;color:var(--muted)}
 
 /* panels / forms */
@@ -445,7 +446,7 @@ a.media-item:hover{border-color:var(--gold)}
 .tag.samenloop{background:var(--soft);color:var(--navy)}
 .run-tags span{display:inline-block;background:var(--soft);border-radius:4px;padding:0 6px;margin-right:4px;font-size:12px}
 .organizer{display:flex;align-items:center;gap:8px}
-.run-invite{padding:0;overflow:hidden;gap:0}
+.run-invite{padding:0;overflow:hidden;gap:0;text-decoration:none;color:inherit}
 .run-invite img{width:100%;aspect-ratio:16/8;object-fit:cover;display:block}
 .run-invite>span{padding:12px 16px}
 .agenda-tabs{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr))}
