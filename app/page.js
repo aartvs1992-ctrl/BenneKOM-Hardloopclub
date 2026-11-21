@@ -7,7 +7,7 @@ import { CLUB, CLUB_PHOTOS } from '@/lib/club';
 import { usePhotos } from '@/lib/usePhotos';
 import InstallBanner from '@/components/InstallBanner';
 import { workoutFor } from '@/lib/workouts';
-import { PROMO } from '@/lib/content';
+import { PROMO, WRAPPED } from '@/lib/content';
 
 export default function Home() {
   const { data, local } = useApp();
@@ -31,6 +31,7 @@ export default function Home() {
       {next && <NextTraining e={next} img={heroImg} />}
 
       <KledingNote />
+      <WrappedBanner />
 
       <section className="section">
         <div className="section-head"><h2>Ook samen lopen</h2><Link className="link" href="/agenda#samenloop">{runs.length ? 'Alles ›' : 'Plan een loopje ›'}</Link></div>
@@ -131,6 +132,19 @@ function NextTraining({ e, img }) {
       </div>
       <span className="slogan">Samen=LEUKER</span>
     </section>
+  );
+}
+
+// Jaaroverzicht: banner van WRAPPED.from t/m WRAPPED.until (lib/content.js)
+function WrappedBanner() {
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Amsterdam' });
+  if (today < WRAPPED.from || today > WRAPPED.until) return null;
+  return (
+    <Link href="/wrapped" className="panel wrapped-banner">
+      <span className="w-eb">BenneKOM Wrapped</span>
+      <b>Jouw BenneKOM-jaar {WRAPPED.year} staat klaar ✨</b>
+      <span className="small">Bekijk je dinsdagen, badges en meer ›</span>
+    </Link>
   );
 }
 

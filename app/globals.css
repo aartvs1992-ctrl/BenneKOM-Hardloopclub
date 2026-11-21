@@ -646,3 +646,22 @@ a.media-item:hover{border-color:var(--gold)}
 .route-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .route-name{font-size:18px}
 .route-btns{display:flex;gap:8px;flex-wrap:wrap}
+
+/* BenneKOM Wrapped */
+.wrapped{width:100%;padding-block:16px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.w-bar{display:flex;gap:4px;width:min(100%,380px)}.w-bar span{flex:1;height:3px;border-radius:2px;background:var(--line)}.w-bar span.on{background:var(--gold)}
+.w-card{flex:none;width:min(100%,380px);height:min(620px,calc(100dvh - 170px));min-height:500px;border-radius:20px;padding:26px 24px;display:flex;flex-direction:column;cursor:pointer;user-select:none;overflow:hidden;background:#071E3E;color:#F4F1E6}
+.w-card.gold{background:#C99A1E;color:#071E3E}.w-card.cream{background:#F4F1E6;color:#071E3E}
+.w-k{font-family:var(--f-display);font-weight:800;letter-spacing:.01em;line-height:.95}
+.w-eb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.w-big{font-size:clamp(76px,24vw,104px)}.w-mid{font-size:clamp(30px,9.5vw,40px)}.w-sm{font-size:30px}.w-g{color:#E2B74A}
+.w-p{font-size:16px;margin:16px 0 0}
+.w-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.w-tile{background:rgba(244,241,230,.08);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.w-card.gold .w-tile{background:rgba(7,30,62,.1)}
+.w-tile .w-k{font-size:40px;color:#E2B74A}.w-card.gold .w-tile .w-k{color:#071E3E}.w-tile span{font-size:13px;opacity:.85;line-height:1.25}
+.w-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-top:1px solid rgba(244,241,230,.2);padding:10px 0}.w-row.dark{border-color:rgba(7,30,62,.2)}
+.w-foot{margin-top:auto;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;display:flex;justify-content:space-between;padding-top:12px}
+.w-share{margin-top:auto;background:#C99A1E;color:#071E3E;border:0;border-radius:12px;padding:14px;font-weight:700;font-size:16px;cursor:pointer}
+.wrapped-banner{display:flex;flex-direction:column;gap:4px;text-decoration:none;background:var(--navy);color:var(--on-navy);border:0;box-shadow:inset 4px 0 0 var(--gold)}
+.wrapped-banner b{font-family:var(--f-display);font-size:22px;color:var(--gold)}
