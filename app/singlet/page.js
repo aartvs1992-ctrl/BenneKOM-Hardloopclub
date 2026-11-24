@@ -5,6 +5,7 @@ import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, People } from '@/components/ui';
 import { SINGLET, euro } from '@/lib/content';
 import PayBox from '@/components/PayBox';
+import { thumb } from '@/lib/img';
 
 const STATUS = { geclaimd: 'Geclaimd · komt rond 10 december binnen', opgehaald: 'Overhandigd · veel plezier ermee!', betaald: 'Betaald · veel plezier ermee!' };
 
@@ -34,13 +35,13 @@ export default function Singlet() {
 
       <div className="shirt-product">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={SINGLET.image} alt="Ontwerp van de BenneKOM race singlet, voor- en achterkant" />
+        <img src={thumb(SINGLET.image, 828)} alt="Ontwerp van de BenneKOM race singlet, voor- en achterkant" />
       </div>
 
       <h2>Waarom deze singlet</h2>
       <div className="panel singlet-feature">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/club/singlet-naden.jpg" alt="Close-up van een gelaserde boord bij de schouder" />
+        <img src={thumb('/club/singlet-naden.jpg', 828)} alt="Close-up van een gelaserde boord bij de schouder" />
         <div style={{ minWidth: 0 }}>
           <b>Gelaserde naden</b>
           <p className="small">Geen gestikte zomen bij de hals en armsgaten: de randen zijn met een laser gesneden en verlijmd. Plat, soepel en niets dat schuurt, ook niet na 42 km.</p>

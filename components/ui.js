@@ -5,6 +5,7 @@ import { useApp } from './AppProvider';
 import { dparts, TYPE_LABEL } from '@/lib/content';
 import Checkin from './Checkin';
 import MemberBadges from './MemberBadges';
+import { thumb } from '@/lib/img';
 
 export function Loading() {
   return (<><div className="skeleton" /><div className="skeleton" style={{ minHeight: 200 }} /></>);
@@ -91,7 +92,7 @@ export function Avatar({ name = '', src, size = 36, className = '' }) {
   const initials = name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
   return src
     // eslint-disable-next-line @next/next/no-img-element
-    ? <img className={'avatar ' + className} src={src} alt="" width={size} height={size} style={{ width: size, height: size }} loading="lazy" />
+    ? <img className={'avatar ' + className} src={thumb(src, size * 2)} alt="" width={size} height={size} style={{ width: size, height: size }} loading="lazy" />
     : <span className={'avatar initials ' + className} style={{ width: size, height: size, fontSize: size * 0.38 }} aria-hidden="true">{initials}</span>;
 }
 

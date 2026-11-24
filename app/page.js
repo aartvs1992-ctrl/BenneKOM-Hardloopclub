@@ -8,6 +8,7 @@ import { usePhotos } from '@/lib/usePhotos';
 import InstallBanner from '@/components/InstallBanner';
 import { workoutFor } from '@/lib/workouts';
 import { PROMO, WRAPPED } from '@/lib/content';
+import { thumb } from '@/lib/img';
 
 export default function Home() {
   const { data, local } = useApp();
@@ -21,7 +22,7 @@ export default function Home() {
 
   // Achtergrond van de trainingskaart: uitgelichte foto, anders de eerste clubfoto
   const featured = photos?.find((p) => p.featured);
-  const heroImg = featured?.url || null; // zonder uitgelichte foto: het Backyard-filmpje
+  const heroImg = featured?.url ? thumb(featured.url, 828) : null; // zonder uitgelichte foto: het Backyard-filmpje
   const strip = [...(photos || []).slice(0, 8), ...CLUB_PHOTOS.slice(1).map((p, i) => ({ id: 'club-' + i, url: p.src, name: 'BenneKOM', caption: p.caption }))].slice(0, 8);
 
   return (
@@ -40,7 +41,7 @@ export default function Home() {
           : (
             <Link className="panel run-invite" href="/agenda#samenloop">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/club/lachen-onderweg.jpg" alt="" loading="lazy" />
+              <img src={thumb('/club/lachen-onderweg.jpg', 828)} alt="" loading="lazy" />
               <span><b>Zin om ook buiten de dinsdag te lopen?</b><br /><span className="small muted">Plan een loopje met afstand en tempo, dan haken clubgenoten aan.</span></span>
             </Link>
           )}
@@ -68,7 +69,7 @@ export default function Home() {
           {strip.map((p) => (
             <Link key={p.id} href="/fotos" aria-label={p.caption || 'Foto van ' + p.name}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.url} alt="" loading="lazy" />
+              <img src={thumb(p.url, 384)} alt="" loading="lazy" />
               <span className="by">{p.name}</span>
             </Link>
           ))}

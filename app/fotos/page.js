@@ -5,6 +5,7 @@ import { Loading, PhotoHeader } from '@/components/ui';
 import { usePhotos, shrink } from '@/lib/usePhotos';
 import { CLUB_PHOTOS, CLUB_VIDEOS, clubAlbum, todayISO } from '@/lib/club';
 import { MON } from '@/lib/content';
+import { thumb } from '@/lib/img';
 
 const MONTHS = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
 const dayLabel = (iso) => { const d = new Date(iso + 'T12:00:00Z'); return `${d.getUTCDate()} ${MON[d.getUTCMonth()]}`; };
@@ -244,7 +245,7 @@ export default function Fotos() {
           {shown.map((p, i) => (
             <button key={p.id} className="wall-item" onClick={() => setOpen(i)} aria-label={p.caption || 'Foto van ' + p.name}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.url} alt={p.caption || p.alt || ''} loading="lazy" style={p.width && p.height ? { aspectRatio: `${p.width} / ${p.height}` } : undefined} />
+              <img src={thumb(p.url, 640)} alt={p.caption || p.alt || ''} loading="lazy" style={p.width && p.height ? { aspectRatio: `${p.width} / ${p.height}` } : undefined} />
               {p.video && <span className="play-badge">▶ {secs(p.duration)}</span>}
               {p.likes > 0 && <span className="wall-likes">👍 {p.likes}</span>}
             </button>
@@ -333,7 +334,7 @@ function ZoomImg({ src, alt, onSwipe, onTap }) {
       onMouseUp={() => { g.current.drag = false; }} onMouseLeave={() => { g.current.drag = false; }}
       style={{ cursor: t.s > 1 ? 'grab' : 'zoom-in' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} draggable={false}
+      <img src={thumb(src, 1200, 80)} alt={alt} draggable={false}
         style={{ transform: `translate(${t.x}px, ${t.y}px) scale(${t.s})`, transition: g.current.pinch || g.current.moved || g.current.drag ? 'none' : 'transform .18s ease-out' }} />
     </div>
   );

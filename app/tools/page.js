@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { PhotoHeader } from '@/components/ui';
 import { DISTS, fmt, parseT, riegel, ZONES, splits } from '@/lib/content';
 import { ZONES as TEMPOS } from '@/lib/workouts';
+import { thumb } from '@/lib/img';
 
 const TABS = [['tempo', 'Tempo'], ['voorspeller', 'Voorspeller'], ['zones', 'Zones'], ['splits', 'Splits']];
 
@@ -68,7 +69,7 @@ function ZoneCard({ k, pace, how, open, toggle }) {
           {z.photo && (
             <figure className="zone-photo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={z.photo.src} alt={z.photo.caption} loading="lazy" />
+              <img src={thumb(z.photo.src, 828)} alt={z.photo.caption} loading="lazy" />
               <figcaption className="small muted">{z.photo.caption}</figcaption>
             </figure>
           )}

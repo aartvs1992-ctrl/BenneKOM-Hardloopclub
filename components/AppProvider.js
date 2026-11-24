@@ -68,8 +68,10 @@ export default function AppProvider({ children }) {
     t.current = setTimeout(() => setToastMsg(''), 2600);
   }, []);
 
+  const lastFocus = useRef(0);
   const refresh = useCallback(async () => {
     if (!local?.device) return;
+    lastFocus.current = Date.now();
     try {
       const r = await fetch('/api/state?device=' + encodeURIComponent(local.device), { cache: 'no-store', headers: { [PACK_HEADER]: '1' } });
       if (!r.ok) throw new Error();
@@ -85,8 +87,13 @@ export default function AppProvider({ children }) {
   useEffect(() => {
     if (data?.me?.name && local && data.me.name !== local.name) updateLocal({ name: data.me.name });
   }, [data?.me?.name, local, updateLocal]);
+  // Terug in de app: verversen, maar niet bij elke tik heen en weer (hooguit eens per 20 seconden)
   useEffect(() => {
-    const onFocus = () => refresh();
+    const onFocus = () => {
+      if (Date.now() - lastFocus.current < 20e3) return;
+      lastFocus.current = Date.now();
+      refresh();
+    };
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
   }, [refresh]);

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { PhotoHeader } from '@/components/ui';
 import { VERHAAL } from '@/lib/verhaal';
+import { thumb } from '@/lib/img';
 
 export default function Verhaal() {
   const v = VERHAAL;
@@ -16,7 +17,7 @@ export default function Verhaal() {
             {b.heading && <h3>{b.heading}</h3>}
             {b.text && b.text.split('\n\n').map((t, j) => <p key={j}>{t}</p>)}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            {b.image && <img src={b.image} alt={b.caption || ''} className="story-img" loading="lazy" />}
+            {b.image && <img src={thumb(b.image, 828)} alt={b.caption || ''} className="story-img" loading="lazy" />}
             {b.caption && <p className="small muted">{b.caption}</p>}
           </section>
         )) : (

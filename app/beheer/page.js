@@ -5,6 +5,7 @@ import { useApp } from '@/components/AppProvider';
 import { TYPE_LABEL, fmt, SHIRTS, euro } from '@/lib/content';
 import { Avatar } from '@/components/ui';
 import { BADGES, BADGE } from '@/lib/badges';
+import { thumb } from '@/lib/img';
 
 const EMPTY = { id: '', type: 'special', title: '', date: '', time: '', place: '', description: '', distances: '', capacity: '', registration: true, carpool: false, replaces_training: false, url: '' };
 
@@ -217,7 +218,7 @@ export default function Beheer() {
         {d.photos?.length ? <div className="admin-photos">{d.photos.map((p) => (
           <div key={p.id} className="admin-photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.url} alt={p.caption || ''} loading="lazy" />
+            <img src={thumb(p.url, 256)} alt={p.caption || ''} loading="lazy" />
             <span className="small">{p.name}{p.caption ? ' · ' + p.caption : ''}</span>
             <span className="btn-row" style={{ gap: 8 }}>
               <button className="link" onClick={() => call('featurePhoto', { id: p.id }, p.featured ? 'Niet meer uitgelicht' : 'Uitgelicht op de homepagina')}>{p.featured ? '★ Uitgelicht' : '☆ Uitlichten'}</button>

@@ -5,6 +5,7 @@ import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
 import { MON } from '@/lib/content';
 import { CLUB } from '@/lib/club';
+import { thumb } from '@/lib/img';
 
 const date = (iso) => { const d = new Date(String(iso).slice(0, 10) + 'T12:00:00'); return isNaN(d) ? '' : `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}`; };
 const MONTHS = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
@@ -31,7 +32,7 @@ export default function Nieuws() {
           return (
           <article key={n.id} className="panel news-card">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            {n.image && <img src={n.image} alt="" loading="lazy" onClick={toggle} style={long ? { cursor: 'pointer' } : undefined} />}
+            {n.image && <img src={thumb(n.image, 828)} alt="" loading="lazy" onClick={toggle} style={long ? { cursor: 'pointer' } : undefined} />}
             <div className="news-body">
               <span className="eyebrow">{n.author}{date(n.published_at) && ' · ' + date(n.published_at)}</span>
               <h3 onClick={toggle} style={long ? { cursor: 'pointer' } : undefined}>{n.title}</h3>

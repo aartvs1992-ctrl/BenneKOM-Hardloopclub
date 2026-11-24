@@ -1,6 +1,9 @@
 // BenneKOM service worker: maakt de app installeerbaar, werkt offline voor de tools en toont pushmeldingen.
-const CACHE = 'bennekom-v4';
+const CACHE = 'bennekom-v5';
+const IMG = 'bennekom-img-v1'; // verkleinde foto's, blijft bewaard bij een nieuwe versie van de app
 const SHELL = ['/', '/tools', '/icons/icon-192.png'];
+// oudste verkleinde foto's opruimen, zodat de opslag op de telefoon niet blijft groeien
+const trim = (c, max) => c.keys().then((keys) => keys.length > max && Promise.all(keys.slice(0, keys.length - max).map((k) => c.delete(k))));
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}));
@@ -8,7 +11,7 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))));
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE && k !== IMG).map((k) => caches.delete(k)))));
   self.clients.claim();
 });
 
@@ -28,6 +31,14 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(caches.match(e.request).then((hit) => hit || fetch(e.request).then((res) => put(e.request, res))));
     return;
   }
+  // verkleinde foto's (/_next/image): per adres altijd hetzelfde, dus uit de opslag
+  if (url.pathname === '/_next/image') {
+    e.respondWith(caches.open(IMG).then((c) => c.match(e.request).then((hit) => hit || fetch(e.request).then((res) => {
+      if (res.ok) { c.put(e.request, res.clone()); trim(c, 400); }
+      return res;
+    }))));
+    return;
+  }
   if (/^\/(club|media|icons)\//.test(url.pathname)) {
     e.respondWith(caches.match(e.request).then((hit) => {
       const fresh = fetch(e.request).then((res) => put(e.request, res)).catch(() => hit);
@@ -36,11 +47,17 @@ self.addEventListener('fetch', (e) => {
     }));
     return;
   }
-  e.respondWith(
-    fetch(e.request)
-      .then((res) => put(e.request, res))
-      .catch(() => caches.match(e.request).then((r) => r || caches.match('/')))
-  );
+  // Pagina's: netwerk eerst, maar bij een trage verbinding niet blijven wachten.
+  // Na 2,5 seconden de bewaarde versie tonen (als die er is); de nieuwe wordt op de achtergrond alsnog bewaard.
+  const net = fetch(e.request).then((res) => put(e.request, res));
+  e.waitUntil(net.catch(() => {}));
+  e.respondWith(new Promise((resolve) => {
+    let done = false;
+    const fallback = () => caches.match(e.request).then((r) => r || (e.request.mode === 'navigate' ? caches.match('/') : null));
+    const timer = setTimeout(() => fallback().then((r) => { if (r && !done) { done = true; resolve(r); } }), 2500);
+    net.then((res) => { if (!done) { done = true; clearTimeout(timer); resolve(res); } })
+      .catch(() => { clearTimeout(timer); fallback().then((r) => { if (!done) { done = true; resolve(r || Response.error()); } }); });
+  }));
 });
 
 self.addEventListener('push', (e) => {

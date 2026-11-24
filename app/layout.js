@@ -1,3 +1,14 @@
+// Lettertypes uit de app zelf in plaats van van Google: geen extra verbinding die het eerste beeld ophoudt
+import '@fontsource/barlow/latin-400.css';
+import '@fontsource/barlow/latin-500.css';
+import '@fontsource/barlow/latin-600.css';
+import '@fontsource/barlow/latin-700.css';
+import '@fontsource/barlow-condensed/latin-600.css';
+import '@fontsource/barlow-condensed/latin-700.css';
+import '@fontsource/barlow-condensed/latin-800.css';
+import '@fontsource/barlow-condensed/latin-800-italic.css';
+import '@fontsource/jetbrains-mono/latin-500.css';
+import '@fontsource/jetbrains-mono/latin-700.css';
 import './globals.css';
 import AppProvider from '@/components/AppProvider';
 import Shell from '@/components/Shell';
@@ -19,12 +30,6 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="nl">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" />
-      </head>
       <body>
         <AppProvider>
           <Shell>{children}</Shell>

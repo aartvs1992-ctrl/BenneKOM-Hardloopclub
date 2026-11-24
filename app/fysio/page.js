@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { CLUB } from '@/lib/club';
 import { PhotoHeader, Avatar } from '@/components/ui';
+import { thumb } from '@/lib/img';
 
 export const metadata = { title: 'Fysiotherapeut · BenneKOM' };
 
@@ -13,7 +14,7 @@ export default function Fysio() {
 
       <div className="panel host-card">
         {f.photo
-          ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="host-photo" src={f.photo} alt={f.name} />
+          ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="host-photo" src={thumb(f.photo, 256)} alt={f.name} />
           : <Avatar name={f.name} size={84} />}
         <div style={{ minWidth: 0 }}>
           <b className="host-name">{f.name}</b>
@@ -49,7 +50,7 @@ export default function Fysio() {
       {f.action && (
         <figure className="zone-photo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={f.action} alt={f.name + ' tijdens een trailrun'} loading="lazy" style={{ aspectRatio: 'auto', maxWidth: 360 }} />
+          <img src={thumb(f.action, 828)} alt={f.name + ' tijdens een trailrun'} loading="lazy" style={{ aspectRatio: 'auto', maxWidth: 360 }} />
           <figcaption className="small muted">David zelf onderweg tijdens een trailrun</figcaption>
         </figure>
       )}

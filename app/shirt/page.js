@@ -5,6 +5,7 @@ import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, People } from '@/components/ui';
 import { SHIRTS, SIZES, euro, PAY, SHIRT_ROUND } from '@/lib/content';
 import PayBox from '@/components/PayBox';
+import { thumb } from '@/lib/img';
 
 export default function Shirt() {
   const { data } = useApp();
@@ -17,25 +18,25 @@ export default function Shirt() {
 
       <div className="shirt-product">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/club/shirt-product.jpg" alt="BenneKOM clubshirt van Bioracer" />
+        <img src={thumb('/club/shirt-product.jpg', 828)} alt="BenneKOM clubshirt van Bioracer" />
       </div>
       <h2>Zo staat hij aan</h2>
       <div className="shirt-photos">
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/club/shirt-voorkant.jpg" alt="Loper in het nieuwe BenneKOM clubshirt" style={{ objectPosition: 'center 15%' }} />
+          <img src={thumb('/club/shirt-voorkant.jpg', 828)} alt="Loper in het nieuwe BenneKOM clubshirt" style={{ objectPosition: 'center 15%' }} />
           <figcaption>Heren</figcaption>
         </figure>
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/club/shirt-dames.jpg" alt="Loopster in het nieuwe BenneKOM clubshirt" style={{ objectPosition: 'center 30%' }} />
+          <img src={thumb('/club/shirt-dames.jpg', 828)} alt="Loopster in het nieuwe BenneKOM clubshirt" style={{ objectPosition: 'center 30%' }} />
           <figcaption>Dames</figcaption>
         </figure>
       </div>
 
       <div className="panel flag-card">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/club/vlag-bennekom.jpg" alt="De vlag van Bennekom" />
+        <img src={thumb('/club/vlag-bennekom.jpg', 828)} alt="De vlag van Bennekom" />
         <div style={{ minWidth: 0 }}>
           <b>Geïnspireerd op de vlag van Bennekom</b>
           <p>Het shirt draagt de kleuren van ons dorp: het blauw en geel van de Bennekomse vlag. Zo loop je overal herkenbaar als BenneKOM.</p>
@@ -64,12 +65,12 @@ export default function Shirt() {
       <div className="shirt-photos">
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/club/singlet-bioracer.jpg" alt="BenneKOM clubsinglet van Bioracer" style={{ objectFit: 'contain', background: '#fff' }} />
+          <img src={thumb('/club/singlet-bioracer.jpg', 828)} alt="BenneKOM clubsinglet van Bioracer" style={{ objectFit: 'contain', background: '#fff' }} />
           <figcaption>Het model</figcaption>
         </figure>
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/club/singlet-wilco.jpg" alt="Wilco in de BenneKOM clubsinglet" />
+          <img src={thumb('/club/singlet-wilco.jpg', 828)} alt="Wilco in de BenneKOM clubsinglet" />
           <figcaption>Wilco in de singlet</figcaption>
         </figure>
       </div>

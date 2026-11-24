@@ -11,6 +11,7 @@ import { Gallery } from '@/components/Gallery';
 import PayBox from '@/components/PayBox';
 import { Workout } from '@/components/Workout';
 import { workoutFor } from '@/lib/workouts';
+import { thumb } from '@/lib/img';
 
 const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
 
@@ -35,13 +36,13 @@ export default function EventPage() {
       {isRun && !dt.image && (
         <div className="event-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/club/groep-lacht.jpg" alt="" />
+          <img src={thumb('/club/groep-lacht.jpg', 828)} alt="" />
         </div>
       )}
       {dt.image && (
         <div className="event-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={dt.image} alt="" />
+          <img src={thumb(dt.image, 828)} alt="" />
         </div>
       )}
       <div className="section">
@@ -98,7 +99,7 @@ export default function EventPage() {
           <h2>Met</h2>
           <div className="panel host-card">
             {dt.host.photo
-              ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="host-photo" src={dt.host.photo} alt={dt.host.name} />
+              ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="host-photo" src={thumb(dt.host.photo, 256)} alt={dt.host.name} />
               : <Avatar name={dt.host.name} size={84} />}
             <div style={{ minWidth: 0 }}>
               <b className="host-name">{dt.host.name}</b>

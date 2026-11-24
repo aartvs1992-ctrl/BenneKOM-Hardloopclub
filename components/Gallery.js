@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { thumb } from '@/lib/img';
 
 // Fotoraster; tik op een foto om hem groot te bekijken
 export function Gallery({ photos }) {
@@ -10,7 +11,7 @@ export function Gallery({ photos }) {
         {photos.map((p, i) => (
           <button key={p.src} className={'g-item' + (i === 0 || (i === photos.length - 1 && photos.length % 2 === 0) ? ' wide' : '')} onClick={() => setOpen(i)} aria-label={p.caption || 'Foto vergroten'}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.src} alt={p.caption || ''} loading="lazy" />
+            <img src={thumb(p.src, 640)} alt={p.caption || ''} loading="lazy" />
           </button>
         ))}
       </div>
