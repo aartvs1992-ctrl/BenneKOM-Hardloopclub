@@ -6,6 +6,7 @@ import { Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
 import { dparts, rel, fmt, parseT, MON } from '@/lib/content';
 import { CHALLENGE_EASY, CHALLENGE_PHOTOS } from '@/lib/challenge';
 import { Gallery } from '@/components/Gallery';
+import ChallengeTabs from '@/components/ChallengeTabs';
 
 const STATUS = {
   ok: 'Strava gekoppeld! Je tijden op het segment worden opgehaald.',
@@ -105,6 +106,7 @@ export default function Challenge() {
   return (
     <>
       <PhotoHeader src="/club/challenge-start.jpg" title="5km Challenge" sub="Elke laatste zaterdag van de maand. Je loopt tegen jezelf, en samen is het leuker." pos="center 35%" />
+      <ChallengeTabs active="5km" />
       <ErrorNote />
 
       {next && (
