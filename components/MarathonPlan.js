@@ -4,10 +4,9 @@ import Link from 'next/link';
 import { useApp } from './AppProvider';
 import { EventRow } from './ui';
 import { fmt, daysTo, MON, DAY } from '@/lib/content';
-import { vdot, raceTime } from '@/lib/cooper';
 import {
   MARATHON, KEY_SESSIONS, CHALLENGE_DATES,
-  mpPace, sessionStats, sessionSteps, EASY_FACTOR, JOG_FACTOR, GOAL_MIN, GOAL_MAX, clampGoal,
+  mpPace, sessionStats, sessionSteps, EASY_FACTOR, JOG_FACTOR, GOAL_MIN, GOAL_MAX,
 } from '@/lib/marathon';
 
 const KEY = 'bk-marathon-goal';
@@ -21,10 +20,8 @@ const BAR_SCALE = 170; // minuten: de zwaarste sessie vult bijna de hele breedte
 
 export default function MarathonPlan() {
   const { data } = useApp();
-  // Doel: eerder gekozen, anders uit je laatste coopertest, anders 3:00
-  const lastCooper = (data.cooper || []).slice(-1)[0];
-  const fromCooper = lastCooper ? clampGoal(raceTime(vdot(lastCooper.meters), 42195) / 60) : null;
-  const [goal, setGoal] = useState(fromCooper || 180);
+  // Doel: eerder gekozen, anders 3:00
+  const [goal, setGoal] = useState(180);
   const [variant, setVariant] = useState('base');
   const [s3, setS3] = useState('base');
   useEffect(() => {
@@ -71,11 +68,7 @@ export default function MarathonPlan() {
           <div><span className="big">{fmt(mp * EASY_FACTOR)}</span><span className="lbl">in- en uitlopen /km</span></div>
           <div><span className="big">{fmt(mp * JOG_FACTOR)}</span><span className="lbl">dribbel /km</span></div>
         </div>
-        <p className="small muted">
-          {fromCooper
-            ? <>Je coopertest voorspelt {goalLabel(fromCooper)}. <button className="link" onClick={() => pick(fromCooper)}>Gebruik die</button></>
-            : <>Nog geen doel? Doe de <Link className="link" href="/challenge/cooper">coopertest</Link>, dan rekent de app je marathontempo uit.</>}
-        </p>
+        <p className="small muted">Schuif naar je marathondoel. De app onthoudt je keuze.</p>
         <div className="seg" role="group" aria-label="Variant">
           <button aria-pressed={variant === 'base'} onClick={() => setVariant('base')}>Basis</button>
           <button aria-pressed={variant === 'short'} onClick={() => setVariant('short')}>Kort</button>
@@ -126,7 +119,7 @@ export default function MarathonPlan() {
       <section className="section">
         <h2>Zo haal je er het meest uit</h2>
         <div className="tiles mr-tips">
-          <div className="tile"><span className="k">Tempo bepalen</span><span className="v">De coopertest van 8 december is je nulmeting. Twijfel je, kies dan het langzaamste doel dat realistisch voelt.</span></div>
+          <div className="tile"><span className="k">Tempo kiezen</span><span className="v">Kies het tempo dat je echt denkt te kunnen lopen. Twijfel je, kies dan het langzaamste doel dat realistisch voelt.</span></div>
           <div className="tile"><span className="k">Drinkpost</span><span className="v">Ronde van 2,5 tot 4 km met één tafel. Oefen elke sessie je gels en drinken op racetempo.</span></div>
           <div className="tile"><span className="k">Generale repetitie</span><span className="v">Sessie 3 met je racedag-ontbijt, wedstrijdschoenen en wedstrijdkleding.</span></div>
           <div className="tile"><span className="k">Herstel</span><span className="v">Houd de dag erna rustig en plan in die week geen tweede zware training.</span></div>
