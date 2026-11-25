@@ -71,7 +71,9 @@ export default function EventPage() {
           </a>
         )}
         {e.type === 'wedstrijd' && e.url && <span className="small muted">{hostOf(e.url)}</span>}
-        {e.type === 'wedstrijd' && e.regClosed && !e.past && <p className="small" style={{ margin: 0 }}><b>Inschrijven kan nog niet.</b> Zodra de inschrijving opengaat, vind je die op de site van de organisatie.</p>}
+        {e.type === 'wedstrijd' && e.regClosed && !e.past && (e.soldOut
+          ? <p className="small" style={{ margin: 0 }}><b>Inschrijven kan niet meer.</b> Heb je al een startbewijs? Meld je hier aan, dan zien clubgenoten dat je meeloopt.</p>
+          : <p className="small" style={{ margin: 0 }}><b>Inschrijven kan nog niet.</b> Zodra de inschrijving opengaat, vind je die op de site van de organisatie.</p>)}
         {e.type === 'wedstrijd' && !e.url && <a className="link" href={'https://www.google.com/search?q=' + encodeURIComponent(e.title + ' ' + e.place + ' ' + e.date.slice(0, 4))} target="_blank" rel="noopener noreferrer">Zoek info en inschrijving ›</a>}
         {e.description && !(e.type === 'wedstrijd' && e.about) && <p className={dt.story ? 'lead' : ''} style={{ whiteSpace: 'pre-line' }}>{e.description}</p>}
         {e.type === 'wedstrijd' && e.about && <p className="small muted">Tijden en inschrijving kunnen veranderen: check altijd de site van de organisatie.</p>}

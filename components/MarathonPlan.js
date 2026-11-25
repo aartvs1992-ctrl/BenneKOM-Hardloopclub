@@ -6,7 +6,7 @@ import { EventRow } from './ui';
 import { fmt, daysTo, MON, DAY } from '@/lib/content';
 import { vdot, raceTime } from '@/lib/cooper';
 import {
-  MARATHON, KEY_SESSIONS, BUILDUP_RACES, CHALLENGE_DATES,
+  MARATHON, KEY_SESSIONS, CHALLENGE_DATES,
   mpPace, sessionStats, sessionSteps, EASY_FACTOR, JOG_FACTOR, GOAL_MIN, GOAL_MAX, clampGoal,
 } from '@/lib/marathon';
 
@@ -38,7 +38,6 @@ export default function MarathonPlan() {
   const marks = [
     ...CHALLENGE_DATES.map((d) => ({ k: 'ch', d })),
     ...KEY_SESSIONS.map((s) => ({ k: 'ses', d: s.date, l: 'Sessie ' + s.n, s: short(s.date) })),
-    ...BUILDUP_RACES.map((r) => ({ k: 'race', d: r.date, l: r.short ? <>{r.short}<span className="mr-lg">{r.title.slice(r.short.length)}</span></> : r.title, s: short(r.date) })),
     { k: 'race end', d: MARATHON.date, l: 'Rotterdam', s: short(MARATHON.date) },
   ];
 
@@ -58,7 +57,7 @@ export default function MarathonPlan() {
             </div>
           ))}
         </div>
-        <div className="mr-key"><span>Key session</span><span className="k2">Wedstrijd</span><span className="k3">5km Challenge</span></div>
+        <div className="mr-key"><span>Key session</span><span className="k2">Marathon</span><span className="k3">5km Challenge</span></div>
         {days > 0 && <p className="mr-count"><b>{days}</b> dagen tot de start in Rotterdam</p>}
       </section>
 
