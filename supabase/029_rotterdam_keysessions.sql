@@ -7,9 +7,9 @@ insert into events (id, type, title, date, time, place, description, distances, 
    'Een flinke BenneKOM-ploeg loopt mee. Meld je aan, regel je rit via de carpool en kijk in de Agenda onder Op weg naar Rotterdam voor de key sessions.',
    '42,195 km (+ 10 km en City Run op za 10 apr)', null, false, true, false),
   ('keysession-1', 'special', 'Key session 1 · Op weg naar Rotterdam', '2027-01-24', '', 'Bennekom',
-   'Lange zondagsessie met 4 × 15 min op marathontempo. Alle niveaus, iedereen op zijn eigen tempo.', '1u54 · ±16–30 km', null, true, false, false),
+   'Lange zondagsessie met 4 × 15 min op marathontempo. Alle niveaus, iedereen op zijn eigen tempo.', '1u55–2u15 · ±16–35 km', null, true, false, false),
   ('keysession-2', 'special', 'Key session 2 · Op weg naar Rotterdam', '2027-02-21', '', 'Bennekom',
-   'Lange zondagsessie met 3 × 25 min op marathontempo. Alle niveaus, iedereen op zijn eigen tempo.', '2u16 · ±20–36 km', null, true, false, false),
+   'Lange zondagsessie met 3 × 25 min op marathontempo. Alle niveaus, iedereen op zijn eigen tempo.', '2u15–2u30 · ±19–39 km', null, true, false, false),
   ('keysession-3', 'special', 'Key session 3 · Op weg naar Rotterdam', '2027-03-21', '', 'Bennekom',
    'De generale repetitie: 3 × 35 min op marathontempo (kort: 3 × 30) of 85 min aan één stuk.', '2u25–2u40 · ±21–43 km', null, true, false, false)
 on conflict (id) do nothing;
