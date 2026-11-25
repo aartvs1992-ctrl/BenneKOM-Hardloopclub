@@ -125,9 +125,13 @@ function NextTraining({ e, img }) {
         </div>
       )}
       {!special && workoutFor(e.date) && <Link className="hero-wo" href={'/event/' + e.id}><span className="num">{workoutFor(e.date).title}</span> ›</Link>}
-      <div className="count">{n > 0 ? <><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></> : <span>Wees de eerste die zich aanmeldt</span>}
-        {n > 0 && <span className="stack">{(data.names[e.id] || []).slice(0, 7).map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={30} />)}</span>}
-      </div>
+      {/* tik op de teller of de gezichten: zien wie er komen (ook bij een duurloop zonder workout) */}
+      {n > 0 ? (
+        <Link className="count" href={'/event/' + e.id} style={{ color: 'inherit', textDecoration: 'none' }} aria-label={`Bekijk wie er komen (${n})`}>
+          <span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'} ›</span>
+          <span className="stack">{(data.names[e.id] || []).slice(0, 7).map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={30} />)}</span>
+        </Link>
+      ) : <div className="count"><span>Wees de eerste die zich aanmeldt</span></div>}
       <div className="btn-row">
         <AttendWithCheckin e={e} going={going} act={act} local={local} />
       </div>
