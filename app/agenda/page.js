@@ -3,12 +3,15 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { EventRow, Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
+import MarathonPlan from '@/components/MarathonPlan';
+import { KEY_SESSIONS } from '@/lib/marathon';
 
 const TABS = [
   ['training', 'Trainingen', 'Elke dinsdag samen lopen, alle niveaus.'],
   ['special', 'Specials', 'Clubactiviteiten en de maandelijkse 5km Challenge.'],
   ['wedstrijd', 'Wedstrijden', 'Races binnen 50 km van Bennekom. De club gaat samen: regel je rit via de carpool.'],
   ['samenloop', 'Samen lopen', 'Loopjes van leden buiten de dinsdag. Haak aan of plan er zelf een.'],
+  ['marathon', 'Op weg naar Rotterdam', 'Drie key sessions richting de NN Marathon Rotterdam.'],
 ];
 const EMPTY_RUN = { title: '', date: '', time: '09:00', place: 'Dunantlaan 18, Bennekom', km: '', pace: '', route: '', note: '' };
 const MONTH = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
@@ -38,7 +41,7 @@ export default function Agenda() {
     ? (data.past || []).filter(inTab)
     : data.events.filter(inTab).filter((e) => tab !== 'wedstrijd' || e.km == null || e.km <= 50);
   const setHash = (t, b) => history.replaceState(null, '', '#' + t + (b ? '-terug' : ''));
-  const count = (k) => data.events.filter((e) => (k === 'special' ? e.type === 'special' || e.type === 'challenge' : e.type === k)).length;
+  const count = (k) => k === 'marathon' ? KEY_SESSIONS.length : data.events.filter((e) => (k === 'special' ? e.type === 'special' || e.type === 'challenge' : e.type === k)).length;
   // per maand groeperen
   const groups = [];
   for (const e of list) {
@@ -56,11 +59,12 @@ export default function Agenda() {
       <ErrorNote />
       <div className="seg agenda-tabs" role="tablist" aria-label="Soort">
         {TABS.map(([k, l]) => (
-          <button key={k} role="tab" aria-selected={tab === k} aria-pressed={tab === k} onClick={() => { setTab(k); setHash(k, back); }}>
+          <button key={k} role="tab" className={k === 'marathon' ? 'tab-marathon' : undefined} aria-selected={tab === k} aria-pressed={tab === k} onClick={() => { setTab(k); setHash(k, back); }}>
             {l} <span className="cnt">{count(k)}</span>
           </button>
         ))}
       </div>
+{tab === 'marathon' ? <MarathonPlan /> : <>
       <div className="seg when-toggle" aria-label="Periode">
         <button aria-pressed={!back} onClick={() => { setBack(false); setHash(tab, false); }}>Komend</button>
         <button aria-pressed={back} onClick={() => { setBack(true); setHash(tab, true); }}>Terugkijken</button>
@@ -112,6 +116,7 @@ export default function Agenda() {
           <button className="btn btn-gold" type="submit">Voorstel versturen</button>
         </form>
       )}
+      </>}
     </>
   );
 }

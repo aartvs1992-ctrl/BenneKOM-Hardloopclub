@@ -677,3 +677,53 @@ a.media-item:hover{border-color:var(--gold)}
 .dm-row .dm-face{all:unset;cursor:pointer;display:inline-flex;border-radius:50%}
 .dm-row .dm-face:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .dm-head .small{display:block;font-weight:400}
+
+/* Op weg naar Rotterdam: tab in de agenda en de key sessions */
+.agenda-tabs .tab-marathon{grid-column:1/-1;background:var(--navy);color:var(--on-navy)}
+.agenda-tabs .tab-marathon[aria-pressed="true"]{background:var(--gold);color:#071E3E}
+.agenda-tabs .tab-marathon .cnt{background:rgba(244,241,230,.18);color:inherit}
+.agenda-tabs .tab-marathon[aria-pressed="true"] .cnt{background:var(--navy);color:var(--on-navy)}
+.mr-hero{gap:10px}
+.mr-hero h1{font-size:clamp(38px,11vw,48px)}
+.mr-lead{font-size:15px;opacity:.9;position:relative;z-index:1}
+.mr-tl{position:relative;height:150px;margin:6px 6px 0;z-index:1}
+.mr-axis{position:absolute;left:0;right:0;top:74px;height:3px;border-radius:2px;background:rgba(244,241,230,.35)}
+.mr-mon{position:absolute;top:80px;transform:translateX(-50%);font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+.mr-mk{position:absolute;top:0;height:150px;transform:translateX(-50%)}
+.mr-mk .dot{position:absolute;left:50%;top:75px;transform:translate(-50%,-50%);border-radius:50%}
+.mr-mk.ses .dot{width:20px;height:20px;background:var(--gold);box-shadow:0 0 0 4px var(--navy),0 0 0 6px var(--gold)}
+.mr-mk.race .dot{width:13px;height:13px;background:var(--navy);border:3px solid var(--on-navy)}
+.mr-mk.ch .dot{width:8px;height:8px;background:rgba(244,241,230,.75)}
+.mr-mk .lb{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;text-align:center;line-height:1.1;font-size:13px}
+.mr-mk .lb small{display:block;font-size:12px;opacity:.75;font-weight:400}
+.mr-mk.ses .lb{bottom:90px;font-family:var(--f-display);font-weight:800;font-size:18px;text-transform:uppercase;color:var(--gold)}
+.mr-mk.ses .lb small{font-family:var(--f-body);text-transform:none;color:var(--on-navy)}
+.mr-mk.race .lb{top:98px;font-weight:700}
+.mr-mk.end .lb{left:auto;right:-6px;transform:none;text-align:right}
+.mr-key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;opacity:.85;position:relative;z-index:1}
+.mr-key span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px;background:var(--gold)}
+.mr-key .k2::before{background:var(--navy);border:2px solid var(--on-navy)}
+.mr-key .k3::before{width:6px;height:6px;background:rgba(244,241,230,.75)}
+.mr-count{font-size:14px;position:relative;z-index:1}
+.mr-count b{font-family:var(--f-display);font-size:28px;color:var(--gold);margin-right:4px}
+.mr-goalv{font-size:22px;color:var(--gold-ink)}
+.mr-goal input[type=range]{width:100%;accent-color:var(--gold);min-height:40px}
+.mr-ses{gap:12px}
+.mr-ses .eyebrow{display:block;margin-bottom:4px;color:var(--gold-ink)}
+.mr-ses h2{font-size:30px}
+.mr-what{font-weight:700}
+.mr-bar{display:flex;gap:2px;height:40px;border-radius:8px;overflow:hidden}
+.mr-bar i{display:flex;align-items:center;justify-content:center;font:700 12px var(--f-mono);font-style:normal;white-space:nowrap;overflow:hidden;min-width:3px}
+.mr-bar .b-e{background:var(--line)}
+.mr-bar .b-m{background:var(--gold);color:#071E3E}
+.mr-bar .b-d{background:var(--soft)}
+.mr-steps{list-style:none;margin:0;padding:0;font-size:15px}
+.mr-steps li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}
+.mr-steps li:last-child{border-bottom:0}
+.mr-steps li span:last-child{color:var(--muted);text-align:right}
+.mr-check{background:color-mix(in srgb,var(--gold) 14%,transparent);border-radius:10px;padding:10px 12px}
+.mr-tips .tile{cursor:default}
+.mr-tips .tile:hover{border-color:var(--line)}
+@media (prefers-reduced-motion:no-preference){.mr-bar i{transition:flex-grow .3s ease}}
+.mr-ses .readout .big,.mr-goal .readout .big{font-size:clamp(16px,4.6vw,20px);white-space:nowrap}
+@media (max-width:440px){.mr-lg{display:none}}
