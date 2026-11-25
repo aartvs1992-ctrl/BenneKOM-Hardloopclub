@@ -90,7 +90,7 @@ export default function MarathonPlan() {
             <p>{s.intro}</p>
             {s.n === 3 && (
               <div className="seg" role="group" aria-label="Vorm van sessie 3">
-                <button aria-pressed={s3 === 'base'} onClick={() => setS3('base')}>{variant === 'short' ? 'Blokken (kort)' : '3 × 30 min'}</button>
+                <button aria-pressed={s3 === 'base'} onClick={() => setS3('base')}>{variant === 'short' ? '3 × 30 min' : '3 × 35 min'}</button>
                 <button aria-pressed={s3 === 'long'} onClick={() => setS3('long')}>Doorloper</button>
               </div>
             )}

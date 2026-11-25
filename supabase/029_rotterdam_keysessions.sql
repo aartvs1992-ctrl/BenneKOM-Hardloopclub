@@ -11,5 +11,5 @@ insert into events (id, type, title, date, time, place, description, distances, 
   ('keysession-2', 'special', 'Key session 2 · Op weg naar Rotterdam', '2027-02-21', '', 'Bennekom',
    'Lange zondagsessie met 3 × 25 min op marathontempo. Alle niveaus, iedereen op zijn eigen tempo.', '2u16 · ±20–36 km', null, true, false, false),
   ('keysession-3', 'special', 'Key session 3 · Op weg naar Rotterdam', '2027-03-21', '', 'Bennekom',
-   'De generale repetitie: 3 × 30 min op marathontempo of 85 min aan één stuk.', '2u30–2u40 · ±23–42 km', null, true, false, false)
+   'De generale repetitie: 3 × 35 min op marathontempo (kort: 3 × 30) of 85 min aan één stuk.', '2u25–2u40 · ±21–43 km', null, true, false, false)
 on conflict (id) do nothing;
