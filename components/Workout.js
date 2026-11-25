@@ -31,7 +31,7 @@ export function Workout({ w }) {
       {w.intro && <p className="wo-intro">{w.intro}</p>}
       <Strip w={w} />
       <ol className="wo-steps">
-        <li className="wo-step easy"><span className="wo-big">In</span><span><b>{w.warm}</b>{w.warmNote && <span className="small"> · {w.warmNote}</span>}<br /><span className="small">Rustig, samen</span></span></li>
+        <li className="wo-step easy"><span className="wo-big">In</span><span><b>{w.warm}</b>{w.warmNote && <span className="small"> · {w.warmNote}</span>}{w.warmEasy !== false && <><br /><span className="small">Rustig, samen</span></>}</span></li>
         {w.sets.map((s, i) => (
           <li key={i} className={'wo-step z-' + s.zone}>
             <span className="wo-big num">{s.reps}×</span>
