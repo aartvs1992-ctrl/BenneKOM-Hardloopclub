@@ -5,7 +5,7 @@ import { useApp } from './AppProvider';
 import { EventRow } from './ui';
 import { fmt, daysTo, MON, DAY } from '@/lib/content';
 import {
-  MARATHON, KEY_SESSIONS, CHALLENGE_DATES,
+  MARATHON, KEY_SESSIONS,
   mpPace, sessionStats, sessionSteps, EASY_FACTOR, JOG_FACTOR, GOAL_MIN, GOAL_MAX,
 } from '@/lib/marathon';
 
@@ -33,7 +33,6 @@ export default function MarathonPlan() {
   const days = daysTo(MARATHON.date);
   const race = data.events.find((e) => e.id === MARATHON.id);
   const marks = [
-    ...CHALLENGE_DATES.map((d) => ({ k: 'ch', d })),
     ...KEY_SESSIONS.map((s) => ({ k: 'ses', d: s.date, l: 'Sessie ' + s.n, s: short(s.date) })),
     { k: 'race end', d: MARATHON.date, l: 'Rotterdam', s: short(MARATHON.date) },
   ];
@@ -54,7 +53,7 @@ export default function MarathonPlan() {
             </div>
           ))}
         </div>
-        <div className="mr-key"><span>Key session</span><span className="k2">Marathon</span><span className="k3">5km Challenge</span></div>
+        <div className="mr-key"><span>Key session</span><span className="k2">Marathon</span></div>
         {days > 0 && <p className="mr-count"><b>{days}</b> dagen tot de start in Rotterdam</p>}
       </section>
 
