@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
@@ -19,11 +19,15 @@ export default function Cooper() {
   const [meters, setMeters] = useState('');
   const [day, setDay] = useState(today);
   const [formOpen, setFormOpen] = useState(false);
+  const [demo, setDemo] = useState(false);
+  useEffect(() => { setDemo(new URLSearchParams(location.search).get('demo') === '1'); }, []);
   const ready = useReady();
   if (!ready) return <Loading />;
 
-  const notSetUp = data.cooper === null;
-  const tests = (data.cooper || []).map((t, i, arr) => ({ ...t, delta: i ? t.meters - arr[i - 1].meters : null }));
+  // Voorbeeld (/challenge/cooper?demo=1): Aarts coopertest met BenneKOM, zonder iets op te slaan
+  const notSetUp = !demo && data.cooper === null;
+  const rows = demo ? [{ id: 'demo', date: '2026-11-24', meters: 3890 }] : (data.cooper || []);
+  const tests = rows.map((t, i, arr) => ({ ...t, delta: i ? t.meters - arr[i - 1].meters : null }));
   const last = tests[tests.length - 1];
   const best = tests.length ? Math.max(...tests.map((t) => t.meters)) : null;
   const bestTest = tests.find((t) => t.meters === best);
@@ -44,6 +48,7 @@ export default function Cooper() {
       <PhotoHeader src="/club/groep-met-tempo.jpg" title="Coopertest" sub="Twaalf minuten zo ver mogelijk. Je afstand bepaalt je tempo's voor de intervallen." pos="center 35%" />
       <ChallengeTabs active="cooper" />
       <ErrorNote />
+      {demo && <p className="note">Voorbeeld: Aarts coopertest van 24 november (3.890 m). Er wordt niets opgeslagen.</p>}
 
       <div className="panel callout">
         <b>{COOPER_INFO.title}</b>
@@ -51,7 +56,7 @@ export default function Cooper() {
       </div>
 
       {notSetUp ? (
-        <section className="panel"><h3>Bijna klaar</h3><p className="muted">De coopertest wordt nog ingesteld. Probeer het later nog eens.</p></section>
+        <section className="panel"><h3>Bijna klaar</h3><p className="muted">De coopertest wordt nog ingesteld. Probeer het later nog eens.</p><Link className="link" href="/challenge/cooper?demo=1">Bekijk een voorbeeld ›</Link></section>
       ) : last ? (
         <section className="panel">
           <div className="section-head"><h3>Jouw stand</h3><span className="small muted">{tests.length} {tests.length === 1 ? 'test' : 'tests'}</span></div>
@@ -105,7 +110,7 @@ export default function Cooper() {
         </section>
       )}
 
-      {!notSetUp && (
+      {!notSetUp && !demo && (
         <section className="panel">
           {!formOpen ? (
             <button className="link" style={{ alignSelf: 'flex-start' }} onClick={() => setFormOpen(true)}>+ Coopertest invullen</button>
@@ -137,7 +142,7 @@ export default function Cooper() {
                 </span>
                 <span style={{ textAlign: 'right' }}>
                   {t.delta != null && <span className={'num small ' + (t.delta > 0 ? 'faster' : t.delta < 0 ? 'slower' : '')}>{signedM(t.delta)}</span>}
-                  <br /><button className="link small" onClick={() => act('deleteCooper', { id: t.id }, 'Test verwijderd')}>Verwijder</button>
+                  {!demo && <><br /><button className="link small" onClick={() => act('deleteCooper', { id: t.id }, 'Test verwijderd')}>Verwijder</button></>}
                 </span>
               </div>
             ))}
