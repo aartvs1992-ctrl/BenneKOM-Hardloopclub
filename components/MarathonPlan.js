@@ -115,7 +115,6 @@ export default function MarathonPlan() {
               </div>
             </div>
             <ul className="mr-steps">{sessionSteps(v.blocks).map(([a, b]) => <li key={a}><span>{a}</span><span>{b}</span></li>)}</ul>
-            <p className="mr-check small">{s.check}</p>
             {ev && (
               <Link className={'btn ' + (going ? 'btn-done' : 'btn-gold')} href={'/event/' + s.id}>
                 {going ? '✓ Je bent erbij' : 'Ik ben erbij'}{n > 0 ? ` · ${n} ${n === 1 ? 'loper' : 'lopers'}` : ''}
@@ -131,7 +130,7 @@ export default function MarathonPlan() {
           <div className="tile"><span className="k">Tempo bepalen</span><span className="v">De coopertest van 8 december is je nulmeting. Twijfel je, kies dan het langzaamste doel dat realistisch voelt.</span></div>
           <div className="tile"><span className="k">Drinkpost</span><span className="v">Ronde van 2,5 tot 4 km met één tafel. Oefen elke sessie je gels en drinken op racetempo.</span></div>
           <div className="tile"><span className="k">Generale repetitie</span><span className="v">Sessie 3 met je racedag-ontbijt, wedstrijdschoenen en wedstrijdkleding.</span></div>
-          <div className="tile"><span className="k">Na de CPC</span><span className="v">Halve voluit gelopen op 14 maart? Laat in sessie 3 de doorloper schieten.</span></div>
+          <div className="tile"><span className="k">Herstel</span><span className="v">Houd de dag erna rustig en plan in die week geen tweede zware training.</span></div>
         </div>
       </section>
       <p className="small muted">Kilometers zijn schattingen: in- en uitlopen ≈ MP × 1,18, dribbel ≈ MP × 1,35. Starttijd en ronde volgen.</p>
