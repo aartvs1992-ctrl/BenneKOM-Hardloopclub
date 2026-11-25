@@ -1,14 +1,16 @@
 // Strava stuurt het lid hier terug na het geven (of weigeren) van toestemming
-import { connect, sync } from '@/lib/strava';
+import { connect, sync, safeReturn } from '@/lib/strava';
 import { scanStrava } from '@/lib/badgeScan';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   const url = new URL(req.url);
-  const [stateDevice, next] = (url.searchParams.get('state') || '').split('~');
+  const [stateDevice, next, from] = (url.searchParams.get('state') || '').split('~');
   const page = next === 'badges' ? '/badges' : '/challenge';
-  const back = (status, why = '') => Response.redirect(new URL(`${page}?strava=${status}${why ? '&why=' + encodeURIComponent(why.slice(0, 160)) : ''}`, url.origin));
+  // terug naar het adres waar het lid de app opende (alleen clubadressen)
+  const home = from ? safeReturn(from) : url.origin;
+  const back = (status, why = '') => Response.redirect(new URL(`${page}?strava=${status}${why ? '&why=' + encodeURIComponent(why.slice(0, 160)) : ''}`, home));
   if (url.searchParams.get('error')) return back('geweigerd', url.searchParams.get('error'));
   const code = url.searchParams.get('code');
   const device = (stateDevice || '').slice(0, 64);
