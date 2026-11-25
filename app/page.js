@@ -115,7 +115,7 @@ function NextTraining({ e, img }) {
       )}
       {/* kop (Duurloop/Intervaltraining + datum) is ook tikbaar: opent de trainingspagina */}
       <Link href={'/event/' + e.id} style={{ color: 'inherit', textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <span className="eyebrow">{special ? 'Vervangt de clubtraining' : e.kind === 'interval' ? 'Intervaltraining' : e.kind === 'duurloop' ? 'Duurloop' : 'Volgende clubtraining'} · {rel(e.date)}</span>
+        <span className="eyebrow">{special ? 'Vervangt de clubtraining' : e.title || 'Volgende clubtraining'} · {rel(e.date)}</span>
         <h1>{special ? e.title : `${p.W} ${p.d} ${p.m}`}</h1>
       </Link>
       <div className="meta">{special && <span>{p.W} {p.d} {p.m}</span>}<span className="num">{e.time}</span><span>{e.place}</span></div>
