@@ -6,7 +6,7 @@ import { EventRow } from './ui';
 import { fmt, daysTo, MON, DAY } from '@/lib/content';
 import {
   MARATHON, KEY_SESSIONS,
-  mpPace, sessionStats, sessionSteps, EASY_FACTOR, JOG_FACTOR, GOAL_MIN, GOAL_MAX,
+  mpPace, sessionStats, sessionSteps, easyFactor, jogFactor, GOAL_MIN, GOAL_MAX,
 } from '@/lib/marathon';
 
 const KEY = 'bk-marathon-goal';
@@ -64,8 +64,8 @@ export default function MarathonPlan() {
         <input type="range" id="mr-goal" min={GOAL_MIN} max={GOAL_MAX} step="1" value={goal} onChange={(e) => pick(+e.target.value)} aria-label="Marathondoel in minuten" />
         <div className="readout">
           <div><span className="big">{fmt(mp)}</span><span className="lbl">marathontempo /km</span></div>
-          <div><span className="big">{fmt(mp * EASY_FACTOR)}</span><span className="lbl">in- en uitlopen /km</span></div>
-          <div><span className="big">{fmt(mp * JOG_FACTOR)}</span><span className="lbl">dribbel /km</span></div>
+          <div><span className="big">{fmt(mp * easyFactor(goal))}</span><span className="lbl">in- en uitlopen /km</span></div>
+          <div><span className="big">{fmt(mp * jogFactor(goal))}</span><span className="lbl">dribbel /km</span></div>
         </div>
         <p className="small muted">Schuif naar je marathondoel. De app onthoudt je keuze.</p>
         <div className="seg" role="group" aria-label="Variant">
@@ -124,7 +124,7 @@ export default function MarathonPlan() {
           <div className="tile"><span className="k">Herstel</span><span className="v">Houd de dag erna rustig en plan in die week geen tweede zware training.</span></div>
         </div>
       </section>
-      <p className="small muted">Kilometers zijn schattingen: in- en uitlopen ≈ MP × 1,18, dribbel ≈ MP × 1,35. Starttijd en ronde volgen.</p>
+      <p className="small muted">Kilometers zijn schattingen: in- en uitlopen gaat iets langzamer dan je marathontempo, dribbelen nog wat rustiger. Starttijd en ronde volgen.</p>
     </>
   );
 }
