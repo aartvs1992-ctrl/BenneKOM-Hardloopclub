@@ -98,6 +98,21 @@ export async function POST(req) {
         await remove('challenge_results', { id: r.id });
         break;
       }
+      case 'addCooper': {
+        if (!name) return bad('Vul eerst je naam in bij Meer.');
+        const meters = parseInt(b.meters, 10);
+        if (!(meters >= 1000 && meters <= 5500)) return bad('Vul een afstand tussen 1000 en 5500 meter in.');
+        const day = /^\d{4}-\d{2}-\d{2}$/.test(b.date || '') ? b.date : null;
+        if (!day || day > new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Amsterdam' })) return bad('Kies de datum van je test (niet in de toekomst).');
+        await insert('cooper_results', { device_id: device, name, test_date: day, meters });
+        break;
+      }
+      case 'deleteCooper': {
+        const r = (await find('cooper_results', { device_id: device })).find((x) => x.id === b.id);
+        if (!r) return bad('Deze test is niet van jou.');
+        await remove('cooper_results', { id: r.id });
+        break;
+      }
       case 'paidReport': {
         // lid geeft aan dat hij via de betaallink heeft betaald; Aart bevestigt in Beheer
         const at = b.undo ? null : new Date().toISOString();
@@ -206,6 +221,7 @@ export async function POST(req) {
   } catch (e) {
     if (/events_type_check|violates check/.test(String(e.message))) return bad('Samen lopen is nog niet ingesteld: draai updates.sql in Supabase.', 500);
     if (/paid_reported_at|paid/.test(String(e.message)) && /column/.test(String(e.message))) return bad(`Betalen is nog niet ingesteld: draai ${b.what === 'event' ? '023_betalen_events.sql' : '021_betalen.sql'} in Supabase.`, 500);
+    if (/cooper_results/.test(String(e.message))) return bad('De coopertest is nog niet ingesteld: draai 028_coopertest.sql in Supabase.', 500);
     if (/singlet_claims|claim_singlet/.test(String(e.message))) return bad('Singlets claimen is nog niet ingesteld: draai 019_singlets.sql in Supabase.', 500);
     if (/shirt_interest/.test(String(e.message))) return bad('Shirtbestellingen zijn nog niet ingesteld: draai updates.sql in Supabase.', 500);
     return Response.json({ error: 'Opslaan lukte niet. Probeer het nog eens.' }, { status: 500 });

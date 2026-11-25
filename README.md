@@ -8,6 +8,7 @@ De app van Hardloopclub BenneKOM. Leden zetten hem op hun beginscherm en krijgen
 - **Inschrijven** met één tik (of op naam zonder profiel), met optioneel maximum
 - **Carpool** bij wedstrijden: rit aanbieden of meerijden
 - **Jouw 5 km**: persoonlijke pagina voor de 5km Challenge — tijden op het Strava-segment komen automatisch binnen (of zelf invullen), met PR, verschil met de vorige keer en een grafiek. Alleen zichtbaar voor het lid zelf.
+- **Coopertest** (`/challenge/cooper`, tab naast de 5km Challenge): 12 minuten zo ver mogelijk. Uit de afstand volgt de VDOT (Jack Daniels) en daaruit de intervaltempo's volgens Bakken (drempel 2% rustiger dan Daniels T), per herhalingslengte. Met PR, verschil met de vorige test en een progressiegrafiek. Draai hiervoor `supabase/028_coopertest.sql`.
 - **Calculator** (tempo, voorspeller, hartslagzones, splits) en **voedingsplan**
 - **Leren**: 15 modules met voortgang
 - **Nieuws** van de club
