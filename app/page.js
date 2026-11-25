@@ -129,7 +129,7 @@ function NextTraining({ e, img }) {
       )}
       {!special && (workoutFor(e.date)
         ? <Link className="hero-wo" href={'/event/' + e.id}><span className="num">{workoutFor(e.date).title}</span> ›</Link>
-        : <Link className="hero-wo" href={'/event/' + e.id}>Meer info ›</Link>)}
+        : <Link className="hero-wo" href={'/event/' + e.id}>{e.kind === 'duurloop' ? 'Groepjes op elk tempo ›' : 'Meer info ›'}</Link>)}
       {/* tik op de teller of de gezichten: zien wie er komen (ook bij een duurloop zonder workout) */}
       {n > 0 ? (
         <Link className="count" href={'/event/' + e.id} style={{ color: 'inherit', textDecoration: 'none' }} aria-label={`Bekijk wie er komen (${n})`}>

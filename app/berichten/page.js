@@ -51,6 +51,7 @@ export default function Berichten() {
               ))}
             </div>
           ) : !picking && <p className="muted">Nog geen berichten. Tik op <b>Nieuw bericht</b>, of op het gezicht van een clubgenoot bij een training.</p>}
+          <Link className="link" href="/leden">Bekijk alle clubgenoten en hun profielen ›</Link>
         </section>
       )}
       {!v.open && v.threads.length > 0 && <p className="note">Je hebt nog {v.threads.length} {v.threads.length === 1 ? 'gesprek' : 'gesprekken'}. Zet berichten aan om ze weer te zien.</p>}

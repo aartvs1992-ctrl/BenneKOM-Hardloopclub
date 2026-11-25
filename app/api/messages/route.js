@@ -38,7 +38,7 @@ async function view(device, withH) {
   if (withH) {
     const other = byHandle[withH];
     if (!other || other === device) return { ...out, notFound: true };
-    out.with = card(other);
+    out.with = { ...profiles[other], ...card(other), bh: handle(other) }; // ook de antwoorden op de vragen, voor het profiel
     out.messages = msgs.filter((m) => m.from_device === other || m.to_device === other)
       .map((m) => ({ id: m.id, body: m.body, at: m.created_at, mine: m.from_device === device, read: Boolean(m.read_at) }));
     const unreadIds = msgs.filter((m) => m.from_device === other && m.to_device === device && !m.read_at);
