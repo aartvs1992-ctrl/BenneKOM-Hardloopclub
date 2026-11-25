@@ -141,6 +141,13 @@ export default function EventPage() {
       )}
 
       {isTraining && workoutFor(e.date) && <Workout w={workoutFor(e.date)} />}
+      {isTraining && !workoutFor(e.date) && e.kind === 'duurloop' && (
+        <div className="panel callout">
+          <b>Rustig, in groepjes op elk tempo</b>
+          <p>We lopen de duurloop rustig, in groepjes op verschillende tempo&apos;s. Er is altijd een groepje dat bij je past, dus iedereen kan aanhaken. Rustig mag hier écht rustig: je moet onderweg hele zinnen kunnen praten.</p>
+          <Link className="link" href="/challenge/cooper">Wat is rustig voor jou? Bekijk je tempo&apos;s ›</Link>
+        </div>
+      )}
       {e.past ? <WasThere e={e} /> : (
         <>
           {(isTraining || isRun) && <Attend e={e} />}

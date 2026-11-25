@@ -30,7 +30,7 @@ export default function Gesprek({ params }) {
   return (
     <div className="dm">
       <button className="dm-head" onClick={() => setSheet(true)} aria-label={'Bekijk ' + o.name}>
-        <Avatar name={o.name} src={o.avatar} size={40} /><b>{o.name}</b>
+        <Avatar name={o.name} src={o.avatar} size={40} /><span style={{ textAlign: 'left' }}><b>{o.name}</b><span className="small muted">Bekijk profiel en badges ›</span></span>
       </button>
       <div className="dm-msgs">
         {v.messages.length === 0 && <p className="muted small" style={{ textAlign: 'center' }}>Nog geen berichten. Zeg hallo!</p>}
@@ -54,7 +54,7 @@ export default function Gesprek({ params }) {
           <button className="btn btn-gold" disabled={busy || !text.trim()} aria-label="Versturen">➤</button>
         </form>
       )}
-      {sheet && <MemberSheet p={{ name: o.name, avatar: o.avatar }} onClose={() => setSheet(false)} />}
+      {sheet && <MemberSheet p={{ ...o, dm: null }} onClose={() => setSheet(false)} />}
     </div>
   );
 }

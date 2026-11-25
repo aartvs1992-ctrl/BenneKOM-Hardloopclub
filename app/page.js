@@ -113,8 +113,11 @@ function NextTraining({ e, img }) {
         <video className="hero-video" src="/media/backyard-montage.mp4" poster="/media/backyard-montage.jpg"
           autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
       )}
-      <span className="eyebrow">{special ? 'Vervangt de clubtraining' : e.kind === 'interval' ? 'Intervaltraining' : e.kind === 'duurloop' ? 'Duurloop' : 'Volgende clubtraining'} · {rel(e.date)}</span>
-      <h1>{special ? e.title : `${p.W} ${p.d} ${p.m}`}</h1>
+      {/* kop (Duurloop/Intervaltraining + datum) is ook tikbaar: opent de trainingspagina */}
+      <Link href={'/event/' + e.id} style={{ color: 'inherit', textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <span className="eyebrow">{special ? 'Vervangt de clubtraining' : e.kind === 'interval' ? 'Intervaltraining' : e.kind === 'duurloop' ? 'Duurloop' : 'Volgende clubtraining'} · {rel(e.date)}</span>
+        <h1>{special ? e.title : `${p.W} ${p.d} ${p.m}`}</h1>
+      </Link>
       <div className="meta">{special && <span>{p.W} {p.d} {p.m}</span>}<span className="num">{e.time}</span><span>{e.place}</span></div>
       {special && e.description && <p className="small" style={{ margin: 0, opacity: .9 }}>{e.description}</p>}
       {special && <Link className="hero-wo" href={'/event/' + e.id}>Meer info ›</Link>}
@@ -124,10 +127,16 @@ function NextTraining({ e, img }) {
           <span className="small"><b className="num">{n} van {PROMO.goal}</b> {n >= PROMO.goal ? 'aanmeldingen: hij gaat door 🍝' : open ? `· aanmelden t/m ${PROMO.deadline}, bij ${PROMO.goal} gaat hij door` : 'aanmeldingen'}</span>
         </div>
       )}
-      {!special && workoutFor(e.date) && <Link className="hero-wo" href={'/event/' + e.id}><span className="num">{workoutFor(e.date).title}</span> ›</Link>}
-      <div className="count">{n > 0 ? <><span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'}</span></> : <span>Wees de eerste die zich aanmeldt</span>}
-        {n > 0 && <span className="stack">{(data.names[e.id] || []).slice(0, 7).map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={30} />)}</span>}
-      </div>
+      {!special && (workoutFor(e.date)
+        ? <Link className="hero-wo" href={'/event/' + e.id}><span className="num">{workoutFor(e.date).title}</span> ›</Link>
+        : <Link className="hero-wo" href={'/event/' + e.id}>{e.kind === 'duurloop' ? 'Groepjes op elk tempo ›' : 'Meer info ›'}</Link>)}
+      {/* tik op de teller of de gezichten: zien wie er komen (ook bij een duurloop zonder workout) */}
+      {n > 0 ? (
+        <Link className="count" href={'/event/' + e.id} style={{ color: 'inherit', textDecoration: 'none' }} aria-label={`Bekijk wie er komen (${n})`}>
+          <span className="n num">{n}</span><span>{n === 1 ? 'loper komt' : 'lopers komen'} ›</span>
+          <span className="stack">{(data.names[e.id] || []).slice(0, 7).map((p, i) => <Avatar key={i} name={p.name} src={p.avatar} size={30} />)}</span>
+        </Link>
+      ) : <div className="count"><span>Wees de eerste die zich aanmeldt</span></div>}
       <div className="btn-row">
         <AttendWithCheckin e={e} going={going} act={act} local={local} />
       </div>
