@@ -45,7 +45,7 @@ export default function Cooper() {
 
   return (
     <>
-      <PhotoHeader src="/club/groep-met-tempo.jpg" title="Coopertest" sub="Twaalf minuten zo ver mogelijk. Je afstand bepaalt je tempo's voor de intervallen." pos="center 35%" />
+      <PhotoHeader src="/club/groep-met-tempo.jpg" title="Coopertest" sub="Een kalibratie van je tempo's: twaalf minuten zo ver mogelijk laat zien waar je nu staat." pos="center 35%" />
       <ChallengeTabs active="cooper" />
       <ErrorNote />
       {demo && <p className="note">Voorbeeld: Aarts coopertest van 24 november (3.890 m). Er wordt niets opgeslagen.</p>}
