@@ -94,32 +94,23 @@ export default function Cooper() {
               <span className="num">{fmt(P.bakken)}<small style={{ fontSize: 20 }}>/km</small></span>
               <span className="small muted">Uit je test van {dateLabel(last.date)} ({m(last.meters)})</span>
             </div>
-            <table>
-              <thead><tr><th>Herhaling</th><th className="r">Tempo per km</th></tr></thead>
+            <table className="tempotabel">
+              <thead><tr><th>Soort</th><th className="r">Per km</th></tr></thead>
               <tbody>
-                {P.reps.map((r) => (
-                  <tr key={r.id}><td>{r.name}<br /><span className="small muted">{r.how}</span></td><td className="r num">{range(r.range)}</td></tr>
-                ))}
-                <tr><td>Rustig / duurloop<br /><span className="small muted">Hele zinnen praten</span></td><td className="r num">{range(P.easy)}</td></tr>
-              </tbody>
-            </table>
-            <p className="note">Kortere herhalingen loop je iets sneller, lange blokken rustiger, en altijd onder de drempel. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten. Bij wind, warmte of een zware week loop je op gevoel.</p>
-            <p className="small muted" style={{ margin: 0 }}>Zo rekenen we: je afstand geeft je VDOT (Jack Daniels). Daniels&apos; drempeltempo is dan {fmt(P.danielsT)}/km. Wij trainen volgens Marius Bakken en lopen 2% rustiger: {fmt(P.bakken)}/km.</p>
-            <Link className="link" href="/tools#threshold">Meer over drempeltraining en hoe het hoort te voelen ›</Link>
-          </div>
-          <h3>Harder trainen</h3>
-          <div className="panel">
-            <p className="small" style={{ margin: 0 }}>Harder dan Bakken mag best, zolang het niet het grootste deel van je volume is. Drempel en sub-threshold houd je rustig; deze tempo&apos;s (Jack Daniels) zijn voor de sessies daarbovenop.</p>
-            <table>
-              <thead><tr><th>Soort</th><th className="r">Tempo per km</th></tr></thead>
-              <tbody>
-                <tr><td>VO2max<br /><span className="small muted">Herhalingen van 3–5 min, bv. {'5×1000\u00a0m'}</span></td><td className="r num">{range(P.vo2max)}</td></tr>
-                {P.races.map((r) => (
+                <tr><td>Rustig / duurloop<br /><span className="small muted">Hele zinnen praten. Rustiger mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
+                <tr className="basis"><td><span className="tag special">Basis</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5\u00a0min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
+                <tr className="basis"><td><span className="tag special">Basis</span>Threshold<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000\u00a0m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
+                {P.races.slice().reverse().map((r) => (
                   <tr key={r.meters}><td>{r.meters / 1000} km-wedstrijdtempo<br /><span className="small muted">Voorspelde tijd {fmt(r.time)}</span></td><td className="r num">{fmt(r.pace)}</td></tr>
                 ))}
+                <tr><td>VO2max<br /><span className="small muted">Herhalingen van 3–5 min, bv. {'5×1000\u00a0m'}</span></td><td className="r num">{range(P.vo2max)}</td></tr>
+                <tr><td>Strides<br /><span className="small muted">15–20 sec ontspannen snel, ≈ {Math.round(P.strides[1] / 10)} sec per 100 m</span></td><td className="r num">{range(P.strides)}</td></tr>
               </tbody>
             </table>
-            <p className="note">VO2max doe je af en toe, met ruim herstel (ongeveer even lang als de herhaling). Train je voor een 5 of 10 km, dan loop je in de laatste weken een deel van je herhalingen op wedstrijdtempo, bijvoorbeeld 4×2 km op 10 km-tempo. De voorspelde tijden gaan uit van goede training voor die afstand; met weinig duurvermogen loop je ze wat langzamer.</p>
+            <p className="note"><b>Threshold en sub-threshold zijn de basis</b> en het grootste deel van je harde werk. Die loop je altijd onder de drempel. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten. Bij wind, warmte of een zware week loop je op gevoel.</p>
+            <p className="note">Harder mag best, zolang het niet het grootste deel van je volume is. VO2max doe je af en toe, met ruim herstel. Strides doe je na een rustige duurloop of in je warming-up: 4 tot 6 keer, met wandel- of dribbelpauze. Train je voor een 5 of 10 km, loop dan in de laatste weken een deel van je herhalingen op wedstrijdtempo.</p>
+            <p className="small muted" style={{ margin: 0 }}>Zo rekenen we: je afstand geeft je VDOT (Jack Daniels). Daniels&apos; drempeltempo is dan {fmt(P.danielsT)}/km. Voor threshold en sub-threshold volgen we Marius Bakken en lopen we 2% rustiger: {fmt(P.bakken)}/km. VO2max, strides en wedstrijdtempo&apos;s komen van Daniels.</p>
+            <Link className="link" href="/tools#threshold">Meer over drempeltraining en hoe het hoort te voelen ›</Link>
           </div>
         </section>
       )}

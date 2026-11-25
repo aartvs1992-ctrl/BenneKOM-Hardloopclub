@@ -667,3 +667,6 @@ a.media-item:hover{border-color:var(--gold)}
 .w-share{margin-top:auto;background:#C99A1E;color:#071E3E;border:0;border-radius:12px;padding:14px;font-weight:700;font-size:16px;cursor:pointer}
 .wrapped-banner{display:flex;flex-direction:column;gap:4px;text-decoration:none;background:var(--navy);color:var(--on-navy);border:0;box-shadow:inset 4px 0 0 var(--gold)}
 .wrapped-banner b{font-family:var(--f-display);font-size:22px;color:var(--gold)}
+.tempotabel tr.basis td{background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.tempotabel tr.basis td:first-child{box-shadow:inset 4px 0 0 var(--gold)}
+.tempotabel tr.basis td.r{color:var(--gold-ink);font-weight:700}
