@@ -132,10 +132,8 @@ export default function Welcome() {
             <button className="btn btn-gold" type="submit" disabled={busy}>Profiel openen</button>
           </form>
         )}
-        {!token && (
-          <button className="link" style={{ alignSelf: 'center' }} onClick={() => switchTo(mode === 'signup' ? 'login' : 'signup')}>
-            {mode === 'signup' ? 'Al aangemeld? Log in' : '‹ Nieuw hier? Meld je aan'}
-          </button>
+        {!token && mode !== 'signup' && (
+          <button className="link" style={{ alignSelf: 'center' }} onClick={() => switchTo('signup')}>‹ Nieuw hier? Meld je aan</button>
         )}
       </section>
     </div>
