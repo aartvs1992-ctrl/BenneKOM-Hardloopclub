@@ -128,6 +128,21 @@ export default function AppProvider({ children }) {
     return () => { document.removeEventListener('visibilitychange', onVis); clearInterval(t); };
   }, []);
   useEffect(() => { if (pending.current) location.reload(); }, [path]);
+  // Staat er een nieuwe versie klaar? Dan een tik op een link meteen als volledige paginalading doen,
+  // zodat de app niet probeert oude stukjes code van de vorige versie te laden.
+  useEffect(() => {
+    const onClick = (e) => {
+      if (!pending.current || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest?.('a[href]');
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+      const url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || url.pathname.startsWith('/api/')) return;
+      e.preventDefault();
+      location.assign(url.href);
+    };
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
+  }, []);
 
   // Aan- of afmelden meteen zichtbaar maken, nog voordat de server antwoordt
   const optimistic = useCallback((action, payload) => {
