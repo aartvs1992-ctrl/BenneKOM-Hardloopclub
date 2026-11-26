@@ -16,9 +16,11 @@ export default function Home() {
   if (!useReady()) return <Loading />;
 
   const next = data.events.find((e) => e.type === 'training' || e.replaces_training);
-  const specials = data.events.filter((e) => e.type === 'special' && e.id !== next?.id).slice(0, 3);
-  const runs = data.events.filter((e) => e.type === 'samenloop').slice(0, 2);
-  const races = data.events.filter((e) => e.type === 'wedstrijd' && (e.km == null || e.km <= 50)).slice(0, 3);
+  // Eén rustige lijst met wat eraan komt: clubactiviteiten eerst, plus hooguit één race om de hoek
+  const firstChallenge = data.events.find((e) => e.type === 'challenge');
+  const club = data.events.filter((e) => e.id !== next?.id && (['special', 'samenloop'].includes(e.type) || e === firstChallenge)).slice(0, 3);
+  const race = data.events.find((e) => e.type === 'wedstrijd' && (e.featured || (e.km != null && e.km <= 10)));
+  const upcoming = [...club, ...(race ? [race] : [])].sort((x, y) => (x.date + (x.time || '')).localeCompare(y.date + (y.time || '')));
 
   // Achtergrond van de trainingskaart: uitgelichte foto, anders de eerste clubfoto
   const featured = photos?.find((p) => p.featured);
@@ -34,19 +36,6 @@ export default function Home() {
       <KledingNote />
       <WrappedBanner />
 
-      <section className="section">
-        <div className="section-head"><h2>Ook samen lopen</h2><Link className="link" href="/agenda#samenloop">{runs.length ? 'Alles ›' : 'Plan een loopje ›'}</Link></div>
-        {runs.length
-          ? <div className="list">{runs.map((e) => <EventRow key={e.id} e={e} noTag />)}</div>
-          : (
-            <Link className="panel run-invite" href="/agenda#samenloop">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={thumb('/club/lachen-onderweg.jpg', 828)} alt="" loading="lazy" />
-              <span><b>Zin om ook buiten de dinsdag te lopen?</b><br /><span className="small muted">Plan een loopje met afstand en tempo, dan haken clubgenoten aan.</span></span>
-            </Link>
-          )}
-      </section>
-
       {!data.me && (
         <Link className="panel join-card" href="/profiel">
           <Avatar name="?" size={56} />
@@ -55,12 +44,18 @@ export default function Home() {
         </Link>
       )}
 
-      <section className="section">
-        <div className="section-head"><h2>Doe mee</h2><Link className="link" href="/agenda#special">Alle specials ›</Link></div>
-        <div className="list">
-          {specials.map((e) => <EventRow key={e.id} e={e} />)}
-        </div>
-      </section>
+      {upcoming.length > 0 && (
+        <section className="section">
+          <div className="section-head"><h2>Komt eraan</h2><Link className="link" href="/agenda">Hele agenda ›</Link></div>
+          <div className="list">{upcoming.map((e) => <EventRow key={e.id} e={e} />)}</div>
+        </section>
+      )}
+
+      <Link className="panel join-card" href="/agenda#samenloop">
+        <span className="physio-ico" aria-hidden="true">+</span>
+        <span style={{ minWidth: 0 }}><b>Ook buiten de dinsdag lopen?</b><br /><span className="small muted">Plan een loopje, dan haken clubgenoten aan.</span></span>
+        <span className="chev">›</span>
+      </Link>
 
       <section className="section">
         <div className="section-head"><h2>Dit zijn wij</h2><Link className="link" href="/fotos">Alle foto&apos;s ›</Link></div>
@@ -73,24 +68,6 @@ export default function Home() {
               <span className="by">{p.name}</span>
             </Link>
           ))}
-        </div>
-      </section>
-
-      {races.length > 0 && (
-        <section className="section">
-          <div className="section-head"><h2>Races in de regio</h2><Link className="link" href="/agenda#wedstrijd">Alle wedstrijden ›</Link></div>
-          <div className="list">{races.map((e) => <EventRow key={e.id} e={e} noTag />)}</div>
-        </section>
-      )}
-
-      <section className="section">
-        <h2>Meer BenneKOM</h2>
-        <div className="tiles">
-          <Link className="tile" href="/verhaal"><span className="k">Ons verhaal</span><span className="v">Hoe BenneKOM begon</span></Link>
-          <Link className="tile" href="/partners"><span className="k">Partners</span><span className="v">Ledenkorting bij onze partners</span></Link>
-          <Link className="tile" href="/nieuws"><span className="k">Nieuws</span><span className="v">Van de club en in de media</span></Link>
-          <Link className="tile" href="/fysio"><span className="k">Blessure?</span><span className="v">Fysiotherapeut David Hemstede</span></Link>
-          <Link className="tile tile-wide" href="/tools"><span className="k">Training &amp; tempo</span><span className="v">Jouw tempo&apos;s, uitleg, voorspeller en splits</span></Link>
         </div>
       </section>
     </>
@@ -170,8 +147,8 @@ function KledingNote() {
           style={{ display: 'block', width: 56, height: 56, objectFit: 'cover', borderRadius: 8, background: '#fff' }} />
       </Link>
       <span>
-        Clubshirts zijn besteld en komen rond de derde week van januari: precies op tijd om op 13 februari bij de Februariloop te schitteren. De race singlets komen rond 10 december binnen.
-        Betaal je <Link href="/shirt">shirt</Link> of <Link href="/singlet">singlet</Link> via de app 💙
+        <b>Clubkleding:</b> singlets rond 10 december, shirts rond half januari.{' '}
+        Betaal je <Link href="/shirt">shirt</Link> of <Link href="/singlet">singlet</Link> via de app.
       </span>
     </div>
   );
