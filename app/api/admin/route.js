@@ -5,7 +5,7 @@ import { SINGLET, dparts } from '@/lib/content';
 import { listPhotos } from '@/lib/photos';
 import { mealOptions, mealOf, eventPrice } from '@/lib/meals';
 import { withTrainings } from '@/lib/club';
-import { BADGE } from '@/lib/badges';
+import { BADGE, profileFilled, PROFILE_FIELDS } from '@/lib/badges';
 import { DEFAULT_DETAILS } from '@/lib/seed';
 import { sendPush, sendPushToDevices, pushReady } from '@/lib/push';
 import { mailReady, sendClubMail } from '@/lib/mailcode';
@@ -262,6 +262,20 @@ export async function POST(req) {
         }
         none.push(...open.filter((p) => String(p.device_id).startsWith('beheer-')).map((p) => p.name));
         return Response.json({ reminded: { total: open.length, pushed: inApp.filter((p) => reached.has(p.device_id)).map((p) => p.name), mailed, none, skipped } });
+      }
+      case 'profileNudge': {
+        // Alleen naar leden van wie het profiel nog niet af is (foto + vijf vragen), met de melding 'specials' aan
+        const profs = await all('profiles');
+        const done = new Set(profs.filter((p) => profileFilled(p) >= PROFILE_FIELDS.length).map((p) => p.device_id));
+        const known = new Set(profs.map((p) => p.device_id));
+        const subs = await all('push_subscriptions');
+        const skip = new Set([...done, ...subs.map((x) => x.device_id).filter((d) => !known.has(d))]);
+        const r = await sendPush('events', {
+          title: 'Nieuwe badge: Gezicht van de Club 🏅',
+          body: 'Zet een foto in je profiel en beantwoord de vijf vragen. Dan herkennen clubgenoten je dinsdag meteen!',
+          url: '/profiel',
+        }, skip);
+        return Response.json({ pushed: r, todo: profs.length - done.size });
       }
       case 'push': {
         if (!clean(b.title)) return Response.json({ error: 'Geef de melding een titel.' }, { status: 400 });

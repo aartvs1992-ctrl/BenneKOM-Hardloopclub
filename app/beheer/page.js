@@ -203,6 +203,15 @@ export default function Beheer() {
 
       <section className="section">
         <h2>Pushmelding sturen</h2>
+        <div className="panel">
+          <b>Kant-en-klaar: profielbadge 🏅</b>
+          <p className="small" style={{ margin: 0 }}><b>Nieuwe badge: Gezicht van de Club 🏅</b><br />Zet een foto in je profiel en beantwoord de vijf vragen. Dan herkennen clubgenoten je dinsdag meteen!</p>
+          <p className="small muted" style={{ margin: 0 }}>Gaat alleen naar leden van wie het profiel nog niet af is. Een tik op de melding opent hun profiel.</p>
+          <button className="btn btn-gold btn-sm" type="button" style={{ alignSelf: 'flex-start' }}
+            onClick={() => { if (confirm('Profielbadge-melding nu versturen?')) call('profileNudge', {}, (r) => `Verstuurd naar ${r.pushed?.sent ?? 0} telefoons (${r.todo} leden hebben hun profiel nog niet af)`); }}>
+            Versturen
+          </button>
+        </div>
         <form className="panel" onSubmit={async (e) => { e.preventDefault(); const j = await call('push', push, (r) => `Verstuurd naar ${r.pushed?.sent ?? 0} telefoons`); if (j) setPush({ ...push, title: '', body: '' }); }}>
           <div className="field"><label htmlFor="p-title">Titel</label><input className="input" id="p-title" value={push.title} onChange={(e) => setPush({ ...push, title: e.target.value })} required /></div>
           <div className="field"><label htmlFor="p-body">Tekst</label><input className="input" id="p-body" value={push.body} onChange={(e) => setPush({ ...push, body: e.target.value })} /></div>
