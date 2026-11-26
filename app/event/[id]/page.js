@@ -54,6 +54,11 @@ export default function EventPage() {
           <div><span className="lbl">Tijd</span><span className="big" style={{ fontSize: 16 }}>{e.time || 'volgt'}</span></div>
           <div><span className="lbl">Plaats</span><span style={{ fontWeight: 600, fontSize: 14 }}>{(e.place || '').split(',')[0]}{!e.time && e.type === 'special' && !e.past && e.place === 'Bennekom' ? ' · startplek volgt' : ''}</span></div>
         </div>
+        {!e.past && (
+          <a className="btn btn-line btn-sm cal-btn" style={{ alignSelf: 'flex-start' }} href={'/api/agenda/' + encodeURIComponent(e.id)}>
+            📅 Zet in mijn agenda
+          </a>
+        )}
         {isRun ? <p><b>Afstand en tempo:</b> {e.distances} · {dt.pace}</p> : e.distances && <p><b>Afstanden:</b> {e.distances}</p>}
         {isRun && e.organizer && <div className="organizer"><Avatar name={e.organizer.name} src={e.organizer.avatar} size={32} /><span className="small">Georganiseerd door <b>{e.organizer.name}</b></span></div>}
         {isRun && dt.route && <a className="btn btn-line btn-sm" style={{ alignSelf: 'flex-start' }} href={dt.route} target="_blank" rel="noopener noreferrer">Bekijk de route ↗</a>}

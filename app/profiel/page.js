@@ -4,6 +4,7 @@ import { useApp } from '@/components/AppProvider';
 import { Loading, Avatar, MemberSheet } from '@/components/ui';
 import AvatarCropper from '@/components/AvatarCropper';
 import BadgesPanel from '@/components/BadgesPanel';
+import { reloadBadges } from '@/lib/useBadges';
 
 export default function Profiel() {
   const { local, updateLocal, refresh, toast } = useApp();
@@ -58,6 +59,7 @@ export default function Profiel() {
       setProf(j.profile); setPhoto(null); setRemovePhoto(false);
       updateLocal({ name: j.profile.name });
       await refresh();
+      reloadBadges(local?.device);
       toast(prof ? 'Profiel bijgewerkt' : 'Welkom bij BenneKOM, ' + j.profile.first_name + '! De kortingscodes staan voor je klaar.');
       if (back) history.back();
     } catch (err) { toast(err.message); }
@@ -82,6 +84,7 @@ export default function Profiel() {
     finally { setBusy(false); setSure(false); }
   }
 
+  const filled = prof ? [prof.avatar, prof.member_since, prof.best_run, prof.song, prof.work, prof.fun_fact].filter((v) => String(v || '').trim()).length : 0;
   const card = prof && { name: prof.name, avatar: prof.avatar, since: prof.member_since, song: prof.song, work: prof.work, fact: prof.fun_fact, best: prof.best_run, me: true };
   const shown = removePhoto ? null : photo || prof?.avatar;
   const fullName = [f.first_name, f.last_name].filter(Boolean).join(' ');
@@ -109,8 +112,13 @@ export default function Profiel() {
           </form>
         </>
       )}
-      {prof && !prof.avatar && !prof.song && !prof.best_run && !prof.work && !prof.fun_fact && (
-        <p className="note"><b>Maak je profiel af.</b> Met een foto en een paar leuke antwoorden herkennen anderen je bij de training. Alles is optioneel.</p>
+      {prof && filled < 6 && (
+        <div className="note profile-progress">
+          <b>Maak je profiel af en verdien de badge Gezicht van de Club</b>
+          <span className="small">Een profielfoto en de vijf vragen hieronder. Dan herkennen clubgenoten je bij de training.</span>
+          <span className="progress" aria-hidden="true"><span style={{ width: (filled / 6) * 100 + "%" }} /></span>
+          <span className="small muted">{filled} van 6 ingevuld · nog {6 - filled} te gaan</span>
+        </div>
       )}
 
       {prof && !cropFile && <BadgesPanel />}

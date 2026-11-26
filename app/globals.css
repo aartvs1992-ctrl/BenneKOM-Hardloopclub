@@ -727,3 +727,4 @@ a.media-item:hover{border-color:var(--gold)}
 @media (prefers-reduced-motion:no-preference){.mr-bar i{transition:flex-grow .3s ease}}
 .mr-ses .readout .big,.mr-goal .readout .big{font-size:clamp(16px,4.6vw,20px);white-space:nowrap}
 @media (max-width:440px){.mr-lg{display:none}}
+.profile-progress{display:flex;flex-direction:column;gap:6px;color:var(--ink)}
