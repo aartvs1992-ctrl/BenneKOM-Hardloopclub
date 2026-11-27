@@ -6,7 +6,14 @@ function Strip({ w }) {
   const segs = [{ kind: 'easy', min: 10, level: 1 }];
   for (const s of w.sets) {
     for (let i = 0; i < s.reps; i++) {
-      segs.push({ kind: 'work', min: s.workMin, level: ZONES[s.zone].level, zone: s.zone });
+      // Een set kan uit meerdere blokken bestaan (parts), bv. 3 min · 1:30 · 45 sec
+      if (s.parts) {
+        for (const p of s.parts) {
+          segs.push(p.rest
+            ? { kind: 'rest', min: p.min, level: 0.4 }
+            : { kind: 'work', min: p.min, level: p.level || ZONES[p.zone].level, zone: p.zone });
+        }
+      } else segs.push({ kind: 'work', min: s.workMin, level: ZONES[s.zone].level, zone: s.zone });
       if (s.restMin && i < s.reps - 1) segs.push({ kind: 'rest', min: s.restMin, level: 0.4 });
     }
     segs.push({ kind: 'rest', min: s.pauseAfter || 2, level: 0.4 }); // pauze tussen de sets (standaard 2 min)
