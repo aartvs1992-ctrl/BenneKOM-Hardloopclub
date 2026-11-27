@@ -107,6 +107,23 @@ export async function POST(req) {
         await insert('cooper_results', { device_id: device, name, test_date: day, meters });
         break;
       }
+      case 'addCs': {
+        if (!name) return bad('Vul eerst je naam in bij Meer.');
+        const d3 = parseInt(b.d3, 10), d12 = parseInt(b.d12, 10);
+        if (!(d3 >= 400 && d3 <= 1600)) return bad('Vul voor de 3 minuten een afstand tussen 400 en 1600 meter in.');
+        if (!(d12 >= 1500 && d12 <= 5500)) return bad('Vul voor de 12 minuten een afstand tussen 1500 en 5500 meter in.');
+        if (d12 / 12 >= d3 / 3) return bad('Je 12 minuten moeten per minuut langzamer zijn dan je 3 minuten. Kloppen de afstanden?');
+        const day = /^\d{4}-\d{2}-\d{2}$/.test(b.date || '') ? b.date : null;
+        if (!day || day > new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Amsterdam' })) return bad('Kies de datum van je test (niet in de toekomst).');
+        await insert('cs_results', { device_id: device, name, test_date: day, d3, d12 });
+        break;
+      }
+      case 'deleteCs': {
+        const r = (await find('cs_results', { device_id: device })).find((x) => x.id === b.id);
+        if (!r) return bad('Deze test is niet van jou.');
+        await remove('cs_results', { id: r.id });
+        break;
+      }
       case 'deleteCooper': {
         const r = (await find('cooper_results', { device_id: device })).find((x) => x.id === b.id);
         if (!r) return bad('Deze test is niet van jou.');

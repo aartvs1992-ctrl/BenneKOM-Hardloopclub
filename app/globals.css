@@ -743,3 +743,8 @@ a.media-item:hover{border-color:var(--gold)}
 .promo-going .stack{display:flex;margin-left:8px}
 .promo-going .stack .avatar{border:2px solid #071E3E;margin-left:-8px}
 .promo-going .stack .avatar.initials{background:#E2B74A;color:#071E3E}
+.cs-steps{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:10px}
+.cs-steps li{counter-increment:s;display:grid;grid-template-columns:26px 1fr;column-gap:10px;align-items:baseline}
+.cs-steps li::before{content:counter(s);grid-row:span 2;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#071E3E;display:grid;place-items:center;font-family:var(--f-mono);font-size:12px;font-weight:700}
+.cs-steps li span{grid-column:2;font-size:13px;color:var(--muted)}
+.tempotabel .cs-row td{background:color-mix(in srgb,var(--gold) 10%,transparent)}
