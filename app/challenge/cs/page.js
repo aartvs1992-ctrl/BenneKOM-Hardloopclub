@@ -5,7 +5,7 @@ import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
 import ChallengeTabs from '@/components/ChallengeTabs';
 import { fmt, MON } from '@/lib/content';
-import { csPaces, csCalc, CS_INFO, CS_FATIGUE } from '@/lib/cs';
+import { csPaces, csCalc, CS_INFO } from '@/lib/cs';
 
 const dateLabel = (iso) => { const d = new Date(iso + 'T12:00:00'); return `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}`; };
 const short = (iso) => { const d = new Date(iso + 'T12:00:00'); return `${d.getDate()} ${MON[d.getMonth()]}`; };
@@ -80,6 +80,9 @@ export default function CsTest() {
             <span className="num">{fmt(last.csPace)}<small style={{ fontSize: 20 }}>/km</small></span>
             <span className="small muted">{kmh(last.cs)} · uit je test van {dateLabel(last.date)}</span>
           </div>
+          <p className="small" style={{ margin: 0 }}>
+            <b>Wat is je CS?</b> Het snelste tempo dat je lang kunt volhouden zonder te verzuren: ongeveer 30 tot 40 minuten, net iets sneller dan je 10 km-tempo. Loop je harder, dan raak je snel leeg.
+          </p>
           <div className="readout">
             <div><span className="lbl">3 min</span><span className="big">{last.d3}</span><span className="lbl">meter</span></div>
             <div><span className="lbl">12 min</span><span className="big">{last.d12}</span><span className="lbl">meter</span></div>
@@ -114,7 +117,8 @@ export default function CsTest() {
             <table className="tempotabel">
               <thead><tr><th>Soort</th><th className="r">Per km</th></tr></thead>
               <tbody>
-                <tr><td>Rustig / duurloop<br /><span className="small muted">Hele zinnen praten. Rustiger mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
+                <tr><td>Easy · rustige duurloop<br /><span className="small muted">Hele zinnen praten. Liever te rustig dan te hard: langzamer mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
+                <tr><td>LT1 · aerobe drempel<br /><span className="small muted">Schatting. De bovengrens van je duurlopen: daar blijf je bij easy ruim onder</span></td><td className="r num">{range(P.lt1)}</td></tr>
                 <tr className="basis"><td><span className="tag special">Basis</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5 min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
                 <tr className="basis"><td><span className="tag special">Basis</span>Threshold<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000 m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
                 <tr className="cs-row"><td><span className="tag challenge">CS</span>Critical Speed<br /><span className="small muted">Je grens: daarboven brand je je D&apos; op. Niet om op te trainen, wel goed om te weten</span></td><td className="r num">{fmt(P.csPace)}</td></tr>
@@ -126,11 +130,6 @@ export default function CsTest() {
               </tbody>
             </table>
             <p className="note"><b>Threshold en sub-threshold zijn de basis</b> en het grootste deel van je harde werk. Die loop je altijd onder de drempel, dus ruim langzamer dan je CS. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten.</p>
-            <p className="small muted" style={{ margin: 0 }}>
-              Zo rekenen we: CS = (12-minutenafstand − 3-minutenafstand) ÷ 540 seconden. Omdat je de 12 minuten loopt na maar 15–20 minuten pauze, ben je dan 0,5–1% minder fris. Daarom tellen we {String(CS_FATIGUE * 100).replace('.', ',')}% op bij je 12-minutenafstand ({m(last.d12)} → {m(P.d12c)}).
-              Threshold ligt op 91% van je CS-snelheid, de Bakken-drempel, zodat hij aansluit op de coopertest. Sub-threshold en rustig tellen daar vanaf, net als bij de coopertest.
-              VO2max is 101–104% van je CS-snelheid. De 5 km en de strides komen uit CS + D&apos;. De 10 km voorspellen we uit je 5 km (Riegel), omdat het CS-model boven een half uur te optimistisch wordt.
-            </p>
             <Link className="link" href="/tools#threshold">Meer over drempeltraining en hoe het hoort te voelen ›</Link>
           </div>
         </section>

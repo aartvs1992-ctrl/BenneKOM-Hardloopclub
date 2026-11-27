@@ -97,7 +97,7 @@ export default function Cooper() {
             <table className="tempotabel">
               <thead><tr><th>Soort</th><th className="r">Per km</th></tr></thead>
               <tbody>
-                <tr><td>Rustig / duurloop<br /><span className="small muted">Hele zinnen praten. Rustiger mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
+                <tr><td>Easy · rustige duurloop<br /><span className="small muted">Hele zinnen praten. Liever te rustig dan te hard: langzamer mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
                 <tr className="basis"><td><span className="tag special">Basis</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5\u00a0min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
                 <tr className="basis"><td><span className="tag special">Basis</span>Threshold<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000\u00a0m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
                 {P.races.slice().reverse().map((r) => (
