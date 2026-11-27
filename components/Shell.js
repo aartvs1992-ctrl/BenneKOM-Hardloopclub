@@ -5,6 +5,7 @@ import { useApp } from './AppProvider';
 import { Avatar } from './ui';
 import Welcome from './Welcome';
 import { BadgeWatcher } from './BadgeUnlock';
+import PromoSheet from './PromoSheet';
 
 // Pagina's die ook zonder aanmelding open zijn
 const OPEN = ['/beheer'];
@@ -57,6 +58,7 @@ export default function Shell({ children }) {
       </header>
       <main className="wrap"><div className="view">{children}</div></main>
       {me && <BadgeWatcher />}
+      {me && <PromoSheet />}
       <nav className="tabbar" aria-label="Hoofdmenu">
         <div className="in">
           {TABS.map(([href, label, icon]) => (
