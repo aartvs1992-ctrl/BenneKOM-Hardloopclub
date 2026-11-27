@@ -90,7 +90,7 @@ export default function Cooper() {
           <h2>Jouw tempo&apos;s</h2>
           <div className="panel">
             <div className="pr-big">
-              <span className="lbl">Drempeltempo · Bakken</span>
+              <span className="lbl">Golden zone · net onder je drempel</span>
               <span className="num">{fmt(P.bakken)}<small style={{ fontSize: 20 }}>/km</small></span>
               <span className="small muted">Uit je test van {dateLabel(last.date)} ({m(last.meters)})</span>
             </div>
@@ -98,8 +98,9 @@ export default function Cooper() {
               <thead><tr><th>Soort</th><th className="r">Per km</th></tr></thead>
               <tbody>
                 <tr><td>Easy · rustige duurloop<br /><span className="small muted">Hele zinnen praten. Liever te rustig dan te hard: langzamer mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
-                <tr className="basis"><td><span className="tag special">Basis</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5\u00a0min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
-                <tr className="basis"><td><span className="tag special">Basis</span>Threshold<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000\u00a0m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
+                <tr className="basis"><td><span className="tag special">Golden zone</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5\u00a0min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
+                <tr className="basis"><td><span className="tag special">Golden zone</span>Threshold-intervallen<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000\u00a0m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
+                <tr className="info-row"><td>Threshold · uurtempo<br /><span className="small muted">Je echte drempel: het tempo dat je ongeveer een uur volhoudt. Ter info, wij trainen er net onder</span></td><td className="r num">{range(P.hour)}</td></tr>
                 {P.races.slice().reverse().map((r) => (
                   <tr key={r.meters}><td>{r.meters / 1000} km-wedstrijdtempo<br /><span className="small muted">Voorspelde tijd {fmt(r.time)}</span></td><td className="r num">{fmt(r.pace)}</td></tr>
                 ))}
@@ -107,9 +108,9 @@ export default function Cooper() {
                 <tr><td>Strides<br /><span className="small muted">15–20 sec ontspannen snel, ≈ {Math.round(P.strides[1] / 10)} sec per 100 m</span></td><td className="r num">{range(P.strides)}</td></tr>
               </tbody>
             </table>
-            <p className="note"><b>Threshold en sub-threshold zijn de basis</b> en het grootste deel van je harde werk. Die loop je altijd onder de drempel. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten. Bij wind, warmte of een zware week loop je op gevoel.</p>
+            <p className="note"><b>Wij trainen in de golden zone:</b> net ónder je drempel, zoals Marius Bakken. Zo kun je veel kwaliteit trainen zonder te verzuren, en herstel je sneller. Dit is het grootste deel van je harde werk. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten.</p>
             <p className="note">Harder mag best, zolang het niet het grootste deel van je volume is. VO2max doe je af en toe, met ruim herstel. Strides doe je na een rustige duurloop of in je warming-up: 4 tot 6 keer, met wandel- of dribbelpauze. Train je voor een 5 of 10 km, loop dan in de laatste weken een deel van je herhalingen op wedstrijdtempo.</p>
-            <p className="small muted" style={{ margin: 0 }}>Zo rekenen we: je afstand geeft je VDOT (Jack Daniels). Daniels&apos; drempeltempo is dan {fmt(P.danielsT)}/km. Voor threshold en sub-threshold volgen we Marius Bakken en lopen we 2% rustiger: {fmt(P.bakken)}/km. VO2max, strides en wedstrijdtempo&apos;s komen van Daniels.</p>
+            <p className="small muted" style={{ margin: 0 }}>Zo rekenen we: je afstand geeft je VDOT (Jack Daniels). Daniels&apos; drempeltempo is dan {fmt(P.danielsT)}/km. Voor de golden zone volgen we Marius Bakken en lopen we 2% rustiger: {fmt(P.bakken)}/km. VO2max, strides en wedstrijdtempo&apos;s komen van Daniels.</p>
             <Link className="link" href="/tools#threshold">Meer over drempeltraining en hoe het hoort te voelen ›</Link>
           </div>
         </section>

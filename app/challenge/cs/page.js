@@ -110,7 +110,7 @@ export default function CsTest() {
           <h2>Jouw tempo&apos;s</h2>
           <div className="panel">
             <div className="pr-big">
-              <span className="lbl">Drempeltempo · Bakken</span>
+              <span className="lbl">Golden zone · net onder je drempel</span>
               <span className="num">{fmt(P.threshold[0])}<small style={{ fontSize: 20 }}>/km</small></span>
               <span className="small muted">Uit je CS van {fmt(P.csPace)}/km ({dateLabel(last.date)})</span>
             </div>
@@ -119,8 +119,9 @@ export default function CsTest() {
               <tbody>
                 <tr><td>Easy · rustige duurloop<br /><span className="small muted">Hele zinnen praten. Liever te rustig dan te hard: langzamer mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
                 <tr><td>LT1 · aerobe drempel<br /><span className="small muted">Schatting. De bovengrens van je duurlopen: daar blijf je bij easy ruim onder</span></td><td className="r num">{range(P.lt1)}</td></tr>
-                <tr className="basis"><td><span className="tag special">Basis</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5 min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
-                <tr className="basis"><td><span className="tag special">Basis</span>Threshold<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000 m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
+                <tr className="basis"><td><span className="tag special">Golden zone</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5 min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
+                <tr className="basis"><td><span className="tag special">Golden zone</span>Threshold-intervallen<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000 m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
+                <tr className="info-row"><td>Threshold · uurtempo<br /><span className="small muted">Je echte drempel: het tempo dat je ongeveer een uur volhoudt. Ter info, wij trainen er net onder</span></td><td className="r num">{range(P.hour)}</td></tr>
                 <tr className="cs-row"><td><span className="tag challenge">CS</span>Critical Speed<br /><span className="small muted">Je grens: daarboven brand je je D&apos; op. Niet om op te trainen, wel goed om te weten</span></td><td className="r num">{fmt(P.csPace)}</td></tr>
                 {P.races.slice().reverse().map((r) => (
                   <tr key={r.meters}><td>{r.meters / 1000} km-wedstrijdtempo<br /><span className="small muted">Voorspelde tijd {fmt(r.time)}</span></td><td className="r num">{fmt(r.pace)}</td></tr>
@@ -129,7 +130,7 @@ export default function CsTest() {
                 <tr><td>Strides<br /><span className="small muted">15–20 sec ontspannen snel, ≈ {Math.round(P.strides[1] / 10)} sec per 100 m</span></td><td className="r num">{range(P.strides)}</td></tr>
               </tbody>
             </table>
-            <p className="note"><b>Threshold en sub-threshold zijn de basis</b> en het grootste deel van je harde werk. Die loop je altijd onder de drempel, dus ruim langzamer dan je CS. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten.</p>
+            <p className="note"><b>Wij trainen in de golden zone:</b> net ónder je drempel, zoals Marius Bakken. Zo kun je veel kwaliteit trainen zonder te verzuren, en herstel je sneller. Dit is het grootste deel van je harde werk. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten.</p>
             <Link className="link" href="/tools#threshold">Meer over drempeltraining en hoe het hoort te voelen ›</Link>
           </div>
         </section>
