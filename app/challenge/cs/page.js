@@ -114,7 +114,7 @@ export default function CsTest() {
                 <tr><td>Easy · rustige duurloop<br /><span className="small muted">Hele zinnen praten. Langzamer mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
               </tbody>
             </table>
-            <p className="note"><b>Wij trainen in de golden zone:</b> net ónder je drempel, zoals Marius Bakken. Zo train je veel kwaliteit zonder te verzuren. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten.</p>
+            <p className="note"><b>Je drempeltempo ligt rond {range(P.hour)}/km:</b> ongeveer het tempo dat je een uur volhoudt. Wij trainen daar bewust net ónder, in de golden zone, zoals Marius Bakken. Zo train je veel kwaliteit zonder te verzuren. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten.</p>
             <details className="cs-races">
               <summary>Bekijk je geschatte wedstrijdtijden ›</summary>
               <div className="list">
