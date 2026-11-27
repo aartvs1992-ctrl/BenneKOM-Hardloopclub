@@ -355,7 +355,7 @@ a.media-item:hover{border-color:var(--gold)}
 .wo-seg{display:block;min-width:2px;border-radius:3px 3px 0 0;background:rgba(244,241,230,.35)}
 .wo-seg.rest{background:rgba(244,241,230,.15)}
 .wo-seg.z-threshold{background:#E2B74A}
-.wo-seg.z-zevenheuvelen{background:#E2B74A}
+.wo-seg.z-zevenheuvelen,.wo-seg.z-fartlek{background:#E2B74A}
 .wo-seg.z-hard,.wo-seg.z-vo2max,.wo-seg.z-cooper,.wo-seg.z-cs{background:#FFD873}
 .wo-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .wo-step{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;background:rgba(244,241,230,.06);border-radius:10px;padding:10px 12px;border-left:4px solid rgba(244,241,230,.3)}
