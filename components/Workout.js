@@ -9,7 +9,7 @@ function Strip({ w }) {
       segs.push({ kind: 'work', min: s.workMin, level: ZONES[s.zone].level, zone: s.zone });
       if (s.restMin && i < s.reps - 1) segs.push({ kind: 'rest', min: s.restMin, level: 0.4 });
     }
-    segs.push({ kind: 'rest', min: 2, level: 0.4 });
+    segs.push({ kind: 'rest', min: s.pauseAfter || 2, level: 0.4 }); // pauze tussen de sets (standaard 2 min)
   }
   segs.pop();
   segs.push({ kind: 'easy', min: 8, level: 1 });
@@ -49,7 +49,7 @@ export function Workout({ w }) {
         {[...new Set(w.sets.map((s) => s.zone))].filter((z) => z !== 'hard').map((z) => (
           <p key={z}>
             <b>Wat is {ZONES[z].short}?</b> {ZONES[z].summary}{' '}
-            {ZONES[z].href ? <Link className="wo-more" href={ZONES[z].href}>Naar de coopertest ›</Link> : !ZONES[z].hidden && <Link className="wo-more" href={'/tools#' + z}>Meer over {ZONES[z].short} ›</Link>}
+            {ZONES[z].href ? <Link className="wo-more" href={ZONES[z].href}>{ZONES[z].hrefLabel || 'Naar de coopertest ›'}</Link> : !ZONES[z].hidden && <Link className="wo-more" href={'/tools#' + z}>Meer over {ZONES[z].short} ›</Link>}
           </p>
         ))}
       </div>

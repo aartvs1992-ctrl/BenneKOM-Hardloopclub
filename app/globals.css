@@ -356,7 +356,7 @@ a.media-item:hover{border-color:var(--gold)}
 .wo-seg.rest{background:rgba(244,241,230,.15)}
 .wo-seg.z-threshold{background:#E2B74A}
 .wo-seg.z-zevenheuvelen{background:#E2B74A}
-.wo-seg.z-hard,.wo-seg.z-vo2max,.wo-seg.z-cooper{background:#FFD873}
+.wo-seg.z-hard,.wo-seg.z-vo2max,.wo-seg.z-cooper,.wo-seg.z-cs{background:#FFD873}
 .wo-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .wo-step{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;background:rgba(244,241,230,.06);border-radius:10px;padding:10px 12px;border-left:4px solid rgba(244,241,230,.3)}
 .wo-step:not(.easy){border-left-color:#E2B74A}
@@ -749,3 +749,7 @@ a.media-item:hover{border-color:var(--gold)}
 .cs-steps li span{grid-column:2;font-size:13px;color:var(--muted)}
 .tempotabel .cs-row td{background:color-mix(in srgb,var(--gold) 10%,transparent)}
 .tempotabel .info-row td{background:color-mix(in srgb,var(--muted) 8%,transparent)}
+.cs-races{display:flex;flex-direction:column;gap:10px}
+.cs-races summary{cursor:pointer;font-weight:600;color:var(--gold-ink,#8a6a12);list-style:none}
+.cs-races summary::-webkit-details-marker{display:none}
+.cs-races[open] summary{margin-bottom:8px}

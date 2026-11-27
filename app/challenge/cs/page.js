@@ -11,7 +11,6 @@ const dateLabel = (iso) => { const d = new Date(iso + 'T12:00:00'); return `${d.
 const short = (iso) => { const d = new Date(iso + 'T12:00:00'); return `${d.getDate()} ${MON[d.getMonth()]}`; };
 const m = (n) => Math.round(n).toLocaleString('nl-NL') + ' m';
 const range = ([a, b]) => `${fmt(a)}–${fmt(b)}`;
-const kmh = (ms) => (ms * 3.6).toFixed(1).replace('.', ',') + ' km/u';
 const secs = (s) => { const r = Math.round(s); return (r > 0 ? '−' : r < 0 ? '+' : '±') + Math.abs(r) + ' s'; }; // positief = sneller
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Amsterdam' });
 const valid = (d3, d12) => d3 >= 400 && d3 <= 1600 && d12 >= 1500 && d12 <= 5500 && csCalc(d3, d12).ok && d12 / 12 < d3 / 3;
@@ -57,7 +56,7 @@ export default function CsTest() {
       <PhotoHeader src="/club/samen-tempo.jpg" title="CS-test" sub="3 minuten en 12 minuten all-out: je Critical Speed, de grens tussen lang volhouden en opbranden." pos="center 40%" />
       <ChallengeTabs active="cs" />
       <ErrorNote />
-      {demo && <p className="note">Voorbeeld: Aarts CS-test met 1.080 m in 3 minuten en 3.900 m in 12 minuten. Er wordt niets opgeslagen.</p>}
+      {demo && <p className="note">Voorbeeld: een CS-test met 1.080 m in 3 minuten en 3.900 m in 12 minuten. Er wordt niets opgeslagen.</p>}
 
       <div className="panel callout">
         <b>{CS_INFO.title}</b>
@@ -67,11 +66,11 @@ export default function CsTest() {
       <section className="panel">
         <h3>Zo doe je de test</h3>
         <ol className="cs-steps">
-          <li><b>Warming-up</b><span>15–20 min inlopen met een paar versnellingen</span></li>
+          <li><b>Samen inlopen (± 20 min)</b><span>10 min inlopen, loopscholing en een paar versnellingen</span></li>
           <li><b>3 minuten all-out</b><span>Zo ver mogelijk. Noteer je afstand</span></li>
           <li><b>15–20 minuten pauze</b><span>Wandelen of rustig dribbelen</span></li>
           <li><b>12 minuten all-out</b><span>Zo ver mogelijk, gelijkmatig verdeeld. Noteer je afstand</span></li>
-          <li><b>Uitlopen</b><span>10 min rustig</span></li>
+          <li><b>Samen uitlopen</b><span>Rustig, samen</span></li>
         </ol>
       </section>
 
@@ -81,21 +80,11 @@ export default function CsTest() {
         <section className="panel">
           <div className="section-head"><h3>Jouw stand</h3><span className="small muted">{tests.length} {tests.length === 1 ? 'test' : 'tests'}</span></div>
           <div className="pr-big">
-            <span className="lbl">Critical Speed</span>
+            <span className="lbl">Jouw Critical Speed</span>
             <span className="num">{fmt(last.csPace)}<small style={{ fontSize: 20 }}>/km</small></span>
-            <span className="small muted">{kmh(last.cs)} · uit je test van {dateLabel(last.date)}</span>
+            <span className="small">Dat is het tempo dat je zo&apos;n <b>30 tot 40 minuten</b> volhoudt.</span>
+            <span className="small muted">{m(last.d3)} in 3 min + {m(last.d12)} in 12 min · {dateLabel(last.date)}</span>
           </div>
-          <p className="small" style={{ margin: 0 }}>
-            <b>Wat is je CS?</b> Het snelste tempo dat je lang kunt volhouden zonder te verzuren: ongeveer 30 tot 40 minuten, net iets sneller dan je 10 km-tempo. Loop je harder, dan raak je snel leeg.
-          </p>
-          <div className="readout">
-            <div><span className="lbl">3 min</span><span className="big">{last.d3}</span><span className="lbl">meter</span></div>
-            <div><span className="lbl">12 min</span><span className="big">{last.d12}</span><span className="lbl">meter</span></div>
-            <div><span className="lbl">D&apos;</span><span className="big">{Math.round(last.dPrime)}</span><span className="lbl">meter reserve</span></div>
-          </div>
-          <p className="small muted" style={{ margin: 0 }}>
-            <b>D&apos;</b> is je anaerobe reserve: hoeveel meter je boven je CS kunt lopen voordat je leeg bent. Hoe groter, hoe beter je kunt versnellen en sprinten.
-          </p>
           {tests.length > 1 && <>
             <div className="section-head"><b>Je progressie</b><span className="small muted legend"><i className="lg-pr" /> PR</span></div>
             <Chart tests={tests.slice(-10)} best={bestPace} />
@@ -112,30 +101,32 @@ export default function CsTest() {
 
       {P?.ok && (
         <section className="section" id="tempos">
-          <h2>Jouw tempo&apos;s</h2>
+          <h2>Jouw trainingstempo&apos;s</h2>
           <div className="panel">
-            <div className="pr-big">
-              <span className="lbl">Golden zone · net onder je drempel</span>
-              <span className="num">{fmt(P.threshold[0])}<small style={{ fontSize: 20 }}>/km</small></span>
-              <span className="small muted">Uit je CS van {fmt(P.csPace)}/km ({dateLabel(last.date)})</span>
-            </div>
             <table className="tempotabel">
               <thead><tr><th>Soort</th><th className="r">Per km</th></tr></thead>
               <tbody>
-                <tr><td>Easy · rustige duurloop<br /><span className="small muted">Hele zinnen praten. Liever te rustig dan te hard: langzamer mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
-                <tr><td>LT1 · aerobe drempel<br /><span className="small muted">Schatting. De bovengrens van je duurlopen: daar blijf je bij easy ruim onder</span></td><td className="r num">{range(P.lt1)}</td></tr>
-                <tr className="basis"><td><span className="tag special">Golden zone</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5 min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
-                <tr className="basis"><td><span className="tag special">Golden zone</span>Threshold-intervallen<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000 m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
-                <tr className="info-row"><td>Threshold · uurtempo<br /><span className="small muted">Je echte drempel: het tempo dat je ongeveer een uur volhoudt. Ter info, wij trainen er net onder</span></td><td className="r num">{range(P.hour)}</td></tr>
-                <tr className="cs-row"><td><span className="tag challenge">CS</span>Critical Speed<br /><span className="small muted">Je grens: daarboven brand je je D&apos; op. Niet om op te trainen, wel goed om te weten</span></td><td className="r num">{fmt(P.csPace)}</td></tr>
-                {P.races.slice().reverse().map((r) => (
-                  <tr key={r.meters}><td>{r.meters / 1000} km-wedstrijdtempo<br /><span className="small muted">Voorspelde tijd {fmt(r.time)}</span></td><td className="r num">{fmt(r.pace)}</td></tr>
-                ))}
-                <tr><td>VO2max<br /><span className="small muted">Herhalingen van 3–5 min, bv. {'5×1000 m'}</span></td><td className="r num">{range(P.vo2max)}</td></tr>
-                <tr><td>Strides<br /><span className="small muted">15–20 sec ontspannen snel, ≈ {Math.round(P.strides[1] / 10)} sec per 100 m</span></td><td className="r num">{range(P.strides)}</td></tr>
+                <tr><td>VO2max<br /><span className="small muted">Herhalingen van 3–5 min, bv. {'5×1000\u00a0m'}</span></td><td className="r num">{range(P.vo2max)}</td></tr>
+                <tr className="basis"><td><span className="tag special">Golden zone</span>Threshold<br /><span className="small muted">Herhalingen van 1–4 min, bv. {'10×1000\u00a0m'}</span></td><td className="r num">{range(P.threshold)}</td></tr>
+                <tr className="basis"><td><span className="tag special">Golden zone</span>Sub-threshold<br /><span className="small muted">Blokken van 5–10 min, bv. {'5×5\u00a0min'}</span></td><td className="r num">{range(P.subthreshold)}</td></tr>
+                <tr><td>Strides<br /><span className="small muted">15–20 sec ontspannen snel</span></td><td className="r num">{range(P.strides)}</td></tr>
+                <tr><td>LT1 · aerobe drempel<br /><span className="small muted">Schatting. De bovengrens van je duurlopen</span></td><td className="r num">{range(P.lt1)}</td></tr>
+                <tr><td>Easy · rustige duurloop<br /><span className="small muted">Hele zinnen praten. Langzamer mag altijd</span></td><td className="r num">{range(P.easy)}</td></tr>
               </tbody>
             </table>
-            <p className="note"><b>Wij trainen in de golden zone:</b> net ónder je drempel, zoals Marius Bakken. Zo kun je veel kwaliteit trainen zonder te verzuren, en herstel je sneller. Dit is het grootste deel van je harde werk. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten.</p>
+            <p className="note"><b>Wij trainen in de golden zone:</b> net ónder je drempel, zoals Marius Bakken. Zo train je veel kwaliteit zonder te verzuren. Na afloop moet je het gevoel hebben dat er nog een of twee herhalingen in hadden gezeten.</p>
+            <details className="cs-races">
+              <summary>Bekijk je geschatte wedstrijdtijden ›</summary>
+              <div className="list">
+                {P.races.map((r) => (
+                  <div key={r.meters} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}>
+                    <span><span className="t">{r.meters / 1000} km</span><br /><span className="s">{fmt(r.pace)}/km</span></span>
+                    <span className="num" style={{ fontWeight: 700 }}>{fmt(r.time)}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="small muted" style={{ margin: 0 }}>Een schatting op basis van je CS-test, bij goede omstandigheden en een vlak parcours.</p>
+            </details>
             <Link className="link" href="/tools#threshold">Meer over drempeltraining en hoe het hoort te voelen ›</Link>
           </div>
         </section>
@@ -170,7 +161,7 @@ export default function CsTest() {
               <div key={t.id} className="row" style={{ gridTemplateColumns: '1fr auto', cursor: 'default' }}>
                 <span style={{ minWidth: 0 }}>
                   <span className="t num">CS {fmt(t.csPace)}/km{t.csPace === bestPace && <span className="tag special" style={{ marginLeft: 8 }}>PR</span>}</span><br />
-                  <span className="s">{dateLabel(t.date)} · {m(t.d3)} + {m(t.d12)} · D&apos; {Math.round(t.dPrime)} m</span>
+                  <span className="s">{dateLabel(t.date)} · {m(t.d3)} + {m(t.d12)}</span>
                 </span>
                 <span style={{ textAlign: 'right' }}>
                   {t.delta != null && <span className={'num small ' + (t.delta > 0 ? 'faster' : t.delta < 0 ? 'slower' : '')}>{secs(t.delta)}/km</span>}

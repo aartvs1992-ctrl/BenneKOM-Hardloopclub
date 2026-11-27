@@ -8,7 +8,7 @@ import { CLUB } from '@/lib/club';
 const GROUPS = [
   ['Mijn BenneKOM', [
     ['/badges', 'Mijn badges', 'Verdien badges met trainingen, Challenges en events'],
-    ['/challenge', 'Challenges', 'Jouw 5 km-tijden en je coopertest met tempo\'s'],
+    ['/challenge', 'Challenges', 'Jouw 5 km-tijden en je CS-test met tempo\'s'],
     ['/tools', 'Training & tempo', "Jouw tempo's, uitleg, voorspeller en splits"],
     ['/berichten', 'Berichten', 'Stuur clubgenoten een bericht'],
     ['/meldingen', 'Meldingen', 'Pushmeldingen instellen'],
