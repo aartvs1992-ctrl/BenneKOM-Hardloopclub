@@ -1,5 +1,5 @@
 'use client';
-// Eenmalige pop-up bij het openen van de app om een evenement onder de aandacht te brengen (zie POPUP in lib/content.js).
+// Pop-up bij het openen van de app (hooguit één keer per week) om een evenement onder de aandacht te brengen (zie POPUP in lib/content.js).
 // Alleen voor aangemelde leden die nog niet meedoen, en nooit tegelijk met een badge-scherm.
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -10,8 +10,11 @@ import { POPUP } from '@/lib/content';
 import { todayISO } from '@/lib/club';
 
 const KEY = 'bk-popup-seen';
-const seen = (id) => { try { return (JSON.parse(localStorage.getItem(KEY) || '[]')).includes(id); } catch { return true; } };
-const markSeen = (id) => { try { const l = JSON.parse(localStorage.getItem(KEY) || '[]'); localStorage.setItem(KEY, JSON.stringify([...new Set([...l, id])])); } catch {} };
+const WEEK = 7 * 24 * 60 * 60 * 1000;
+// Wanneer zag dit toestel de pop-up voor het laatst? { [id]: tijdstip }
+const lastSeen = () => { try { const v = JSON.parse(localStorage.getItem(KEY) || '{}'); return Array.isArray(v) ? {} : v; } catch { return null; } };
+const due = (id) => { const m = lastSeen(); return m !== null && Date.now() - (m[id] || 0) >= WEEK; };
+const markSeen = (id) => { try { localStorage.setItem(KEY, JSON.stringify({ ...(lastSeen() || {}), [id]: Date.now() })); } catch {} };
 
 export default function PromoSheet() {
   const { data, local, act } = useApp();
@@ -24,7 +27,7 @@ export default function PromoSheet() {
 
   useEffect(() => {
     if (!p || !ev || !data?.me) return;
-    if (!demo && (going || seen(p.id) || todayISO() > p.until || path.startsWith('/event/' + p.event))) return;
+    if (!demo && (going || !due(p.id) || todayISO() > p.until || path.startsWith('/event/' + p.event))) return;
     let tries = 0;
     // even wachten, en niet tonen zolang er een badge-scherm openstaat
     const t = setInterval(() => {
