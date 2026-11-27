@@ -5,7 +5,7 @@ import { useApp } from '@/components/AppProvider';
 import { Loading, ErrorNote, useReady, PhotoHeader } from '@/components/ui';
 import ChallengeTabs from '@/components/ChallengeTabs';
 import { fmt, MON } from '@/lib/content';
-import { csPaces, csCalc, CS_INFO } from '@/lib/cs';
+import { csPaces, csCalc, CS_INFO, CS_ENABLED } from '@/lib/cs';
 
 const dateLabel = (iso) => { const d = new Date(iso + 'T12:00:00'); return `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}`; };
 const short = (iso) => { const d = new Date(iso + 'T12:00:00'); return `${d.getDate()} ${MON[d.getMonth()]}`; };
@@ -23,9 +23,14 @@ export default function CsTest() {
   const [day, setDay] = useState(today);
   const [formOpen, setFormOpen] = useState(false);
   const [demo, setDemo] = useState(false);
-  useEffect(() => { setDemo(new URLSearchParams(location.search).get('demo') === '1'); }, []);
+  useEffect(() => {
+    const d = new URLSearchParams(location.search).get('demo') === '1';
+    // Nog niet live: zonder ?demo=1 terug naar de coopertest
+    if (!CS_ENABLED && !d) { location.replace('/challenge/cooper'); return; }
+    setDemo(d);
+  }, []);
   const ready = useReady();
-  if (!ready) return <Loading />;
+  if (!ready || (!CS_ENABLED && !demo)) return <Loading />;
 
   // Voorbeeld (/challenge/cs?demo=1): Aarts CS-test, zonder iets op te slaan
   const notSetUp = !demo && data.cs === null;
