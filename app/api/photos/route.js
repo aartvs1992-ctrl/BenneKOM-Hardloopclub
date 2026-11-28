@@ -62,6 +62,7 @@ export async function POST(req) {
           width: parseInt(b.width, 10) || null, height: parseInt(b.height, 10) || null,
         };
         const album = clean(b.album, 60);
+        const takenOn = /^\d{4}-\d{2}-\d{2}$/.test(b.taken_on || '') && b.taken_on <= today ? b.taken_on : null;
         const videoPath = typeof b.video_path === 'string' && VIDEO_PATH.test(b.video_path) ? b.video_path : null;
         if (b.video_path && !videoPath) return bad('Deze video is niet goed geüpload. Probeer het opnieuw.');
         if (videoPath) {
@@ -75,7 +76,6 @@ export async function POST(req) {
           }
           break;
         }
-        const takenOn = /^\d{4}-\d{2}-\d{2}$/.test(b.taken_on || '') && b.taken_on <= today ? b.taken_on : null;
         try {
           await insert('photos', { ...row, album, taken_on: takenOn });
         } catch (e) {
